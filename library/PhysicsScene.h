@@ -39,11 +39,14 @@ class PhysicsScene : public Scene {
 public:
     
 protected:
-    void initPhysicsBody(PhysicsMaterial material, bool isDebugDrawMask = false, float speed = 2.f);
+    void initPhysicsBody(Node * p, PhysicsMaterial material, bool isDebugDrawMask = false, float speed = 2.f);
     void setDebugDrawMask();
     void setAutoStepToggle();
     void setStep(float step);
     void setGravity(const Vec2& gravity);
+    
+    Node * setPhysicsBodyRect(Node * p, PhysicsMaterial material, bool dynamic = true, int tag = 0, int bitmaskCategory=0xFFFFFFFF, int bitmaskCollision=0xFFFFFFFF, int bitmaskContact=0);	
+    
     Node * setPhysicsBodyCircle(Node * p, PhysicsMaterial material, bool dynamic = true, int tag = 0, int bitmaskCategory=0xFFFFFFFF, int bitmaskCollision=0xFFFFFFFF, int bitmaskContact=0);
     
     struct bitmask {

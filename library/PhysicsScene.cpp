@@ -7,12 +7,12 @@
 
 #include "PhysicsScene.h"
 
-void PhysicsScene::initPhysicsBody(PhysicsMaterial material, bool isDebugDrawMask, float speed) {
+void PhysicsScene::initPhysicsBody(Node* p, PhysicsMaterial material, bool isDebugDrawMask, float speed) {
     auto edgeNode = Node::create();
-    edgeNode->setPosition(gui::inst()->getCenter());
-    edgeNode->setPhysicsBody(PhysicsBody::createEdgeBox(Director::getInstance()->getVisibleSize(), material));
+    edgeNode->setPosition(gui::inst()->getCenter(p));
+    edgeNode->setPhysicsBody(PhysicsBody::createEdgeBox(p->getContentSize(), material));
     
-    this->addChild(edgeNode);
+    p->addChild(edgeNode);
     
     this->getPhysicsWorld()->setSpeed(speed);
     if(isDebugDrawMask)
@@ -39,6 +39,17 @@ void PhysicsScene::setStep(float step) {
 Node * PhysicsScene::setPhysicsBodyCircle(Node * p, PhysicsMaterial material, bool dynamic, int tag, int bitmaskCategory, int bitmaskCollision, int bitmaskContact) {
     float width = p->getContentSize().width / 2;
     auto body = PhysicsBody::createCircle(width, material);
+    body->setDynamic(dynamic);
+    body->setCategoryBitmask(bitmaskCategory);
+    body->setCollisionBitmask(bitmaskCollision);
+    body->setContactTestBitmask(bitmaskContact);
+    body->setTag(tag);
+    p->setPhysicsBody(body);
+    return p;
+}
+
+Node * PhysicsScene::setPhysicsBodyRect(Node * p, PhysicsMaterial material, bool dynamic, int tag, int bitmaskCategory, int bitmaskCollision, int bitmaskContact) {
+    auto body = PhysicsBody::createBox(p->getContentSize(), material);
     body->setDynamic(dynamic);
     body->setCategoryBitmask(bitmaskCategory);
     body->setCollisionBitmask(bitmaskCollision);

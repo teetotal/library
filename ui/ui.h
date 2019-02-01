@@ -102,16 +102,15 @@ _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 class gui {
 public:
     gui(){
-		if (hInstance == NULL) {		
-			EmptyString = " ";
-			hInstance = this;
-		}
-            
     };
     ~gui(){
         //hInstance = NULL;
     };
     static gui * inst(){
+        if (hInstance == NULL) {
+            hInstance = new gui();
+            hInstance->EmptyString = " ";
+        }
         return hInstance;
     };
     void init(const char* font = "fonts/Marker Felt.ttf"
@@ -448,6 +447,14 @@ public:
 		point.y += Director::getInstance()->getVisibleOrigin().y;
 		return point;
 	};
+    
+    Vec2 getCenter(Node * p) {
+        Vec2 center = getCenter();
+        center.x = p->getContentSize().width / 2;
+        center.y = p->getContentSize().height / 2;
+        
+        return center;
+    }
 
     //이미지 하나를 3배 복제해서 스크롤링, 리턴 없음
     void addBGScrolling(const string img, Node * p, float duration);
