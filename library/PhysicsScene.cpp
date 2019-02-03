@@ -10,11 +10,14 @@
 void PhysicsScene::initPhysicsBody(Node* p, PhysicsMaterial material, bool isDebugDrawMask, float speed) {
     auto edgeNode = Node::create();
     edgeNode->setPosition(gui::inst()->getCenter(p));
-    edgeNode->setPhysicsBody(PhysicsBody::createEdgeBox(p->getContentSize(), material));
+    PhysicsBody * physics = PhysicsBody::createEdgeBox(p->getContentSize(), material);
+    physics->setDynamic(false);
+    edgeNode->setPhysicsBody(physics);
     
     p->addChild(edgeNode);
     
     this->getPhysicsWorld()->setSpeed(speed);
+    this->getPhysicsWorld()->setSubsteps(50);
     if(isDebugDrawMask)
         setDebugDrawMask();
 }
@@ -44,6 +47,7 @@ Node * PhysicsScene::setPhysicsBodyCircle(Node * p, PhysicsMaterial material, bo
     body->setCollisionBitmask(bitmaskCollision);
     body->setContactTestBitmask(bitmaskContact);
     body->setTag(tag);
+    p->setTag(tag);
     p->setPhysicsBody(body);
     return p;
 }
