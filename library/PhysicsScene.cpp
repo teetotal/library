@@ -17,7 +17,7 @@ void PhysicsScene::initPhysicsBody(Node* p, PhysicsMaterial material, bool isDeb
     p->addChild(edgeNode);
     
     this->getPhysicsWorld()->setSpeed(speed);
-    this->getPhysicsWorld()->setSubsteps(50);
+    this->getPhysicsWorld()->setSubsteps(1000);
     if(isDebugDrawMask)
         setDebugDrawMask();
 }
