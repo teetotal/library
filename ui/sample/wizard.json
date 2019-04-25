@@ -1,0 +1,40 @@
+{
+  "background": {
+    "img": null,
+    "color": [0,0,255]
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "dimension": [0,0,9,1],
+      "margin": [0, 0],
+      "gridSize": [2,1],
+	  "img": null,
+	  "color": [0,0,255],
+      "objects": [
+        {
+          "id": 1,
+          "position": [ 0, 0 ],
+          "type": "label",
+          "link": null,
+          "img": null,
+          "bgColor": null,
+		  "color": null,
+          "text": "대꼬 lv.16",
+          "fontSize": 16
+        },
+        {
+          "id": 2,
+          "position": [ 1, 0 ],
+          "type": "button",
+          "link": 1,
+          "img": null,
+          "bgColor": null,
+		  "color": null,
+          "text": "575,211",
+          "fontSize": 16
+        }
+      ]
+    }
+  ]
+}
