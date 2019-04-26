@@ -100,7 +100,7 @@ void ui_cultivation::update(float percent, int remain, const string comment){
 	mComment->setString(comment);
 
 	bool isDone = true;
-	for(int n=0; n < mVec.size(); n++){
+	for(size_t n=0; n < mVec.size(); n++){
 		int nPre = (n == 0) ? 0 : n - 1;
         if(percent >= mVec[nPre].maxLevel  && mVec[n].maxLevel >= percent){
             mCurrentIdx = n;

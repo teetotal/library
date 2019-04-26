@@ -62,8 +62,8 @@ void ui_gacha::run(Node * parent, const string img, LayerColor * contentsLayer, 
                                            MoveBy::create(t, Vec2(length / 2, 0)),
                                            RotateBy::create(t, amplitude / 2),
                                            
-                                           ScaleBy::create(t * 1.5, 1.5),
-                                           ScaleBy::create(t * 1.5, 1/ 1.5),
+                                           ScaleBy::create(t * 1.5f, 1.5f),
+                                           ScaleBy::create(t * 1.5f, 1.0f/ 1.5f),
                                            nullptr
                                            );
     

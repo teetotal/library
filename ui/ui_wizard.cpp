@@ -20,7 +20,14 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
 	}
 	this->type = (OBJECT_TYPE)getObjectType(p["type"].GetString());
 	this->link = p["link"].IsNull() ? NULL_INT_VALUE : p["link"].GetInt();
-	this->img = p["img"].IsNull() ? NULL_STRING_VALUE : p["img"].GetString();
+	
+	if (p["img"].IsNull())
+		this->img = NULL_STRING_VALUE;
+	else {		
+		this->img = p["img"].GetString();
+		SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
+		//SpriteFrameCache::getInstance()->removeSpriteFrameByName("btn_bg");	
+	}
 	if (!p["bgColor"].IsNull()) {
 		this->bgColor = Color3B(
 			p["bgColor"][rapidjson::SizeType(0)].GetInt()
@@ -82,6 +89,26 @@ bool WIZARD::_Node::load(rapidjson::Value & p)
 	return true;
 }
 
+bool WIZARD::_Background::load(rapidjson::Value & p)
+{	
+	if (p["img"].IsNull())
+		this->img = NULL_STRING_VALUE;
+	else {
+		this->img = p["img"].GetString();
+		SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
+	}
+
+	if (!p["bgColor"].IsNull()) {
+		this->bgColor = Color4B(
+			p["bgColor"][rapidjson::SizeType(0)].GetInt()
+			, p["bgColor"][rapidjson::SizeType(1)].GetInt()
+			, p["bgColor"][rapidjson::SizeType(2)].GetInt()
+			, p["bgColor"][rapidjson::SizeType(3)].GetInt()
+		);
+	}
+	return true;
+}
+
 bool ui_wizard::loadFromJson(const string& sceneName, const string& path, ui_wizard_business * pBusinessClass)
 {
 	mBusinessClass = pBusinessClass;
@@ -89,8 +116,10 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path, ui_wiz
 		mBusinessClass->setCallerScene(this);
 
 	if (ui_wizard_share::inst()->hasNode(sceneName)) {
+		drawBackground(ui_wizard_share::inst()->getBackgound(sceneName));
+
 		WIZARD::VEC_NODES nodes = ui_wizard_share::inst()->getNodes(sceneName);
-		for (int n = 0; n < nodes.size(); n++) {
+		for (size_t n = 0; n < nodes.size(); n++) {
 			WIZARD::_Node p = nodes[n];
 			drawNode(p);
 		}
@@ -105,7 +134,12 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path, ui_wiz
 	if (d.HasParseError()) {		
 		CCLOG("loadFromJson Failure. ErrorCode: %d, ErrorOffset: %d", d.GetParseError(), d.GetErrorOffset());		
 		return false;
-	}	
+	}
+
+	WIZARD::_Background bg;
+	bg.load(d["background"]);
+	ui_wizard_share::inst()->setBackground(sceneName, bg);
+	this->drawBackground(bg);
 
 	const rapidjson::Value& nodes = d["nodes"];
 	for (rapidjson::SizeType i = 0; i < nodes.Size(); i++)
@@ -127,6 +161,22 @@ void ui_wizard::callback(cocos2d::Ref * pSender, int from, int link)
 	if (mBusinessClass)
 		mBusinessClass->call(link);
 }
+void ui_wizard::drawBackground(WIZARD::_Background & bg)
+{
+	auto p = LayerColor::create(bg.bgColor);
+	p->setContentSize(Director::getInstance()->getVisibleSize());
+	p->setAnchorPoint(Vec2(0, 0));
+	p->setPosition(Director::getInstance()->getVisibleOrigin());
+	this->addChild(p);
+
+	if (bg.img.compare(NULL_STRING_VALUE) != 0) {
+		auto p = Sprite::createWithSpriteFrameName(bg.img);
+		p->setContentSize(Director::getInstance()->getVisibleSize());
+		p->setAnchorPoint(Vec2(0, 0));		
+		p->setPosition(Director::getInstance()->getVisibleOrigin());
+		this->addChild(p);
+	}
+}
 void ui_wizard::drawNode(WIZARD::_Node &node)
 {
 	Vec2 start= gui::inst()->getPointVec2(node.dimensionStart.x, node.dimensionStart.y, ALIGNMENT_NONE);
@@ -136,7 +186,7 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 	layout->setTag(node.id);
 	layout->setPosition(Vec2(start.x, end.y));
 
-	for (int n = 0; n < node.mObjects.size(); n++) {
+	for (size_t n = 0; n < node.mObjects.size(); n++) {
 		WIZARD::_Object obj = node.mObjects[n];
 		string sz = obj.text;
 
@@ -181,3 +231,4 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 	
 	this->addChild(layout);
 }
+

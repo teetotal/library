@@ -376,8 +376,8 @@ public:
     );
 
 	Sequence * createActionFocus() { 
-		float raiseDuration = 0.3;
-		float returnDuration = 0.1;
+		float raiseDuration = 0.3f;
+		float returnDuration = 0.1f;
 		float scale = 1.5f;
 
 		return Sequence::create(
@@ -386,7 +386,7 @@ public:
 	};
 
 	RepeatForever * createActionBlink() {
-		return RepeatForever::create(Sequence::create(ScaleTo::create(0.3, 1.2), ScaleTo::create(0.3, 1), NULL));
+		return RepeatForever::create(Sequence::create(ScaleTo::create(0.3f, 1.2f), ScaleTo::create(0.3f, 1.0f), NULL));
 	}
 
 	void actionHarvest(Node * p, string img, int cnt, Vec2 from, Vec2 to, Size size) {		
@@ -399,8 +399,8 @@ public:
 
 			auto delay1 = DelayTime::create(n * 0.03);
 			auto delay2 = delay1->clone();
-			auto seq1 = Sequence::create(delay1, MoveTo::create(0.5, to), RemoveSelf::create(), NULL);
-			auto seq2 = Sequence::create(delay2, ScaleTo::create(0.2, 1.5), ScaleTo::create(0.3, 0.5), NULL);
+			auto seq1 = Sequence::create(delay1, MoveTo::create(0.5f, to), RemoveSelf::create(), NULL);
+			auto seq2 = Sequence::create(delay2, ScaleTo::create(0.2f, 1.5f), ScaleTo::create(0.3f, 0.5f), NULL);
 
 			sprite->runAction(Spawn::create(seq1, seq2, NULL));
 		}

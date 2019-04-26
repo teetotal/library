@@ -48,24 +48,31 @@ namespace WIZARD {
 		bool load(rapidjson::Value &p);
 	};
 
+	struct _Background {
+		string img;
+		Color4B bgColor;
+
+		bool load(rapidjson::Value &p);
+	};
+
 	typedef vector<WIZARD::_Node> VEC_NODES;
 };
-
+/* ===============================================
+	ui_wizard_business
+================================================== */
 interface ui_wizard_business {
 public:
 	virtual void setCallerScene(Scene * p) = 0;
 	virtual const string getText(const string& defaultString, int id) = 0;
 	virtual void call(int link) = 0;
 };
-
+/* ===============================================
+	ui_wizard_share
+================================================== */
 class ui_wizard_share {
 public:
-	ui_wizard_share() {
-
-	};
-	~ui_wizard_share() {
-
-	};
+	ui_wizard_share() {};
+	~ui_wizard_share() {};
 	static ui_wizard_share * inst() {
 		if (hInstance == NULL) {
 			hInstance = new ui_wizard_share;
@@ -76,12 +83,19 @@ public:
 		mSharedNodes.clear();
 		delete hInstance;
 	};
-	void addNode(const string id, WIZARD::_Node& node) {
+	void addNode(const string& id, WIZARD::_Node& node) {
 		mSharedNodes[id].push_back(node);
+	};
+	void setBackground(const string& id, WIZARD::_Background& bg) {
+		mSharedBackgounds[id] = bg;
 	};
 	
 	WIZARD::VEC_NODES getNodes(const string& id) {
 		return mSharedNodes[id];
+	};
+
+	WIZARD::_Background getBackgound(const string& id) {
+		return mSharedBackgounds[id];
 	};
 
 	bool hasNode(const string& id) {
@@ -93,8 +107,11 @@ public:
 private:
 	static ui_wizard_share * hInstance;
 	map<string, WIZARD::VEC_NODES> mSharedNodes;
+	map<string, WIZARD::_Background> mSharedBackgounds;
 };
-
+/* ===============================================
+	ui_wizard
+================================================== */
 class ui_wizard : public Scene {
 public:
 	
@@ -108,6 +125,7 @@ private:
 #define NULL_STRING_VALUE ""
 
 	ui_wizard_business * mBusinessClass;
+	void drawBackground(WIZARD::_Background &bg);
 	void drawNode(WIZARD::_Node &node);
 };
 

@@ -969,7 +969,7 @@ void gui::drawParallelogram(Node * p, Vec2 top1, Vec2 top2, Vec2 bottom1, Vec2 b
 
 
 bool gui::isExistVec2(vector<Vec2> &vec, Vec2 point){
-    for (int n=0; n<vec.size(); n++) {
+    for (size_t n=0; n<vec.size(); n++) {
         if(abs(vec.at(n).x - point.x) < 1 && abs(vec.at(n).y - point.y) < 1)
             return true;
     }
