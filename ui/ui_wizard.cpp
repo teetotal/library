@@ -3,12 +3,21 @@
 //
 
 #include "ui_wizard.h"
-#include "ui/ui.h"
-bool ui_wizard::_Object::load(rapidjson::Value & p)
+
+ui_wizard_share * ui_wizard_share::hInstance = NULL;
+
+bool WIZARD::_Object::load(rapidjson::Value & p)
 {
 	this->id = p["id"].GetInt();
 	this->position.x = p["position"][rapidjson::SizeType(0)].GetFloat();
 	this->position.y = p["position"][rapidjson::SizeType(1)].GetFloat();
+	const string szAlignment = p["alignment"].GetString();
+	if (szAlignment.compare("none") == 0) {
+		this->alignment = ALIGNMENT_NONE;
+	}
+	else {
+		this->alignment = ALIGNMENT_CENTER;
+	}
 	this->type = (OBJECT_TYPE)getObjectType(p["type"].GetString());
 	this->link = p["link"].IsNull() ? NULL_INT_VALUE : p["link"].GetInt();
 	this->img = p["img"].IsNull() ? NULL_STRING_VALUE : p["img"].GetString();
@@ -32,7 +41,7 @@ bool ui_wizard::_Object::load(rapidjson::Value & p)
 	return true;
 }
 
-int ui_wizard::_Object::getObjectType(const string type)
+int WIZARD::_Object::getObjectType(const string type)
 {
 	if (type.compare("label") == 0)
 		return OBJECT_TYPE_LABEL;
@@ -40,7 +49,7 @@ int ui_wizard::_Object::getObjectType(const string type)
 	return OBJECT_TYPE_BUTTON;
 }
 
-bool ui_wizard::_Node::load(rapidjson::Value & p)
+bool WIZARD::_Node::load(rapidjson::Value & p)
 {
 	this->id = p["id"].GetInt();
 	this->dimensionStart.x = p["dimension"][rapidjson::SizeType(0)].GetFloat();
@@ -73,9 +82,20 @@ bool ui_wizard::_Node::load(rapidjson::Value & p)
 	return true;
 }
 
-bool ui_wizard::loadFromJson(const string path, ui_wizard_business * pBusinessClass)
+bool ui_wizard::loadFromJson(const string& sceneName, const string& path, ui_wizard_business * pBusinessClass)
 {
-	gui::inst()->init();
+	mBusinessClass = pBusinessClass;
+	if (mBusinessClass)
+		mBusinessClass->setCallerScene(this);
+
+	if (ui_wizard_share::inst()->hasNode(sceneName)) {
+		WIZARD::VEC_NODES nodes = ui_wizard_share::inst()->getNodes(sceneName);
+		for (int n = 0; n < nodes.size(); n++) {
+			WIZARD::_Node p = nodes[n];
+			drawNode(p);
+		}
+		return true;
+	}
 
 	string fullpath = FileUtils::getInstance()->fullPathForFilename(path);
 	string sz = FileUtils::getInstance()->getStringFromFile(fullpath);
@@ -90,18 +110,24 @@ bool ui_wizard::loadFromJson(const string path, ui_wizard_business * pBusinessCl
 	const rapidjson::Value& nodes = d["nodes"];
 	for (rapidjson::SizeType i = 0; i < nodes.Size(); i++)
 	{	
-		_Node p;
+		WIZARD::_Node p;
 		if (!p.load(d["nodes"][rapidjson::SizeType(i)]))
 			return false;
-
-		mNodes.push_back(p);
+		
+		ui_wizard_share::inst()->addNode(sceneName, p);
 		drawNode(p);
 	}
 
 	return true;
 }
 
-void ui_wizard::drawNode(_Node &node) 
+void ui_wizard::callback(cocos2d::Ref * pSender, int from, int link)
+{
+	CCLOG("Callback From %d, To %d", from, link);
+	if (mBusinessClass)
+		mBusinessClass->call(link);
+}
+void ui_wizard::drawNode(WIZARD::_Node &node)
 {
 	Vec2 start= gui::inst()->getPointVec2(node.dimensionStart.x, node.dimensionStart.y, ALIGNMENT_NONE);
 	Vec2 end = gui::inst()->getPointVec2(node.dimensionEnd.x, node.dimensionEnd.y, ALIGNMENT_NONE);
@@ -111,11 +137,46 @@ void ui_wizard::drawNode(_Node &node)
 	layout->setPosition(Vec2(start.x, end.y));
 
 	for (int n = 0; n < node.mObjects.size(); n++) {
-		_Object obj = node.mObjects[n];
-		if (obj.type == OBJECT_TYPE_LABEL) {
-			auto label = gui::inst()->addLabelAutoDimension(obj.position.x, obj.position.y, obj.text, layout, obj.fontSize, ALIGNMENT_CENTER, obj.color, node.gridSize, Size::ZERO, node.margin, obj.img);
-			label->setTag(obj.id);
+		WIZARD::_Object obj = node.mObjects[n];
+		string sz = obj.text;
+
+		if(mBusinessClass)
+			sz = mBusinessClass->getText(sz, obj.id);
+
+		Node * pObj;
+		switch(obj.type) {
+		case WIZARD::OBJECT_TYPE_LABEL:
+			pObj = gui::inst()->addLabelAutoDimension(obj.position.x, obj.position.y
+				, sz
+				, layout
+				, obj.fontSize
+				, obj.alignment
+				, obj.color
+				, node.gridSize
+				, Size::ZERO
+				, node.margin
+				, obj.img
+			);			
+			break;
+
+		case WIZARD::OBJECT_TYPE_BUTTON:
+			pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x, obj.position.y
+				, sz
+				, layout
+				, CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+				, obj.fontSize
+				, obj.alignment
+				, obj.color
+				, node.gridSize
+				, Size::ZERO
+				, node.margin
+				, obj.img);
+			break;
+
+		default:
+			break;
 		}
+		pObj->setTag(obj.id);
 	}
 	
 	this->addChild(layout);
