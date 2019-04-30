@@ -1,4 +1,4 @@
-﻿{
+{
   "background": {
     "img": "bg_temp.png",
     "bgColor": [ 156, 126, 65, 255 ]
@@ -41,58 +41,22 @@
     {
       "id": 10,
       "dimension": [ 0, 2, 9, 5 ],
-      "margin": [ 5, 5 ],
-      "gridSize": [ 3, 5 ],
+      "margin": [ 30, 30 ],
+      "gridSize": [ 1, 1 ],
       "img": null,
       "color": [ 95, 75, 139 ],
       "objects": [
         {
           "id": 11,
           "position": [ 0, 0 ],
-          "alignment": "none",
-          "type": "label",
-          "link": null,
-          "img": null,
-          "bgColor": null,
-          "color": [ 158, 182, 184 ],
-          "text": "Semi Pro",
-          "fontSize": 24
-        },
-        {
-          "id": 12,
-          "position": [ 0, 1 ],
-          "alignment": "none",
-          "type": "label",
-          "link": null,
-          "img": null,
-          "bgColor": null,
-          "color": [ 255, 255, 255 ],
-          "text": "3 win / 2 draw / 3 lose 48%",
-          "fontSize": 14
-        },
-        {
-          "id": 13,
-          "position": [ 0, 4 ],
-          "alignment": "none",
-          "type": "label",
-          "link": null,
-          "img": null,
-          "bgColor": null,
-          "color": [ 158, 182, 184 ],
-          "text": "1613th",
-          "fontSize": 24
-        },
-        {
-          "id": 14,
-          "position": [ 2, 2 ],
           "alignment": "center",
-          "type": "button",
-          "link": 2,
-          "img": null,
+          "type": "sprite_button",
+          "link": 10,
+          "img": "roulette.png",
           "bgColor": null,
-          "color": [ 240, 161, 191],
-          "text": "SEMI\n PRO",
-          "fontSize": 36
+          "color": [ 255, 255, 255],
+          "text": "",
+          "fontSize": 0
         }
       ]
     },
@@ -120,11 +84,11 @@
           "id": 22,
           "position": [ 1, 0 ],
           "alignment": "center",
-          "type": "label",
+          "type": "button",
           "link": 11,
           "img": null,
           "bgColor": null,
-          "color": [ 156, 126, 65],
+          "color": [ 255, 255, 255],
           "text": "PLAY",
           "fontSize": 20
         },
@@ -144,11 +108,11 @@
           "id": 24,
           "position": [ 3, 0 ],
           "alignment": "center",
-          "type": "button",
+          "type": "label",
           "link": 13,
           "img": null,
           "bgColor": null,
-          "color": [ 255, 255, 255],
+          "color": [ 156, 126, 65],
           "text": "ROULETTE",
           "fontSize": 20
         },
