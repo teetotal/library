@@ -116,6 +116,7 @@ public:
     void init(const char* font = "fonts/Marker Felt.ttf"
             , int fontSize = GRID_DEFAULT_FONT_SIZE
             , Color4F bgColor = Color4F::WHITE
+			, bool useSpriteCache = false
     );
 
     float getRealPixel(float x);
@@ -557,10 +558,8 @@ public:
     
     const char* mDefaultFont;
     int mDefaultFontSize;
-    
+	bool mUseSpriteCache;
 private:
-    
-
     static gui * hInstance;
 
     const Vec2 getNoneAnchorPoint(){

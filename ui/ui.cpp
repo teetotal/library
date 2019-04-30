@@ -6,7 +6,7 @@
 
 gui * gui::hInstance = NULL;
 
-void gui::init(const char* font, int fontSize, Color4F bgColor) {
+void gui::init(const char* font, int fontSize, Color4F bgColor, bool useSpriteCache) {
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
     mVisibleSize = visibleSize;
@@ -31,6 +31,8 @@ void gui::init(const char* font, int fontSize, Color4F bgColor) {
     MenuItemFont::setFontSize(fontSize);
 
     Director::getInstance()->setClearColor(bgColor);
+
+	mUseSpriteCache = useSpriteCache;
 }
 
 float gui::getRealPixel(float x){
@@ -180,8 +182,8 @@ bool gui::drawPoint(Node *p) {
     return true;
 }
 
-Sprite * gui::addBG(const string bgImg, Node * parent) {
-    auto bg = Sprite::create(bgImg);
+Sprite * gui::addBG(const string bgImg, Node * parent) {	
+    auto bg = (mUseSpriteCache == false) ? Sprite::create(bgImg) : Sprite::createWithSpriteFrameName(bgImg);
     bg->setContentSize(Director::getInstance()->getVisibleSize());
     bg->setPosition(getCenter());
     //bg->setAnchorPoint(Vec2(0, 0));
@@ -304,7 +306,7 @@ Label * gui::addLabel(Node *p, int x, int y, const string text, int fontSize, AL
     float pX;
 
     if(img.compare("") != 0){
-        auto sprite = Sprite::create(img);
+        auto sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img); ;
         if(isBGImg){
 
             sprite->setPosition(Point(
@@ -382,7 +384,7 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu, int x, int y, const string t
 
     if(img.compare("") != 0){
 
-        auto sprite = Sprite::create(img);
+        auto sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
         if(isBGImg){
 
             sprite->setPosition(
@@ -459,7 +461,7 @@ gui::createModalLayer(LayerColor * &layerBG, Size size, const string bgImg, Colo
     //drawGrid(layer, size, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE), Size::ZERO, Size::ZERO);
 
     if(bgImg.compare("") != 0){
-        auto sprite = Sprite::create(bgImg);
+        auto sprite = (mUseSpriteCache == false) ? Sprite::create(bgImg) : Sprite::createWithSpriteFrameName(bgImg); 
         sprite->setContentSize(size);
         sprite->setPosition(Vec2::ZERO);
         sprite->setAnchorPoint(Vec2::ZERO);
@@ -588,7 +590,7 @@ LoadingBar * gui::addProgressBar(int x, int y, const string img, Node * p, float
     setScale(loadingBar, width);
     
 	//progress backgroung image
-	auto bgProgress = Sprite::create(img);
+	auto bgProgress = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
 	bgProgress->setOpacity(50);
 	bgProgress->setPosition(point);
     setScale(bgProgress, width);
@@ -628,7 +630,7 @@ gui::addSprite(int x, int y, const string img, Node *p, ALIGNMENT align, Size di
             , margin
     );
 
-    Sprite * sprite = Sprite::create(img);
+	Sprite * sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
     sprite->setAnchorPoint(Vec2(0.5, 0.5));
 
     float pX;
@@ -643,9 +645,9 @@ gui::addSprite(int x, int y, const string img, Node *p, ALIGNMENT align, Size di
 }
 
 void gui::addBGScrolling(const string img, Node * p, float duration){
-    auto sprite1 = Sprite::create(img);
-    auto sprite2 = Sprite::create(img);
-    auto sprite3 = Sprite::create(img); // 카메라 전환시 빈공간 메꿔주기 위해 추가
+    auto sprite1 = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
+    auto sprite2 = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
+    auto sprite3 = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img); // 카메라 전환시 빈공간 메꿔주기 위해 추가
 
     Vec2 point = Vec2(mVisibleX / 2 + mOriginX, mVisibleY / 2 + mOriginY);
     sprite1->setContentSize(Size(mVisibleX, mVisibleY));

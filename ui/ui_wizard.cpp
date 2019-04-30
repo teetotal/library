@@ -25,7 +25,8 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
 		this->img = NULL_STRING_VALUE;
 	else {		
 		this->img = p["img"].GetString();
-		SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
+		if (SpriteFrameCache::getInstance()->getSpriteFrameByName(this->img) == NULL)
+			SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
 		//SpriteFrameCache::getInstance()->removeSpriteFrameByName("btn_bg");	
 	}
 	if (!p["bgColor"].IsNull()) {
@@ -50,10 +51,14 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
 
 int WIZARD::_Object::getObjectType(const string type)
 {
-	if (type.compare("label") == 0)
-		return OBJECT_TYPE_LABEL;
+	if (type.compare("button") == 0)
+		return OBJECT_TYPE_BUTTON;
+	else if (type.compare("sprite") == 0)
+		return OBJECT_TYPE_SPRITE;
+	else if (type.compare("sprite_button") == 0)
+		return OBJECT_TYPE_SPRITE_BUTTON;
 
-	return OBJECT_TYPE_BUTTON;
+	return OBJECT_TYPE_LABEL;
 }
 
 bool WIZARD::_Node::load(rapidjson::Value & p)
@@ -76,14 +81,16 @@ bool WIZARD::_Node::load(rapidjson::Value & p)
 		);
 	}
 
-	const rapidjson::Value& objects = p["objects"];
-	for (rapidjson::SizeType i = 0; i < objects.Size(); i++)
-	{
-		_Object object;
-		if (!object.load(p["objects"][rapidjson::SizeType(i)]))
-			return false;
+	if (p.HasMember("objects")) {
+		const rapidjson::Value& objects = p["objects"];
+		for (rapidjson::SizeType i = 0; i < objects.Size(); i++)
+		{
+			_Object object;
+			if (!object.load(p["objects"][rapidjson::SizeType(i)]))
+				return false;
 
-		this->mObjects.push_back(object);
+			this->mObjects.push_back(object);
+		}
 	}
 	
 	return true;
@@ -95,7 +102,8 @@ bool WIZARD::_Background::load(rapidjson::Value & p)
 		this->img = NULL_STRING_VALUE;
 	else {
 		this->img = p["img"].GetString();
-		SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
+		if(SpriteFrameCache::getInstance()->getSpriteFrameByName(this->img) == NULL)
+			SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
 	}
 
 	if (!p["bgColor"].IsNull()) {
@@ -109,12 +117,8 @@ bool WIZARD::_Background::load(rapidjson::Value & p)
 	return true;
 }
 
-bool ui_wizard::loadFromJson(const string& sceneName, const string& path, ui_wizard_business * pBusinessClass)
+bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 {
-	mBusinessClass = pBusinessClass;
-	if (mBusinessClass)
-		mBusinessClass->setCallerScene(this);
-
 	if (ui_wizard_share::inst()->hasNode(sceneName)) {
 		drawBackground(ui_wizard_share::inst()->getBackgound(sceneName));
 
@@ -155,12 +159,13 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path, ui_wiz
 	return true;
 }
 
-void ui_wizard::callback(cocos2d::Ref * pSender, int from, int link)
+Node * ui_wizard::getNodeById(int id)
 {
-	CCLOG("Callback From %d, To %d", from, link);
-	if (mBusinessClass)
-		mBusinessClass->call(link);
+	if (mNodeMap.find(id) == mNodeMap.end())
+		return nullptr;
+	return mNodeMap[id];
 }
+
 void ui_wizard::drawBackground(WIZARD::_Background & bg)
 {
 	auto p = LayerColor::create(bg.bgColor);
@@ -170,11 +175,7 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
 	this->addChild(p);
 
 	if (bg.img.compare(NULL_STRING_VALUE) != 0) {
-		auto p = Sprite::createWithSpriteFrameName(bg.img);
-		p->setContentSize(Director::getInstance()->getVisibleSize());
-		p->setAnchorPoint(Vec2(0, 0));		
-		p->setPosition(Director::getInstance()->getVisibleOrigin());
-		this->addChild(p);
+		gui::inst()->addBG(bg.img, this);
 	}
 }
 void ui_wizard::drawNode(WIZARD::_Node &node)
@@ -182,16 +183,16 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 	Vec2 start= gui::inst()->getPointVec2(node.dimensionStart.x, node.dimensionStart.y, ALIGNMENT_NONE);
 	Vec2 end = gui::inst()->getPointVec2(node.dimensionEnd.x, node.dimensionEnd.y, ALIGNMENT_NONE);
 	Size size = Size(end.x - start.x, start.y - end.y);
+	Size sizePerGrid = Size((size.width / node.gridSize.width) - node.margin.width, (size.height / node.gridSize.height) - node.margin.height);
+	
 	auto layout = gui::inst()->createLayout(size, node.img, true, node.color);
-	layout->setTag(node.id);
+	//layout->setTag(node.id);
 	layout->setPosition(Vec2(start.x, end.y));
+	mNodeMap[node.id] = layout;
 
 	for (size_t n = 0; n < node.mObjects.size(); n++) {
 		WIZARD::_Object obj = node.mObjects[n];
-		string sz = obj.text;
-
-		if(mBusinessClass)
-			sz = mBusinessClass->getText(sz, obj.id);
+		string sz = getText(obj.text, obj.id);
 
 		Node * pObj;
 		switch(obj.type) {
@@ -222,11 +223,40 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 				, node.margin
 				, obj.img);
 			break;
+		case WIZARD::OBJECT_TYPE_SPRITE:			
+			pObj = gui::inst()->addSpriteAutoDimension(obj.position.x, obj.position.y, obj.img, layout, obj.alignment, node.gridSize, Size::ZERO, node.margin);
+			if (sizePerGrid.width > sizePerGrid.height) {
+				gui::inst()->setScaleByHeight(pObj, sizePerGrid.height);				
+			}
+			else {
+				gui::inst()->setScaleByHeight(pObj, sizePerGrid.width);
+			} 
+			break;
+		case WIZARD::OBJECT_TYPE_SPRITE_BUTTON:
+			pObj = gui::inst()->addSpriteButton(obj.position.x
+				, obj.position.y
+				, obj.img
+				, obj.img
+				,layout
+				, CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+				, obj.alignment
+				, layout->getContentSize()
+				, node.gridSize
+				, Size::ZERO
+				, node.margin);
 
+			if (sizePerGrid.width > sizePerGrid.height) {
+				gui::inst()->setScaleByHeight(pObj, sizePerGrid.height);
+			}
+			else {
+				gui::inst()->setScaleByHeight(pObj, sizePerGrid.width);
+			}
+			break;
 		default:
 			break;
 		}
-		pObj->setTag(obj.id);
+		//pObj->setTag(obj.id);
+		mNodeMap[obj.id] = pObj;
 	}
 	
 	this->addChild(layout);

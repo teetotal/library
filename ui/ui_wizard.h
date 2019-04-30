@@ -5,7 +5,7 @@
 #ifndef PROJ_ANDROID_UI_WIZARD_H
 #define PROJ_ANDROID_UI_WIZARD_H
 
-#include "cocos2d.h"
+#include "library/PhysicsScene.h"
 #include "ui/ui.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
@@ -18,7 +18,9 @@ using namespace rapidjson;
 namespace WIZARD {
 	enum OBJECT_TYPE {
 		OBJECT_TYPE_LABEL = 0,
-		OBJECT_TYPE_BUTTON
+		OBJECT_TYPE_BUTTON,
+		OBJECT_TYPE_SPRITE,
+		OBJECT_TYPE_SPRITE_BUTTON
 	};
 
 	struct _Object {
@@ -56,15 +58,6 @@ namespace WIZARD {
 	};
 
 	typedef vector<WIZARD::_Node> VEC_NODES;
-};
-/* ===============================================
-	ui_wizard_business
-================================================== */
-interface ui_wizard_business {
-public:
-	virtual void setCallerScene(Scene * p) = 0;
-	virtual const string getText(const string& defaultString, int id) = 0;
-	virtual void call(int link) = 0;
 };
 /* ===============================================
 	ui_wizard_share
@@ -112,21 +105,34 @@ private:
 /* ===============================================
 	ui_wizard
 ================================================== */
-class ui_wizard : public Scene {
-public:
-	
+class ui_wizard : public PhysicsScene {	
 protected:
-	bool loadFromJson(const string& sceneName, const string& path, ui_wizard_business * pBusinessClass);
-	void callback(cocos2d::Ref* pSender, int from, int link);
+	bool loadFromJson(const string& sceneName, const string& path);
+	Node * getNodeById(int id);
+	void pushScene(Scene * pScene) {
+		Director::getInstance()->pushScene(pScene);
+	};
+	void replaceScene(Scene * pScene) {
+		Director::getInstance()->replaceScene(pScene);
+	};
+	void popScene() {
+		Director::getInstance()->popScene();
+	};
+	void closeScene() {
+		Director::getInstance()->end();
+	};
 
-private:
-	
+	virtual void callback(cocos2d::Ref* pSender, int from, int link) = 0;
+	virtual const string getText(const string& defaultString, int id) = 0;	
+private:	
 #define NULL_INT_VALUE -1
 #define NULL_STRING_VALUE ""
+	map<int, Node*> mNodeMap;
 
-	ui_wizard_business * mBusinessClass;
 	void drawBackground(WIZARD::_Background &bg);
 	void drawNode(WIZARD::_Node &node);
+	
+	
 };
 
 

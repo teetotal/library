@@ -1,9 +1,20 @@
-//
-//  PhysicsScene.hpp
-//  cat-mobile
-//
-//  Created by Jung, DaeCheon on 10/01/2019.
-//
+/*
+  PhysicsScene.h
+ 
+ init
+	TOUCH_INIT(HelloWorld);
+		bool HelloWorld::onTouchBegan(Touch* touch, Event* event);
+		bool HelloWorld::onTouchEnded(Touch* touch, Event* event);
+		void HelloWorld::onTouchMoved(Touch *touch, Event *event);
+
+	PHYSICS_CONTACT(HelloWorld);
+		bool HelloWorld::onContactBegin(PhysicsContact &contact);
+
+	initPhysicsBody(mLayer, PHYSICSMATERIAL, false, SEPPED);
+
+  Created by Jung, DaeCheon on 10/01/2019.
+
+*/
 
 #ifndef PhysicsScene_hpp
 #define PhysicsScene_hpp
