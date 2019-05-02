@@ -32,6 +32,7 @@ namespace WIZARD {
 		OBJECT_TYPE type;
 		int link;
 		string img;
+        string img_selected;
 		Color3B bgColor, color;
 		string text;
 		float fontSize;

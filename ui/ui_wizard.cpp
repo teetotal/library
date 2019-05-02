@@ -21,12 +21,25 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
 	this->type = (OBJECT_TYPE)getObjectType(p["type"].GetString());
 	this->link = p["link"].IsNull() ? NULL_INT_VALUE : p["link"].GetInt();
 	
-	if (p["img"].IsNull())
+    if (p["img"].IsNull()) {
 		this->img = NULL_STRING_VALUE;
-	else {		
-		this->img = p["img"].GetString();
-		if (SpriteFrameCache::getInstance()->getSpriteFrameByName(this->img) == NULL)
-			SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
+        this->img_selected = NULL_STRING_VALUE;
+    }
+	else {
+        if(p["img"].IsArray()) {
+            this->img = p["img"][rapidjson::SizeType(0)].GetString();
+            if (SpriteFrameCache::getInstance()->getSpriteFrameByName(this->img) == NULL)
+                SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
+            this->img_selected = p["img"][rapidjson::SizeType(1)].GetString();
+            if (SpriteFrameCache::getInstance()->getSpriteFrameByName(this->img_selected) == NULL)
+                SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img_selected)->getSpriteFrame(), this->img_selected);
+            
+        } else {
+            this->img = p["img"].GetString();
+            this->img_selected = this->img;
+            if (SpriteFrameCache::getInstance()->getSpriteFrameByName(this->img) == NULL)
+                SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
+        }
 		//SpriteFrameCache::getInstance()->removeSpriteFrameByName("btn_bg");	
 	}
 	if (!p["bgColor"].IsNull()) {
@@ -284,7 +297,7 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 			pObj = gui::inst()->addSpriteButton(obj.position.x
 				, obj.position.y
 				, obj.img
-				, obj.img
+				, obj.img_selected
 				,layout
 				, CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
 				, obj.alignment
