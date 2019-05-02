@@ -1,4 +1,4 @@
-﻿//
+//
 // Created by Jung, DaeCheon on 25/04/2019.
 //
 
@@ -61,6 +61,28 @@ namespace WIZARD {
 };
 /* ===============================================
 	ui_wizard_share
+ 
+ 
+ #ifndef __SCENES_H__
+ #define __SCENES_H__
+ 
+ #include "ui/ui_wizard.h"
+ USING_NS_CC;
+ 
+ class SceneMain : public ui_wizard
+ {
+ public:
+ static Scene* createScene() { return SceneMain::create(); };
+ virtual bool init();
+ CREATE_FUNC(SceneMain);
+ 
+ protected:
+ virtual void callback(Ref* pSender, int from, int link);
+ virtual const string getText(const string& defaultString, int id);
+ };
+ 
+ #endif // __SCENES_H__
+ 
 ================================================== */
 class ui_wizard_share {
 public:

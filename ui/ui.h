@@ -1,4 +1,4 @@
-﻿//
+//
 // Created by daejung on 2018-07-24.
 //
 
@@ -118,6 +118,10 @@ public:
             , Color4F bgColor = Color4F::WHITE
 			, bool useSpriteCache = false
     );
+    
+    void initDefaultWithSpriteCache() {
+        init("fonts/Marker Felt.ttf", GRID_DEFAULT_FONT_SIZE, Color4F::WHITE, true);
+    };
 
     float getRealPixel(float x);
     float getSizeFromRealPixel(float x);

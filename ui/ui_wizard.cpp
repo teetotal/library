@@ -1,4 +1,4 @@
-﻿//
+//
 // Created by Jung, DaeCheon on 25/04/2019.
 //
 
@@ -119,8 +119,16 @@ bool WIZARD::_Background::load(rapidjson::Value & p)
 
 bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 {
+    //////////////////////////////
+    // 1. super init first
+    if ( !Scene::init() )
+    {
+        return false;
+    }
+    
 	if (ui_wizard_share::inst()->hasNode(sceneName)) {
-		drawBackground(ui_wizard_share::inst()->getBackgound(sceneName));
+        WIZARD::_Background bg = ui_wizard_share::inst()->getBackgound(sceneName);
+		this->drawBackground(bg);
 
 		WIZARD::VEC_NODES nodes = ui_wizard_share::inst()->getNodes(sceneName);
 		for (size_t n = 0; n < nodes.size(); n++) {
@@ -136,7 +144,7 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 	rapidjson::Document d;	
 	d.Parse(sz.c_str());
 	if (d.HasParseError()) {		
-		CCLOG("loadFromJson Failure. ErrorCode: %d, ErrorOffset: %d", d.GetParseError(), d.GetErrorOffset());		
+		CCLOG("loadFromJson Failure. ErrorCode: %d, ErrorOffset: %zu", d.GetParseError(), d.GetErrorOffset());		
 		return false;
 	}
 
