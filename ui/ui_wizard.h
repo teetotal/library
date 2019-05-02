@@ -20,6 +20,8 @@ namespace WIZARD {
 		OBJECT_TYPE_LABEL = 0,
 		OBJECT_TYPE_BUTTON,
 		OBJECT_TYPE_SPRITE,
+        OBJECT_TYPE_LABEL_SPRITE,
+        OBJECT_TYPE_BUTTON_SPRITE,
 		OBJECT_TYPE_SPRITE_BUTTON
 	};
 
@@ -53,7 +55,8 @@ namespace WIZARD {
 	struct _Background {
 		string img;
 		Color4B bgColor;
-
+        bool isDrawGrid;
+        
 		bool load(rapidjson::Value &p);
 	};
 
@@ -143,7 +146,6 @@ protected:
 	void closeScene() {
 		Director::getInstance()->end();
 	};
-
 	virtual void callback(cocos2d::Ref* pSender, int from, int link) = 0;
 	virtual const string getText(const string& defaultString, int id) = 0;	
 private:	
@@ -153,8 +155,8 @@ private:
 
 	void drawBackground(WIZARD::_Background &bg);
 	void drawNode(WIZARD::_Node &node);
-	
-	
+    
+    bool mIsDrawGrid;
 };
 
 

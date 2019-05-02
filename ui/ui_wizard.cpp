@@ -55,6 +55,10 @@ int WIZARD::_Object::getObjectType(const string type)
 		return OBJECT_TYPE_BUTTON;
 	else if (type.compare("sprite") == 0)
 		return OBJECT_TYPE_SPRITE;
+    else if (type.compare("label_sprite") == 0)
+        return OBJECT_TYPE_LABEL_SPRITE;
+    else if (type.compare("button_sprite") == 0)
+        return OBJECT_TYPE_BUTTON_SPRITE;
 	else if (type.compare("sprite_button") == 0)
 		return OBJECT_TYPE_SPRITE_BUTTON;
 
@@ -64,7 +68,7 @@ int WIZARD::_Object::getObjectType(const string type)
 bool WIZARD::_Node::load(rapidjson::Value & p)
 {
 	this->id = p["id"].GetInt();
-	this->dimensionStart.x = p["dimension"][rapidjson::SizeType(0)].GetFloat();
+    this->dimensionStart.x = p["dimension"][rapidjson::SizeType(0)].GetFloat();
 	this->dimensionStart.y = p["dimension"][rapidjson::SizeType(1)].GetFloat();
 	this->dimensionEnd.x = p["dimension"][rapidjson::SizeType(2)].GetFloat();
 	this->dimensionEnd.y = p["dimension"][rapidjson::SizeType(3)].GetFloat();
@@ -114,6 +118,10 @@ bool WIZARD::_Background::load(rapidjson::Value & p)
 			, p["bgColor"][rapidjson::SizeType(3)].GetInt()
 		);
 	}
+    this->isDrawGrid = false;
+    if(!p["isDrawGrid"].IsNull())
+        this->isDrawGrid = p["isDrawGrid"].GetBool();
+    
 	return true;
 }
 
@@ -176,6 +184,7 @@ Node * ui_wizard::getNodeById(int id)
 
 void ui_wizard::drawBackground(WIZARD::_Background & bg)
 {
+    mIsDrawGrid = bg.isDrawGrid;
 	auto p = LayerColor::create(bg.bgColor);
 	p->setContentSize(Director::getInstance()->getVisibleSize());
 	p->setAnchorPoint(Vec2(0, 0));
@@ -197,6 +206,9 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 	//layout->setTag(node.id);
 	layout->setPosition(Vec2(start.x, end.y));
 	mNodeMap[node.id] = layout;
+    
+    if(mIsDrawGrid)
+        gui::inst()->drawGrid(layout, layout->getContentSize(), node.gridSize, Size::ZERO, node.margin);
 
 	for (size_t n = 0; n < node.mObjects.size(); n++) {
 		WIZARD::_Object obj = node.mObjects[n];
@@ -217,7 +229,20 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 				, obj.img
 			);			
 			break;
-
+        case WIZARD::OBJECT_TYPE_LABEL_SPRITE:
+            pObj = gui::inst()->addLabelAutoDimension(obj.position.x, obj.position.y
+                  , sz
+                  , layout
+                  , obj.fontSize
+                  , obj.alignment
+                  , obj.color
+                  , node.gridSize
+                  , Size::ZERO
+                  , node.margin
+                  , obj.img
+                  , false
+              );
+            break;
 		case WIZARD::OBJECT_TYPE_BUTTON:
 			pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x, obj.position.y
 				, sz
@@ -231,6 +256,21 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 				, node.margin
 				, obj.img);
 			break;
+        case WIZARD::OBJECT_TYPE_BUTTON_SPRITE:
+            pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x, obj.position.y
+               , sz
+               , layout
+               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+               , obj.fontSize
+               , obj.alignment
+               , obj.color
+               , node.gridSize
+               , Size::ZERO
+               , node.margin
+               , obj.img
+               , false
+            );
+            break;
 		case WIZARD::OBJECT_TYPE_SPRITE:			
 			pObj = gui::inst()->addSpriteAutoDimension(obj.position.x, obj.position.y, obj.img, layout, obj.alignment, node.gridSize, Size::ZERO, node.margin);
 			if (sizePerGrid.width > sizePerGrid.height) {

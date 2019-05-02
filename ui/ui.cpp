@@ -306,22 +306,32 @@ Label * gui::addLabel(Node *p, int x, int y, const string text, int fontSize, AL
     float pX;
 
     if(img.compare("") != 0){
-        auto sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img); ;
+        Size sizePerGrid = Size((p->getContentSize().width / grid.width) - (margin.width *2)
+                                , (p->getContentSize().height / grid.height) - (margin.height * 2));
+        
+        auto sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
+        if(sizePerGrid.width > sizePerGrid.height)
+            setScaleByHeight(sprite, sizePerGrid.height);
+        else
+            setScale(sprite, sizePerGrid.width);
+        
         if(isBGImg){
 
-            sprite->setPosition(Point(
-                    (align == ALIGNMENT_NONE) ? pointX_NONE + (sprite->getContentSize().width /2) : pointX
-                    , pointY));
-            label->setPosition(Point(
-                    (align == ALIGNMENT_NONE) ? pointX_NONE + (label->getContentSize().width /2) : pointX
-                    , pointY));
+            sprite->setPosition(Vec2(
+                    (align == ALIGNMENT_NONE) ? pointX_NONE + (sprite->getContentSize().width /2) : pointX, pointY));
+            label->setPosition(Vec2(
+                    (align == ALIGNMENT_NONE) ? pointX_NONE + (label->getContentSize().width /2) : pointX, pointY));
 
         }else{
-            pX = (align == ALIGNMENT_NONE) ? pointX_NONE + (sprite->getContentSize().width /2) :
-                 pointX_NONE + ((sprite->getContentSize().width + label->getContentSize().width) /2);
+            sprite->setAnchorPoint(Vec2(0, 0.5));
+            label->setAnchorPoint(Vec2(0, 0.5));
+            
+            float spriteWidth = sprite->getContentSize().width * sprite->getScale();
+            float labelWidth = label->getContentSize().width;
+            pX = (align == ALIGNMENT_NONE) ? pointX_NONE : pointX - ((spriteWidth + labelWidth) / 2);
 
-            sprite->setPosition(Point(pX, pointY));
-            label->setPosition(Point(pX + (sprite->getContentSize().width /2) + (label->getContentSize().width / 2), pointY));
+            sprite->setPosition(Vec2(pX, pointY));
+            label->setPosition(Vec2(sprite->getPosition().x + spriteWidth, pointY));
         }
         p->addChild(sprite);
     }
@@ -383,8 +393,15 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu, int x, int y, const string t
     float pX;
 
     if(img.compare("") != 0){
-
+        Size sizePerGrid = Size((p->getContentSize().width / grid.width) - (margin.width *2)
+                                , (p->getContentSize().height / grid.height) - (margin.height * 2));
+        
         auto sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
+        if(sizePerGrid.width > sizePerGrid.height)
+            setScaleByHeight(sprite, sizePerGrid.height);
+        else
+            setScale(sprite, sizePerGrid.width);
+        
         if(isBGImg){
 
             sprite->setPosition(
@@ -396,14 +413,15 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu, int x, int y, const string t
                     , pointY));
 
         }else{
-
-            pX = (align == ALIGNMENT_NONE) ? pointX_NONE + (sprite->getContentSize().width /2) :
-                 pointX_NONE + ((sprite->getContentSize().width + pItem->getContentSize().width) /2);
-
-            sprite->setPosition(Point(pX, pointY));
-            pMenu->setPosition(Point(pX + (sprite->getContentSize().width /2) + (pItem->getContentSize().width / 2), pointY));
+            sprite->setAnchorPoint(Vec2(0, 0.5));
+            
+            float spriteWidth = sprite->getContentSize().width * sprite->getScale();
+            float labelWidth = label->getContentSize().width;
+            pX = (align == ALIGNMENT_NONE) ? pointX_NONE : pointX - ((spriteWidth + labelWidth) / 2);
+            
+            sprite->setPosition(Vec2(pX, pointY));
+            pMenu->setPosition(Vec2(sprite->getPosition().x + spriteWidth + (labelWidth / 2), pointY));
         }
-
         p->addChild(sprite);
 
     }else{		
