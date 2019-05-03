@@ -42,13 +42,7 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
         }
 		//SpriteFrameCache::getInstance()->removeSpriteFrameByName("btn_bg");	
 	}
-	if (!p["bgColor"].IsNull()) {
-		this->bgColor = Color3B(
-			p["bgColor"][rapidjson::SizeType(0)].GetInt()
-			, p["bgColor"][rapidjson::SizeType(1)].GetInt()
-			, p["bgColor"][rapidjson::SizeType(2)].GetInt()
-		);
-	}	
+    
 	if (!p["color"].IsNull()) {
 		this->color = Color3B(
 			p["color"][rapidjson::SizeType(0)].GetInt()
@@ -96,6 +90,11 @@ bool WIZARD::_Node::load(rapidjson::Value & p)
 			, p["color"][rapidjson::SizeType(1)].GetInt()
 			, p["color"][rapidjson::SizeType(2)].GetInt()
 		);
+        
+        if(p["color"].GetArray().Size() == 4)
+            this->opacity = (GLubyte)p["color"][rapidjson::SizeType(3)].GetInt();
+        else
+            this->opacity = (GLubyte)0xFF;
 	}
 
 	if (p.HasMember("objects")) {
@@ -114,7 +113,8 @@ bool WIZARD::_Node::load(rapidjson::Value & p)
 }
 
 bool WIZARD::_Background::load(rapidjson::Value & p)
-{	
+{
+    this->id = p["id"].GetInt();
 	if (p["img"].IsNull())
 		this->img = NULL_STRING_VALUE;
 	else {
@@ -146,6 +146,11 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
     {
         return false;
     }
+    
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    mGrid = Size(GRID_X, GRID_Y);
+    if(visibleSize.width < visibleSize.height)
+        mGrid = Size(GRID_Y, GRID_X);
     
 	if (ui_wizard_share::inst()->hasNode(sceneName)) {
         WIZARD::_Background bg = ui_wizard_share::inst()->getBackgound(sceneName);
@@ -205,18 +210,24 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
 	this->addChild(p);
 
 	if (bg.img.compare(NULL_STRING_VALUE) != 0) {
-		gui::inst()->addBG(bg.img, this);
+		gui::inst()->addBG(bg.img, p, true);
 	}
+    
+    mNodeMap[bg.id] = p;
+    
+    if(bg.isDrawGrid)
+        gui::inst()->drawGrid(this, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE), mGrid);
 }
 void ui_wizard::drawNode(WIZARD::_Node &node)
 {
-	Vec2 start= gui::inst()->getPointVec2(node.dimensionStart.x, node.dimensionStart.y, ALIGNMENT_NONE);
-	Vec2 end = gui::inst()->getPointVec2(node.dimensionEnd.x, node.dimensionEnd.y, ALIGNMENT_NONE);
+    Vec2 start= gui::inst()->getPointVec2(node.dimensionStart.x, node.dimensionStart.y, ALIGNMENT_NONE, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE), mGrid);
+    Vec2 end = gui::inst()->getPointVec2(node.dimensionEnd.x, node.dimensionEnd.y, ALIGNMENT_NONE, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE), mGrid);
 	Size size = Size(end.x - start.x, start.y - end.y);
-	Size sizePerGrid = Size((size.width / node.gridSize.width) - node.margin.width, (size.height / node.gridSize.height) - node.margin.height);
+	Size sizePerGrid = Size((size.width / node.gridSize.width) - (node.margin.width * 2)
+                            , (size.height / node.gridSize.height) - (node.margin.height * 2));
 	
 	auto layout = gui::inst()->createLayout(size, node.img, true, node.color);
-	//layout->setTag(node.id);
+    layout->setOpacity(node.opacity);
 	layout->setPosition(Vec2(start.x, end.y));
 	mNodeMap[node.id] = layout;
     
@@ -286,31 +297,31 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
             break;
 		case WIZARD::OBJECT_TYPE_SPRITE:			
 			pObj = gui::inst()->addSpriteAutoDimension(obj.position.x, obj.position.y, obj.img, layout, obj.alignment, node.gridSize, Size::ZERO, node.margin);
-			if (sizePerGrid.width > sizePerGrid.height) {
-				gui::inst()->setScaleByHeight(pObj, sizePerGrid.height);				
-			}
-			else {
-				gui::inst()->setScaleByHeight(pObj, sizePerGrid.width);
-			} 
+            if (sizePerGrid.width > sizePerGrid.height) {
+                gui::inst()->setScaleByHeight(pObj, sizePerGrid.height);
+            }
+            else {
+                gui::inst()->setScale(pObj, sizePerGrid.width);
+            }
 			break;
 		case WIZARD::OBJECT_TYPE_SPRITE_BUTTON:
 			pObj = gui::inst()->addSpriteButton(obj.position.x
 				, obj.position.y
 				, obj.img
 				, obj.img_selected
-				,layout
+				, layout
 				, CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
 				, obj.alignment
 				, layout->getContentSize()
 				, node.gridSize
 				, Size::ZERO
 				, node.margin);
-
+                
 			if (sizePerGrid.width > sizePerGrid.height) {
 				gui::inst()->setScaleByHeight(pObj, sizePerGrid.height);
 			}
 			else {
-				gui::inst()->setScaleByHeight(pObj, sizePerGrid.width);
+				gui::inst()->setScale(pObj, sizePerGrid.width);
 			}
 			break;
 		default:

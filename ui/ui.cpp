@@ -140,7 +140,7 @@ bool gui::drawGrid(Node * p
                 , origin
                 , margin);
         draw->drawLine(Point(startX, startY), Point(endX, endY), Color4F::GRAY);
-        p->addChild(draw, 1000);
+        p->addChild(draw);
     }
 
     for(int y=0; y<=gridY; y++){
@@ -155,7 +155,7 @@ bool gui::drawGrid(Node * p
                 , origin
                 , margin);
         draw->drawLine(Point(startX, startY), Point(endX, endY), Color4F::GRAY);
-        p->addChild(draw, 1000);
+        p->addChild(draw);
     }
 
     return true;
@@ -182,10 +182,14 @@ bool gui::drawPoint(Node *p) {
     return true;
 }
 
-Sprite * gui::addBG(const string bgImg, Node * parent) {	
+Sprite * gui::addBG(const string bgImg, Node * parent, bool isOnLayer) {
     auto bg = (mUseSpriteCache == false) ? Sprite::create(bgImg) : Sprite::createWithSpriteFrameName(bgImg);
     bg->setContentSize(Director::getInstance()->getVisibleSize());
-    bg->setPosition(getCenter());
+    if(!isOnLayer)
+        bg->setPosition(getCenter());
+    else {
+        bg->setPosition(Vec2(parent->getContentSize().width / 2, parent->getContentSize().height / 2));
+    }
     //bg->setAnchorPoint(Vec2(0, 0));
     //bg->setPosition(Director::getInstance()->getVisibleOrigin());
     parent->addChild(bg);

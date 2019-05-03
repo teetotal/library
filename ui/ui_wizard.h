@@ -33,7 +33,7 @@ namespace WIZARD {
 		int link;
 		string img;
         string img_selected;
-		Color3B bgColor, color;
+		Color3B color;
 		string text;
 		float fontSize;
 
@@ -48,12 +48,14 @@ namespace WIZARD {
 		Size gridSize;
 		string img;
 		Color3B color;
+        GLubyte opacity;
 		vector<_Object> mObjects;
 
 		bool load(rapidjson::Value &p);
 	};
 
 	struct _Background {
+        int id;
 		string img;
 		Color4B bgColor;
         bool isDrawGrid;
@@ -158,6 +160,7 @@ private:
 	void drawNode(WIZARD::_Node &node);
     
     bool mIsDrawGrid;
+    Size mGrid;
 };
 
 

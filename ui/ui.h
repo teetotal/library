@@ -157,7 +157,7 @@ public:
     );
     bool drawPoint(Node * p);
     
-    Sprite * addBG(const string bgImg, Node * parent);
+    Sprite * addBG(const string bgImg, Node * parent, bool isOnLayer = false /* Scene이 아닌 layer에 이미지 올릴때 true */);
     
     Label * addLabel(int x
             , int y
