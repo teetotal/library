@@ -7,6 +7,9 @@
 gui * gui::hInstance = NULL;
 
 void gui::init(const char* font, int fontSize, Color4F bgColor, bool useSpriteCache) {
+	if (mIsInitialized)
+		return;
+	mIsInitialized = true;
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
     mVisibleSize = visibleSize;

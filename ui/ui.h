@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by daejung on 2018-07-24.
 //
 
@@ -101,8 +101,7 @@ _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 class gui {
 public:
-    gui(){
-    };
+    gui() : mIsInitialized(false) {};
     ~gui(){
         //hInstance = NULL;
     };
@@ -565,7 +564,7 @@ public:
 	bool mUseSpriteCache;
 private:
     static gui * hInstance;
-
+	bool mIsInitialized;
     const Vec2 getNoneAnchorPoint(){
         return Vec2(0,1.75);
     };

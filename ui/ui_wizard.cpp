@@ -62,12 +62,14 @@ int WIZARD::_Object::getObjectType(const string type)
 		return OBJECT_TYPE_BUTTON;
 	else if (type.compare("sprite") == 0)
 		return OBJECT_TYPE_SPRITE;
-    else if (type.compare("label_sprite") == 0)
-        return OBJECT_TYPE_LABEL_SPRITE;
-    else if (type.compare("button_sprite") == 0)
-        return OBJECT_TYPE_BUTTON_SPRITE;
+	else if (type.compare("label_sprite") == 0)
+		return OBJECT_TYPE_LABEL_SPRITE;
+	else if (type.compare("button_sprite") == 0)
+		return OBJECT_TYPE_BUTTON_SPRITE;
 	else if (type.compare("sprite_button") == 0)
 		return OBJECT_TYPE_SPRITE_BUTTON;
+	else if (type.compare("loadingbar") == 0)
+		return OBJECT_TYPE_LOADINGBAR;
 
 	return OBJECT_TYPE_LABEL;
 }
@@ -123,13 +125,35 @@ bool WIZARD::_Background::load(rapidjson::Value & p)
 			SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
 	}
 
+	this->isGradient = false;
+
 	if (!p["bgColor"].IsNull()) {
-		this->bgColor = Color4B(
-			p["bgColor"][rapidjson::SizeType(0)].GetInt()
-			, p["bgColor"][rapidjson::SizeType(1)].GetInt()
-			, p["bgColor"][rapidjson::SizeType(2)].GetInt()
-			, p["bgColor"][rapidjson::SizeType(3)].GetInt()
-		);
+		if (p["bgColor"][rapidjson::SizeType(0)].IsArray()) {
+			this->bgColor = Color4B(
+				p["bgColor"][rapidjson::SizeType(0)][rapidjson::SizeType(0)].GetInt()
+				, p["bgColor"][rapidjson::SizeType(0)][rapidjson::SizeType(1)].GetInt()
+				, p["bgColor"][rapidjson::SizeType(0)][rapidjson::SizeType(2)].GetInt()
+				, p["bgColor"][rapidjson::SizeType(0)][rapidjson::SizeType(3)].GetInt()
+			);
+
+			if (p["bgColor"].GetArray().Size() == rapidjson::SizeType(2)) {
+				this->bgColor_end = Color4B(
+					p["bgColor"][rapidjson::SizeType(1)][rapidjson::SizeType(0)].GetInt()
+					, p["bgColor"][rapidjson::SizeType(1)][rapidjson::SizeType(1)].GetInt()
+					, p["bgColor"][rapidjson::SizeType(1)][rapidjson::SizeType(2)].GetInt()
+					, p["bgColor"][rapidjson::SizeType(1)][rapidjson::SizeType(3)].GetInt()
+				);
+				this->isGradient = true;
+			}
+		}
+		else {
+			this->bgColor = Color4B(
+				p["bgColor"][rapidjson::SizeType(0)].GetInt()
+				, p["bgColor"][rapidjson::SizeType(1)].GetInt()
+				, p["bgColor"][rapidjson::SizeType(2)].GetInt()
+				, p["bgColor"][rapidjson::SizeType(3)].GetInt()
+			);
+		}
 	}
     this->isDrawGrid = false;
     if(!p["isDrawGrid"].IsNull())
@@ -203,7 +227,7 @@ Node * ui_wizard::getNodeById(int id)
 void ui_wizard::drawBackground(WIZARD::_Background & bg)
 {
     mIsDrawGrid = bg.isDrawGrid;
-	auto p = LayerColor::create(bg.bgColor);
+	auto p = (bg.isGradient) ? LayerGradient::create(bg.bgColor, bg.bgColor_end) : LayerColor::create(bg.bgColor);
 	p->setContentSize(Director::getInstance()->getVisibleSize());
 	p->setAnchorPoint(Vec2(0, 0));
 	p->setPosition(Director::getInstance()->getVisibleOrigin());
@@ -323,6 +347,19 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 			else {
 				gui::inst()->setScale(pObj, sizePerGrid.width);
 			}
+			break;
+		case WIZARD::OBJECT_TYPE_LOADINGBAR:
+			pObj = gui::inst()->addProgressBar(obj.position.x
+				, obj.position.y
+				, obj.img
+				, layout
+				, sizePerGrid.width
+				, 90.f
+				, layout->getContentSize()
+				, node.gridSize
+				, Size::ZERO
+				, node.margin
+			);
 			break;
 		default:
 			break;

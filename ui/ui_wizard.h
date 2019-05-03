@@ -22,7 +22,8 @@ namespace WIZARD {
 		OBJECT_TYPE_SPRITE,
         OBJECT_TYPE_LABEL_SPRITE,
         OBJECT_TYPE_BUTTON_SPRITE,
-		OBJECT_TYPE_SPRITE_BUTTON
+		OBJECT_TYPE_SPRITE_BUTTON,
+		OBJECT_TYPE_LOADINGBAR,
 	};
 
 	struct _Object {
@@ -57,7 +58,8 @@ namespace WIZARD {
 	struct _Background {
         int id;
 		string img;
-		Color4B bgColor;
+		Color4B bgColor, bgColor_end;
+		bool isGradient;
         bool isDrawGrid;
         
 		bool load(rapidjson::Value &p);
