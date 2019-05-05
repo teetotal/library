@@ -244,17 +244,35 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
 }
 void ui_wizard::drawNode(WIZARD::_Node &node)
 {
-    Vec2 start= gui::inst()->getPointVec2(node.dimensionStart.x, node.dimensionStart.y, ALIGNMENT_NONE, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE), mGrid);
-    Vec2 end = gui::inst()->getPointVec2(node.dimensionEnd.x, node.dimensionEnd.y, ALIGNMENT_NONE, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE), mGrid);
+    Vec2 start= gui::inst()->getPointVec2(node.dimensionStart.x, node.dimensionStart.y, ALIGNMENT_NONE
+		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+		, mGrid
+		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+		//, Size::ZERO
+	);
+    Vec2 end = gui::inst()->getPointVec2(node.dimensionEnd.x, node.dimensionEnd.y, ALIGNMENT_NONE
+		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+		, mGrid
+		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+		//, Size::ZERO
+	);
 	Size size = Size(end.x - start.x, start.y - end.y);
 	Size sizePerGrid = Size((size.width / node.gridSize.width) - (node.margin.width * 2)
                             , (size.height / node.gridSize.height) - (node.margin.height * 2));
 	
-	auto layout = gui::inst()->createLayout(size, node.img, true, node.color);
-    layout->setOpacity(node.opacity);
+	auto layout = gui::inst()->createLayout(size);
 	layout->setPosition(Vec2(start.x, end.y));
 	mNodeMap[node.id] = layout;
     
+	//background colored layer
+	if (node.opacity > 0) {
+		auto layoutBG = gui::inst()->createLayout(Size(size.width - (node.margin.width * 2), size.height - (node.margin.height * 2))
+			, node.img, true, node.color);
+		layoutBG->setPosition(Vec2(node.margin.width, node.margin.height));
+		layoutBG->setOpacity(node.opacity);
+		layout->addChild(layoutBG);
+	}
+	
     if(mIsDrawGrid)
         gui::inst()->drawGrid(layout, layout->getContentSize(), node.gridSize, Size::ZERO, node.margin);
 
