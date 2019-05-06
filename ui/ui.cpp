@@ -24,9 +24,6 @@ void gui::init(const char* font, int fontSize, Color4F bgColor, bool useSpriteCa
     mVisibleX = visibleSize.width;
     mVisibleY = visibleSize.height;
 
-    mWidth = visibleSize.width - GRID_MARGIN * 2;
-    mHeight = visibleSize.height - GRID_MARGIN * 2;
-
     mDefaultFont = font;
     mDefaultFontSize = fontSize;
 
@@ -72,15 +69,15 @@ bool gui::getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align
     float marginX = margin.width == GRID_INVALID_VALUE ? GRID_MARGIN : margin.width;
     float marginY = margin.height == GRID_INVALID_VALUE ? GRID_MARGIN : margin.height;
 
-    float dimensionX = dimension.width == GRID_INVALID_VALUE ? mWidth : dimension.width - marginX * 2;
-    float dimensionY = dimension.height == GRID_INVALID_VALUE ? mHeight : dimension.height - marginY * 2;
+    float dimensionX = dimension.width == GRID_INVALID_VALUE ? mVisibleX : dimension.width - (marginX * 2.f);
+    float dimensionY = dimension.height == GRID_INVALID_VALUE ? mVisibleY : dimension.height - (marginY * 2.f);
 
     float gridWidth = dimensionX / gridX;
     float gridHeight = dimensionY / gridY;
 
 
-    pointX = (gridWidth * x) + originX + marginX;
-    pointY = originY + marginY + dimensionY -  (gridHeight * y) ;
+    pointX = (gridWidth * (float)x) + originX + marginX;
+    pointY = originY + marginY + dimensionY -  (gridHeight * (float)y) ;
 
     switch(align){
         case ALIGNMENT_NONE:
@@ -88,8 +85,8 @@ bool gui::getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align
             //pointY -= mGridHeight/2;
             break;
         case ALIGNMENT_CENTER:
-            pointX += gridWidth/ 2;
-            pointY -= gridHeight/2;
+            pointX += gridWidth / 2.f;
+            pointY -= gridHeight/ 2.f;
             break;
     }
     return true;

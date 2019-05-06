@@ -24,6 +24,7 @@ namespace WIZARD {
         OBJECT_TYPE_BUTTON_SPRITE,
 		OBJECT_TYPE_SPRITE_BUTTON,
 		OBJECT_TYPE_LOADINGBAR,
+		OBJECT_TYPE_CIRCLE,
 	};
 
 	struct _Object {
@@ -35,6 +36,7 @@ namespace WIZARD {
 		string img;
         string img_selected;
 		Color3B color;
+		GLubyte opacity;
 		string text;
 		float fontSize;
 
@@ -48,8 +50,9 @@ namespace WIZARD {
 		Size margin;
 		Size gridSize;
 		string img;
-		Color3B color;
-        GLubyte opacity;
+		Color3B color, color_end;
+        GLubyte opacity, opacity_end;
+		bool isGradient;
 		vector<_Object> mObjects;
 
 		bool load(rapidjson::Value &p);

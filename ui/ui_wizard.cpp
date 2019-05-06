@@ -44,11 +44,19 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
 	}
     
 	if (!p["color"].IsNull()) {
-		this->color = Color3B(
-			p["color"][rapidjson::SizeType(0)].GetInt()
-			, p["color"][rapidjson::SizeType(1)].GetInt()
-			, p["color"][rapidjson::SizeType(2)].GetInt()
-		);
+		if (p["color"].IsInt()) {
+			this->opacity = (GLubyte)p["color"].GetInt();
+		}
+		else {
+			this->color = Color3B(
+				p["color"][rapidjson::SizeType(0)].GetInt()
+				, p["color"][rapidjson::SizeType(1)].GetInt()
+				, p["color"][rapidjson::SizeType(2)].GetInt()
+			);
+
+			this->opacity = (p["color"].GetArray().Size() == 4) ? (GLubyte)p["color"][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
+		}
+		
 	}
 	this->text = p["text"].IsNull() ? NULL_STRING_VALUE : p["text"].GetString();
 	this->fontSize = p["fontSize"].GetFloat();
@@ -70,12 +78,15 @@ int WIZARD::_Object::getObjectType(const string type)
 		return OBJECT_TYPE_SPRITE_BUTTON;
 	else if (type.compare("loadingbar") == 0)
 		return OBJECT_TYPE_LOADINGBAR;
+	else if (type.compare("circle") == 0)
+		return OBJECT_TYPE_CIRCLE;
 
 	return OBJECT_TYPE_LABEL;
 }
 
 bool WIZARD::_Node::load(rapidjson::Value & p)
 {
+	this->isGradient = false;
 	this->id = p["id"].GetInt();
     this->dimensionStart.x = p["dimension"][rapidjson::SizeType(0)].GetFloat();
 	this->dimensionStart.y = p["dimension"][rapidjson::SizeType(1)].GetFloat();
@@ -87,16 +98,41 @@ bool WIZARD::_Node::load(rapidjson::Value & p)
 	this->gridSize.height = p["gridSize"][rapidjson::SizeType(1)].GetFloat();
 	this->img = p["img"].IsNull() ? NULL_STRING_VALUE : p["img"].GetString();
 	if (!p["color"].IsNull()) {
-		this->color = Color3B(
-			p["color"][rapidjson::SizeType(0)].GetInt()
-			, p["color"][rapidjson::SizeType(1)].GetInt()
-			, p["color"][rapidjson::SizeType(2)].GetInt()
-		);
-        
-        if(p["color"].GetArray().Size() == 4)
-            this->opacity = (GLubyte)p["color"][rapidjson::SizeType(3)].GetInt();
-        else
-            this->opacity = (GLubyte)0xFF;
+		if (p["color"].IsArray() && p["color"][rapidjson::SizeType(0)].IsArray()) {
+			this->color = Color3B(
+				p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(0)].GetInt()
+				, p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(1)].GetInt()
+				, p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(2)].GetInt()
+			);
+			this->opacity = (p["color"][rapidjson::SizeType(0)].GetArray().Size() == 4) ? 
+				(GLubyte)p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
+			
+			if (p["color"].GetArray().Size() == rapidjson::SizeType(2)) {
+				this->color_end = Color3B(
+					p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(0)].GetInt()
+					, p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(1)].GetInt()
+					, p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(2)].GetInt()
+				);
+				this->opacity_end = (p["color"][rapidjson::SizeType(1)].GetArray().Size() == 4) ?
+					(GLubyte)p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
+
+				this->isGradient = true;
+			}
+		}
+		else {
+			if (p["color"].IsInt()) {
+				this->opacity = (GLubyte)p["color"].GetInt();
+			}
+			else {
+				this->color = Color3B(
+					p["color"][rapidjson::SizeType(0)].GetInt()
+					, p["color"][rapidjson::SizeType(1)].GetInt()
+					, p["color"][rapidjson::SizeType(2)].GetInt()
+				);
+
+				this->opacity = (p["color"].GetArray().Size() == 4) ? (GLubyte)p["color"][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
+			}
+		}
 	}
 
 	if (p.HasMember("objects")) {
@@ -240,7 +276,11 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
     mNodeMap[bg.id] = p;
     
     if(bg.isDrawGrid)
-        gui::inst()->drawGrid(this, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE), mGrid);
+        gui::inst()->drawGrid(this
+			, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+			, mGrid
+			, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+			, Size::ZERO);
 }
 void ui_wizard::drawNode(WIZARD::_Node &node)
 {
@@ -248,29 +288,45 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
 		, mGrid
 		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		//, Size::ZERO
+		, Size::ZERO
 	);
     Vec2 end = gui::inst()->getPointVec2(node.dimensionEnd.x, node.dimensionEnd.y, ALIGNMENT_NONE
 		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
 		, mGrid
 		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		//, Size::ZERO
+		, Size::ZERO
 	);
 	Size size = Size(end.x - start.x, start.y - end.y);
 	Size sizePerGrid = Size((size.width / node.gridSize.width) - (node.margin.width * 2)
                             , (size.height / node.gridSize.height) - (node.margin.height * 2));
-	
+
 	auto layout = gui::inst()->createLayout(size);
 	layout->setPosition(Vec2(start.x, end.y));
-	mNodeMap[node.id] = layout;
+	
+	if(node.id > 0)
+		mNodeMap[node.id] = layout;
     
 	//background colored layer
 	if (node.opacity > 0) {
-		auto layoutBG = gui::inst()->createLayout(Size(size.width - (node.margin.width * 2), size.height - (node.margin.height * 2))
-			, node.img, true, node.color);
+		Node * layoutBG;
+		Size sizeColored = Size(size.width - (node.margin.width * 2), size.height - (node.margin.height * 2));
+		if (node.img.length() > 0 || !node.isGradient) {
+			layoutBG = gui::inst()->createLayout(sizeColored, node.img, true, node.color);
+		}
+		else {
+			Color4B gradientStart = Color4B(node.color);
+			gradientStart.a = node.opacity;
+
+			Color4B gradientEnd = Color4B(node.color_end);
+			gradientEnd.a = node.opacity_end;
+
+			layoutBG = LayerGradient::create(gradientStart, gradientEnd);
+			layoutBG->setContentSize(sizeColored);
+		}
 		layoutBG->setPosition(Vec2(node.margin.width, node.margin.height));
 		layoutBG->setOpacity(node.opacity);
 		layout->addChild(layoutBG);
+		
 	}
 	
     if(mIsDrawGrid)
@@ -279,6 +335,15 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 	for (size_t n = 0; n < node.mObjects.size(); n++) {
 		WIZARD::_Object obj = node.mObjects[n];
 		string sz = getText(obj.text, obj.id);
+		Vec2 center = gui::inst()->getPointVec2(obj.position.x
+			, obj.position.y
+			, ALIGNMENT_CENTER
+			, layout->getContentSize()
+			, node.gridSize
+			, Size::ZERO
+			, node.margin
+		);
+		float min = (sizePerGrid.width > sizePerGrid.height) ? sizePerGrid.height : sizePerGrid.width;
 
 		Node * pObj;
 		switch(obj.type) {
@@ -379,11 +444,18 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 				, node.margin
 			);
 			break;
+		case WIZARD::OBJECT_TYPE_CIRCLE:
+			
+			pObj = gui::inst()->drawCircle(layout, center, min / 2.f, Color4F(obj.color));
+			break;
 		default:
 			break;
 		}
-		//pObj->setTag(obj.id);
-		mNodeMap[obj.id] = pObj;
+		//pObj->setColor(obj.color);
+		pObj->setOpacity(obj.opacity);
+		
+		if(obj.id > 0)
+			mNodeMap[obj.id] = pObj;
 	}
 	
 	this->addChild(layout);

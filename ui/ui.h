@@ -552,8 +552,6 @@ public:
 
 	float mOriginX, mOriginY;
 	float mVisibleX, mVisibleY;
-	float mWidth;
-	float mHeight;
 
     Vec2 mOrigin;
     Vec2 mVisibleSize;
