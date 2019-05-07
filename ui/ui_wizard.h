@@ -25,6 +25,7 @@ namespace WIZARD {
 		OBJECT_TYPE_SPRITE_BUTTON,
 		OBJECT_TYPE_LOADINGBAR,
 		OBJECT_TYPE_CIRCLE,
+        OBJECT_TYPE_RECT_BOUND,
 	};
 
 	struct _Object {
@@ -48,6 +49,7 @@ namespace WIZARD {
 		Vec2 dimensionStart;
 		Vec2 dimensionEnd;
 		Size margin;
+        Size innerMargin;
 		Size gridSize;
 		string img;
 		Color3B color, color_end;

@@ -844,6 +844,43 @@ DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color){
     return draw;
 }
 
+DrawNode * gui::drawRectBound (Node * p, Vec2 pos, Size size, Color4F color){
+    auto draw = DrawNode::create();
+    float ratio = 0.05f;
+    Vec2 origin = Vec2(pos.x - size.width / 2.f, pos.y - size.height / 2.f);
+    Vec2 dest = Vec2(pos.x + size.width / 2.f, pos.y + size.height / 2.f);
+    Vec2 marignBound = Vec2(size.width * ratio, size.height * ratio);
+    float margin = (marignBound.x > marignBound.y) ? marignBound.x : marignBound.y;
+//    Vec2 poli[9] = {
+//      Vec2(origin.x + marignBound.x, origin.y)
+//        , Vec2(dest.x - marignBound.x, origin.y)
+//        , Vec2(dest.x, origin.y + marignBound.y)
+//        , Vec2(dest.x, dest.y - marignBound.y)
+//        , Vec2(dest.x - marignBound.x, dest.y)
+//        , Vec2(origin.x + marignBound.x, dest.y)
+//        , Vec2(origin.x, dest.y - marignBound.y)
+//        , Vec2(origin.x, origin.y + marignBound.y)
+//        , Vec2(origin.x + marignBound.x, origin.y)
+//    };
+    
+    Vec2 poli[9] = {
+              Vec2(origin.x + margin    , origin.y)
+                , Vec2(dest.x - margin  , origin.y)
+                , Vec2(dest.x           , origin.y + margin)
+                , Vec2(dest.x           , dest.y - margin)
+                , Vec2(dest.x - margin  , dest.y)
+                , Vec2(origin.x + margin, dest.y)
+                , Vec2(origin.x         , dest.y - margin)
+                , Vec2(origin.x         , origin.y + margin)
+                , Vec2(origin.x + margin, origin.y)
+            };
+    
+    draw->drawSolidPoly(poli, 9, color);
+    p->addChild(draw);
+    
+    return draw;
+}
+
 DrawNode * gui::drawDiamond(Node * p, Vec2 pos, Size size, Color4F color){
     auto draw = DrawNode::create();
     
