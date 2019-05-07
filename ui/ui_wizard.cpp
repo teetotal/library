@@ -82,6 +82,8 @@ int WIZARD::_Object::getObjectType(const string type)
 		return OBJECT_TYPE_LOADINGBAR;
 	else if (type.compare("circle") == 0)
 		return OBJECT_TYPE_CIRCLE;
+    else if (type.compare("rectangle") == 0)
+        return OBJECT_TYPE_RECT;
     else if (type.compare("rectbound") == 0)
         return OBJECT_TYPE_RECT_BOUND;
 
@@ -308,12 +310,6 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
                             , (sizeColored.height - (node.innerMargin.height * 2.f)) / node.gridSize.height
                             );
     float min = (sizePerGrid.width > sizePerGrid.height) ? sizePerGrid.height : sizePerGrid.width;
-
-	auto layout = gui::inst()->createLayout(size);
-	layout->setPosition(Vec2(start.x, end.y));
-	
-	if(node.id > 0)
-		mNodeMap[node.id] = layout;
     
 	//background colored layer
     Node * layoutBG;
@@ -330,11 +326,12 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
         layoutBG = LayerGradient::create(gradientStart, gradientEnd);
         layoutBG->setContentSize(sizeColored);
     }
-    layoutBG->setPosition(Vec2(node.margin.width, node.margin.height));
+    layoutBG->setPosition(Vec2(start.x + node.margin.width, end.y + node.margin.height));
     layoutBG->setOpacity(node.opacity);
-    layout->addChild(layoutBG);
-		
-	
+    
+    if(node.id >= 0)
+        mNodeMap[node.id] = layoutBG;
+    
 	//draw grid line
     if(mIsDrawGrid)
         gui::inst()->drawGrid(layoutBG, layoutBG->getContentSize(), node.gridSize, Size::ZERO, node.innerMargin);
@@ -453,6 +450,9 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 		case WIZARD::OBJECT_TYPE_CIRCLE:
 			pObj = gui::inst()->drawCircle(layoutBG, center, min / 2.f, Color4F(obj.color));
 			break;
+        case WIZARD::OBJECT_TYPE_RECT:
+            pObj = gui::inst()->drawRect(layoutBG, center, sizePerGrid, Color4F(obj.color));
+            break;
         case WIZARD::OBJECT_TYPE_RECT_BOUND:
             pObj = gui::inst()->drawRectBound(layoutBG, center, sizePerGrid, Color4F(obj.color));
             break;
@@ -466,6 +466,6 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 			mNodeMap[obj.id] = pObj;
 	}
 	
-	this->addChild(layout);
+	this->addChild(layoutBG);
 }
 
