@@ -66,7 +66,9 @@ namespace WIZARD {
         int id;
 		string img;
 		Color4B bgColor, bgColor_end;
-		bool isGradient;
+        Color4F tileColor;
+		bool isGradient, hasTile;
+        Vec2 tileNum;
         bool isDrawGrid;
         
 		bool load(rapidjson::Value &p);

@@ -814,7 +814,15 @@ float gui::drawDiamond(cocos2d::Node *p, Vec2 center, float h, float degrees, co
     return xLen;
 }
 
-
+void gui::drawDiamondTile(Node * p, Vec2 counts, Color4F color) {
+    Vec2 grid = Vec2(p->getContentSize().width / counts.x, p->getContentSize().height / counts.y);
+    for(int x=0; x < counts.x; x++ ) {
+        for(int y=0; y < counts.y; y++ ) {
+            Vec2 pos = Vec2(x * grid.x + (grid.x / 2.f), y * grid.y + (grid.y / 2.f));
+            drawDiamond(p, pos, Size(grid), color);
+        }
+    }
+}
 
 void gui::addTiles(Node * p
                    , Rect dimension

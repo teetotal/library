@@ -114,14 +114,14 @@ public:
         }
         return hInstance;
     };
-    void init(const char* font = "fonts/Marker Felt.ttf"
+    void init(const char* font = "fonts/arial.ttf"
             , int fontSize = GRID_DEFAULT_FONT_SIZE
             , Color4F bgColor = Color4F::WHITE
 			, bool useSpriteCache = false
     );
     
-    void initDefaultWithSpriteCache() {
-        init("fonts/Marker Felt.ttf", GRID_DEFAULT_FONT_SIZE, Color4F::WHITE, true);
+    void initDefaultWithSpriteCache(const char* font = "fonts/arial.ttf") {
+        init(font, GRID_DEFAULT_FONT_SIZE, Color4F::WHITE, true);
     };
 
     float getRealPixel(float x);
@@ -493,6 +493,8 @@ public:
     DrawNode * drawRectRoundShadow (Node * p, Vec2 pos, Size size, Color4F color);
     DrawNode * drawDiamond(Node * p, Vec2 pos, Size size, Color4F color);
     float drawDiamond(Node * p, Vec2 center, float h, float degrees, Color4F color);
+    void drawDiamondTile(Node * p, Vec2 counts, Color4F);
+    
     float getTanLen(float h, float degrees) {
 //        const double pi = std::acos(-1);
         //180 X = degree

@@ -180,7 +180,9 @@ bool WIZARD::_Background::load(rapidjson::Value & p)
 	}
 
 	this->isGradient = false;
-
+    this->hasTile = false;
+    this->isDrawGrid = false;
+    //bgColor
 	if (!p["bgColor"].IsNull()) {
 		if (p["bgColor"][rapidjson::SizeType(0)].IsArray()) {
 			this->bgColor = Color4B(
@@ -209,7 +211,20 @@ bool WIZARD::_Background::load(rapidjson::Value & p)
 			);
 		}
 	}
-    this->isDrawGrid = false;
+    //tile
+    if (!p["tile"].IsNull()) {
+        this->tileColor = Color4F(Color4B(p["tile"]["color"][rapidjson::SizeType(0)].GetInt()
+                                          , p["tile"]["color"][rapidjson::SizeType(1)].GetInt()
+                                          , p["tile"]["color"][rapidjson::SizeType(2)].GetInt()
+                                          , p["tile"]["color"][rapidjson::SizeType(3)].GetInt()));
+        this->tileNum = Vec2(
+                             p["tile"]["num"][rapidjson::SizeType(0)].GetInt()
+                             , p["tile"]["num"][rapidjson::SizeType(1)].GetInt()
+        );
+        this->hasTile = true;
+    }
+    
+    //isDrawGrid
     if(!p["isDrawGrid"].IsNull())
         this->isDrawGrid = p["isDrawGrid"].GetBool();
     
@@ -292,6 +307,10 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
 	}
     
     mNodeMap[bg.id] = p;
+    
+    if(bg.hasTile) {
+        gui::inst()->drawDiamondTile(p, bg.tileNum, bg.tileColor);
+    }
     
     if(bg.isDrawGrid)
         gui::inst()->drawGrid(this
