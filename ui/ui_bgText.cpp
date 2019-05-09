@@ -4,7 +4,7 @@
 //
 //  Created by Jung, DaeCheon on 04/01/2019.
 //
-
+/*
 #include "ui_bgText.h"
 
 void ui_bgText::drawBG(Node * pParent) {
@@ -58,3 +58,4 @@ void ui_bgText::setBGSize() {
         mBGLayerColor->setPosition(Vec2(mMenu->getPosition().x - mMenuItemLabel->getContentSize().width / 2, mMenu->getPosition().y - mMenuItemLabel->getContentSize().height / 2));
     }
 }
+ */

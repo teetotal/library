@@ -52,22 +52,44 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
 	}
     
     this->opacity = (GLubyte)0xFF;
+    this->opacity_second = (GLubyte)0xFF;
     
-	if (!p["color"].IsNull()) {
-		if (p["color"].IsInt()) {
-			this->opacity = (GLubyte)p["color"].GetInt();
-		}
-		else {
-			this->color = Color3B(
-				p["color"][rapidjson::SizeType(0)].GetInt()
-				, p["color"][rapidjson::SizeType(1)].GetInt()
-				, p["color"][rapidjson::SizeType(2)].GetInt()
-			);
-            if(p["color"].GetArray().Size() == 4)
-                this->opacity = (GLubyte)p["color"][rapidjson::SizeType(3)].GetInt();
-		}
-		
-	}
+    if (!p["color"].IsNull()) {
+        if (p["color"].IsArray() && p["color"][rapidjson::SizeType(0)].IsArray()) {
+            this->color = Color3B(
+                                  p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(0)].GetInt()
+                                  , p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(1)].GetInt()
+                                  , p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(2)].GetInt()
+                                  );
+            this->opacity = (p["color"][rapidjson::SizeType(0)].GetArray().Size() == 4) ?
+            (GLubyte)p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
+            
+            if (p["color"].GetArray().Size() == rapidjson::SizeType(2)) {
+                this->color_second = Color3B(
+                                          p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(0)].GetInt()
+                                          , p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(1)].GetInt()
+                                          , p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(2)].GetInt()
+                                          );
+                this->opacity_second = (p["color"][rapidjson::SizeType(1)].GetArray().Size() == 4) ?
+                (GLubyte)p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
+            }
+        }
+        else {
+            if (p["color"].IsInt()) {
+                this->opacity = (GLubyte)p["color"].GetInt();
+            }
+            else {
+                this->color = Color3B(
+                                      p["color"][rapidjson::SizeType(0)].GetInt()
+                                      , p["color"][rapidjson::SizeType(1)].GetInt()
+                                      , p["color"][rapidjson::SizeType(2)].GetInt()
+                                      );
+                
+                this->opacity = (p["color"].GetArray().Size() == 4) ? (GLubyte)p["color"][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
+            }
+        }
+    }
+    
 	this->text = p["text"].IsNull() ? NULL_STRING_VALUE : p["text"].GetString();
 	this->fontSize = p["fontSize"].GetFloat();
 
@@ -78,14 +100,20 @@ int WIZARD::_Object::getObjectType(const string type)
 {
 	if (type.compare("button") == 0)
 		return OBJECT_TYPE_BUTTON;
+    else if (type.compare("button_sprite") == 0)
+        return OBJECT_TYPE_BUTTON_SPRITE;
+    else if (type.compare("button_circle") == 0)
+        return OBJECT_TYPE_BUTTON_CIRCLE;
+    else if (type.compare("button_rectangle_round_shadow") == 0)
+        return OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW;
 	else if (type.compare("sprite") == 0)
 		return OBJECT_TYPE_SPRITE;
 	else if (type.compare("label_sprite") == 0)
 		return OBJECT_TYPE_LABEL_SPRITE;
-	else if (type.compare("button_sprite") == 0)
-		return OBJECT_TYPE_BUTTON_SPRITE;
 	else if (type.compare("sprite_button") == 0)
 		return OBJECT_TYPE_SPRITE_BUTTON;
+    else if (type.compare("sprite_button_circle") == 0)
+        return OBJECT_TYPE_SPRITE_BUTTON_CIRCLE;
 	else if (type.compare("loadingbar") == 0)
 		return OBJECT_TYPE_LOADINGBAR;
 	else if (type.compare("circle") == 0)
@@ -252,7 +280,7 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 		WIZARD::VEC_NODES nodes = ui_wizard_share::inst()->getNodes(sceneName);
 		for (size_t n = 0; n < nodes.size(); n++) {
 			WIZARD::_Node p = nodes[n];
-			drawNode(p);
+			drawNode(p, (int)n);
 		}
 		return true;
 	}
@@ -280,7 +308,7 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 			return false;
 		
 		ui_wizard_share::inst()->addNode(sceneName, p);
-		drawNode(p);
+		drawNode(p, (int)i);
 	}
 
 	return true;
@@ -314,12 +342,15 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
     
     if(bg.isDrawGrid)
         gui::inst()->drawGrid(this
-			, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-			, mGrid
-			, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-			, Size::ZERO);
+                              , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                              , mGrid
+                              , Vec2(INVALID_VALUE, INVALID_VALUE)
+                              , Vec2::ZERO
+                              , Color4F::MAGENTA
+                              );
 }
-void ui_wizard::drawNode(WIZARD::_Node &node)
+
+void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
 {
     Vec2 start= gui::inst()->getPointVec2(node.dimensionStart.x, node.dimensionStart.y, ALIGNMENT_NONE
 		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
@@ -335,8 +366,8 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 	);
 	Size size = Size(end.x - start.x, start.y - end.y);
     Size sizeColored = Size(size.width - (node.margin.width * 2.f), size.height - (node.margin.height * 2.f));
-    Size sizePerGrid = Size((sizeColored.width - (node.innerMargin.width * 2.f)) / node.gridSize.width
-                            , (sizeColored.height - (node.innerMargin.height * 2.f)) / node.gridSize.height
+    Size sizePerGrid = Size((sizeColored.width / node.gridSize.width) - (node.innerMargin.width * 2.f)
+                            , (sizeColored.height / node.gridSize.height) - (node.innerMargin.height * 2.f) 
                             );
     float min = (sizePerGrid.width > sizePerGrid.height) ? sizePerGrid.height : sizePerGrid.width;
     
@@ -362,9 +393,10 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
         mNodeMap[node.id] = layoutBG;
     
 	//draw grid line
-    if(mIsDrawGrid)
-        gui::inst()->drawGrid(layoutBG, layoutBG->getContentSize(), node.gridSize, Size::ZERO, node.innerMargin);
-
+    if(mIsDrawGrid) {
+        gui::inst()->drawGrid(layoutBG, layoutBG->getContentSize(), node.gridSize, Size::ZERO, Size::ZERO, (seq % 2 == 1) ? Color4F::BLACK : Color4F::GRAY);
+    }
+    
 	for (size_t n = 0; n < node.mObjects.size(); n++) {
 		WIZARD::_Object obj = node.mObjects[n];
 		string sz = getText(obj.text, obj.id);
@@ -374,7 +406,7 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
 			, layoutBG->getContentSize()
 			, node.gridSize
 			, Size::ZERO
-			, node.innerMargin
+			, Size::ZERO
 		);
         
         Vec2 position = gui::inst()->getPointVec2(obj.position.x
@@ -383,8 +415,22 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
               , layoutBG->getContentSize()
               , node.gridSize
               , Size::ZERO
-              , node.innerMargin
+              , Size::ZERO//node.innerMargin
         );
+        Vec2 circleCenter = position;
+        
+        switch(obj.alignment) {
+            case ALIGNMENT_LEFT:
+                position.x += node.innerMargin.width;
+                circleCenter.x = position.x + (min / 2.f);
+            break;
+            case ALIGNMENT_RIGHT:
+                position.x -= node.innerMargin.width;
+                circleCenter.x = position.x - (min / 2.f);
+            break;
+            default:
+            break;
+        }
         
         Node * pObj;
         switch(obj.type) {
@@ -396,7 +442,8 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
                     , obj.alignment
                     , obj.color
                     , node.gridSize
-                    , Size::ZERO
+                    , Vec2::ZERO
+                    , Vec2::ZERO
                     , node.innerMargin
                     , obj.img
                 );
@@ -409,24 +456,27 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
                       , obj.alignment
                       , obj.color
                       , node.gridSize
-                      , Size::ZERO
+                      , Vec2::ZERO
+                      , Vec2::ZERO
                       , node.innerMargin
                       , obj.img
                       , false
                   );
                 break;
             case WIZARD::OBJECT_TYPE_BUTTON:
-                pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x, obj.position.y
-                    , sz
-                    , layoutBG
-                    , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                    , obj.fontSize
-                    , obj.alignment
-                    , obj.color
-                    , node.gridSize
-                    , Size::ZERO
-                    , node.innerMargin
-                    , obj.img);
+                pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
+                                                               , obj.position.y
+                                                               , sz
+                                                               , layoutBG
+                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                               , obj.fontSize
+                                                               , obj.alignment
+                                                               , obj.color
+                                                               , node.gridSize
+                                                               , Vec2::ZERO
+                                                               , Vec2::ZERO
+                                                               , node.innerMargin
+                                                               , obj.img);
                 break;
             case WIZARD::OBJECT_TYPE_BUTTON_SPRITE:
                 pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x, obj.position.y
@@ -437,68 +487,146 @@ void ui_wizard::drawNode(WIZARD::_Node &node)
                    , obj.alignment
                    , obj.color
                    , node.gridSize
-                   , Size::ZERO
+                   , Vec2::ZERO
+                   , Vec2::ZERO
                    , node.innerMargin
                    , obj.img
                    , false
                 );
                 break;
+            case WIZARD::OBJECT_TYPE_BUTTON_CIRCLE:
+            {
+                auto p = gui::inst()->drawCircle(layoutBG, circleCenter, min / 2.f, Color4F(obj.color_second));
+                p->setOpacity(obj.opacity_second);
+                
+                Menu * pMenu;
+                pObj = gui::inst()->addTextButtonRaw(pMenu
+                                                     , 0
+                                                     , 0
+                                                     , sz
+                                                     , layoutBG
+                                                     , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                     , obj.fontSize
+                                                     , ALIGNMENT_CENTER
+                                                     , obj.color
+                                                     , layoutBG->getContentSize()
+                                                     , Vec2(1, 1)
+                                                     , Vec2::ZERO
+                                                     , Vec2::ZERO
+                                                     , node.innerMargin
+                                                     , obj.img
+                                                     , false
+                                                     , true
+                                                     , circleCenter
+                                                    );
+                
+            }
+                break;
+            case WIZARD::OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW:
+            {
+                gui::inst()->drawRectRoundShadow(layoutBG, center, sizePerGrid, Color4F(obj.color_second, obj.opacity_second / 255.f));
+                pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
+                                                               , obj.position.y
+                                                               , sz
+                                                               , layoutBG
+                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                               , obj.fontSize
+                                                               , obj.alignment
+                                                               , obj.color
+                                                               , node.gridSize
+                                                               , Vec2::ZERO
+                                                               , Vec2::ZERO
+                                                               , node.innerMargin
+                                                               , obj.img);
+            }
+                break;
             case WIZARD::OBJECT_TYPE_SPRITE:
-                pObj = gui::inst()->addSpriteAutoDimension(obj.position.x, obj.position.y, obj.img, layoutBG, obj.alignment, node.gridSize, Size::ZERO, node.innerMargin);
-                if (sizePerGrid.width > sizePerGrid.height) {
+                pObj = gui::inst()->addSpriteAutoDimension(obj.position.x
+                                                           , obj.position.y
+                                                           , obj.img
+                                                           , layoutBG
+                                                           , obj.alignment
+                                                           , node.gridSize
+                                                           , Size::ZERO
+                                                           , node.innerMargin);
+            
+                if (sizePerGrid.width > sizePerGrid.height)
                     gui::inst()->setScaleByHeight(pObj, sizePerGrid.height);
-                }
-                else {
+                else
                     gui::inst()->setScale(pObj, sizePerGrid.width);
-                }
+                
                 break;
             case WIZARD::OBJECT_TYPE_SPRITE_BUTTON:
                 pObj = gui::inst()->addSpriteButton(obj.position.x
-                    , obj.position.y
-                    , obj.img
-                    , obj.img_selected
-                    , layoutBG
-                    , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                    , obj.alignment
-                    , layoutBG->getContentSize()
-                    , node.gridSize
-                    , Size::ZERO
-                    , node.innerMargin);
+                                                    , obj.position.y
+                                                    , obj.img
+                                                    , obj.img_selected
+                                                    , layoutBG
+                                                    , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                    , obj.alignment
+                                                    , layoutBG->getContentSize()
+                                                    , node.gridSize
+                                                    , Size::ZERO
+                                                    , node.innerMargin);
                 
-                if (sizePerGrid.width > sizePerGrid.height) {
+                if (sizePerGrid.width > sizePerGrid.height)
                     gui::inst()->setScaleByHeight(pObj, sizePerGrid.height);
-                }
-                else {
+                else
                     gui::inst()->setScale(pObj, sizePerGrid.width);
-                }
+                
+                break;
+            case WIZARD::OBJECT_TYPE_SPRITE_BUTTON_CIRCLE:
+            {
+                auto p = gui::inst()->drawCircle(layoutBG, circleCenter, min / 2.f, Color4F(obj.color));
+                p->setOpacity(obj.opacity);
+                
+                Menu * pMenu;
+                pObj = gui::inst()->addSpriteButtonRaw(pMenu
+                                                       , 0
+                                                       , 0
+                                                       , obj.img
+                                                       , obj.img_selected
+                                                       , layoutBG
+                                                       , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                       , ALIGNMENT_CENTER
+                                                       , layoutBG->getContentSize()
+                                                       , Vec2(1, 1)
+                                                       , Vec2::ZERO
+                                                       , Vec2::ZERO
+                                                       , node.innerMargin
+                                                       , circleCenter
+                                                       );
+                Size imgSize = sizePerGrid;
+                imgSize.width -= node.innerMargin.width * 2.f;
+                imgSize.height -= node.innerMargin.height * 2.f;
+                
+                if (imgSize.width > imgSize.height)
+                    gui::inst()->setScaleByHeight(pObj, imgSize.height);
+                else
+                    gui::inst()->setScale(pObj, imgSize.width);
+            }
                 break;
             case WIZARD::OBJECT_TYPE_LOADINGBAR:
                 pObj = gui::inst()->addProgressBar(obj.position.x
-                    , obj.position.y
-                    , obj.img
-                    , layoutBG
-                    , sizePerGrid.width
-                    , 90.f
-                    , layoutBG->getContentSize()
-                    , node.gridSize
-                    , Size::ZERO
-                    , node.innerMargin
-                );
+                                                    , obj.position.y
+                                                    , obj.img
+                                                    , layoutBG
+                                                    , sizePerGrid
+                                                    , 90.f
+                                                    , layoutBG->getContentSize()
+                                                    , node.gridSize
+                                                    , Vec2::ZERO
+                                                    , Vec2::ZERO
+                                                    , node.innerMargin
+                                                );
                 break;
             case WIZARD::OBJECT_TYPE_CIRCLE:
-            {
-                Vec2 pos = position;
-                if(obj.alignment == ALIGNMENT_LEFT)
-                    pos.x = position.x + (min / 2.f);
-                else if(obj.alignment == ALIGNMENT_RIGHT)
-                    pos.x = position.x - (min / 2.f);
-                
                 pObj = gui::inst()->drawCircle(layoutBG
-                                               , pos
+                                               , circleCenter
                                                , min / 2.f
                                                , Color4F(obj.color)
                                                );
-            }
+            
                 break;
             case WIZARD::OBJECT_TYPE_RECT:
                 pObj = gui::inst()->drawRect(layoutBG, center, sizePerGrid, Color4F(obj.color));

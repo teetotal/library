@@ -12,7 +12,9 @@
 #define GRID_Y 7
 #define GRID_DEFAULT_FONT_SIZE 14
 #define GRID_MARGIN 10
+#define GRID_INNER_MARGIN 0
 #define GRID_INVALID_VALUE -1
+#define INVALID_VALUE -1
 #define DEFAULT_OPACITY 150
 
 #define DEFAULT_LAYER_SIZE Size(420, 200)
@@ -127,208 +129,269 @@ public:
     float getRealPixel(float x);
     float getSizeFromRealPixel(float x);
 
+    // Get Point --------------------------------------------------------------------------------
+    bool getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align = ALIGNMENT_NONE
+                  , Size dimension = Size(INVALID_VALUE, INVALID_VALUE)
+                  , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                  , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                  , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                  , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                  );
+    
     bool getPoint(int x, int y, Vec2 &point, ALIGNMENT align = ALIGNMENT_NONE
-            , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-    );
-
+                    , Size dimension = Size(INVALID_VALUE, INVALID_VALUE)
+                    , Vec2 grid = Size(INVALID_VALUE, INVALID_VALUE)
+                    , Vec2 origin = Size(INVALID_VALUE,INVALID_VALUE)
+                    , Vec2 margin = Size(INVALID_VALUE, INVALID_VALUE)
+                    , Vec2 innerMargin = Size(INVALID_VALUE, INVALID_VALUE)
+                  ) {
+        return getPoint(x, y, point.x, point.y, align, dimension, grid, origin, margin, innerMargin);
+    }
+    /*
     Vec2 getPointVec2(int x, int y, ALIGNMENT align = ALIGNMENT_CENTER
-                      , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-                      , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-                      , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-                      , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)) {
+                      , Size dimension = Size(INVALID_VALUE, INVALID_VALUE)
+                      , Size grid = Size(INVALID_VALUE, INVALID_VALUE)
+                      , Size origin = Size(INVALID_VALUE,INVALID_VALUE)
+                      , Size margin = Size(INVALID_VALUE, INVALID_VALUE)
+                      , Size innerMargin = Size(INVALID_VALUE, INVALID_VALUE)) {
 		Vec2 p;
-		gui::inst()->getPoint(x, y, p, align, dimension, grid, origin, margin);
+		getPoint(x, y, p, align, dimension, grid, origin, margin, innerMargin);
 		return p;
 	};
-
-    bool getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align = ALIGNMENT_NONE
-                  , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-                  , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-                  , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-                  , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-    );
-    
+    */
+    Vec2 getPointVec2(int x, int y, ALIGNMENT align = ALIGNMENT_CENTER
+                      , Size dimension = Size(INVALID_VALUE, INVALID_VALUE)
+                      , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                      , Vec2 origin = Vec2(INVALID_VALUE,INVALID_VALUE)
+                      , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                      , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)) {
+        Vec2 p;
+        getPoint(x, y, p, align, dimension, Size(grid), Size(origin), Size(margin), Size(innerMargin));
+        return p;
+    };
+    // setAnchorPoint --------------------------------------------------------------------------------
     void setAnchorPoint(Node * p, ALIGNMENT align);
-    
+    // drawGrid --------------------------------------------------------------------------------
     bool drawGrid(Node * p
-            , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
+                  , Size dimension = Size(INVALID_VALUE, INVALID_VALUE)
+                  , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                  , Vec2 origin = Vec2(INVALID_VALUE,INVALID_VALUE)
+                  , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                  , Color4F color = Color4F::GRAY
     );
     bool drawPoint(Node * p);
     
     Sprite * addBG(const string bgImg, Node * parent, bool isOnLayer = false /* Scene이 아닌 layer에 이미지 올릴때 true */);
-    
-    Label * addLabel(int x
-            , int y
-            , const string &text
-            , Node *p
-            , int fontSize = 0
-            , ALIGNMENT align = ALIGNMENT_CENTER
-            , const Color3B color = Color3B::BLACK
-            , const string img = ""
-            , bool isBGImg = true
+    // Label --------------------------------------------------------------------------------
+    Label * createLabel(int x
+                        , int y
+                        , const string text
+                        , int fontSize = 0
+                        , ALIGNMENT align = ALIGNMENT_CENTER
+                        , const Color3B color = Color3B::BLACK
+                        , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                        , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                        , Vec2 origin = Vec2(INVALID_VALUE,INVALID_VALUE)
+                        , Vec2 margin = Vec2(INVALID_VALUE,INVALID_VALUE)
+                        , Vec2 innerMargin = Vec2(INVALID_VALUE,INVALID_VALUE)
     );
 
-    Label * addLabelAutoDimension(int x
-            , int y
-            , const string text
-            , Node *p
-            , int fontSize = 0
-            , ALIGNMENT align = ALIGNMENT_CENTER
-            , const Color3B color = Color3B::BLACK
-            , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , const string img = ""
-            , bool isBGImg = true
-    );
-    
-    Label * createLabel(int x
+    Label * addLabel(Node *p
+                     , int x
                      , int y
                      , const string text
                      , int fontSize = 0
                      , ALIGNMENT align = ALIGNMENT_CENTER
                      , const Color3B color = Color3B::BLACK
-                     , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-                     , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-                     , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-                     , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
+                     , Size dimension = Size(INVALID_VALUE, INVALID_VALUE)
+                     , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                     , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                     , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                     , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                     , const string img = ""
+                     , bool isBGImg = true
                      );
-
-    Label * addLabel(Node *p
-            , int x
-            , int y
-            , const string text
-            , int fontSize = 0
-            , ALIGNMENT align = ALIGNMENT_CENTER
-            , const Color3B color = Color3B::BLACK
-            , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , const string img = ""
-            , bool isBGImg = true
-    );
-    MenuItemLabel* addTextButtonAutoDimension(int x
-            , int y
-            , const string text
-            , Node* p
-            , const ccMenuCallback& callback
-            , int fontSize = 0
-            , ALIGNMENT align = ALIGNMENT_CENTER
-            , const Color3B color = Color3B::BLACK
-            , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , const string img = ""
-            , bool isBGImg = true
-    );
-	MenuItemLabel * addTextButton(int x
-		, int y
-		, const string text
-		, Node* p
-		, const ccMenuCallback& callback
-		, int fontSize = 0
-		, ALIGNMENT align = ALIGNMENT_CENTER
-		, const Color3B color = Color3B::BLACK
-		, Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size origin = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size margin = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, const string img = ""
-		, bool isBGImg = true
-	) {
-		Menu * pMenu = NULL;
-		return addTextButtonRaw(pMenu, x, y, text, p, callback, fontSize, align, color, dimension, grid, origin, margin, img, isBGImg);
-	};
-
+    
+    Label * addLabelAutoDimension(int x
+                                    , int y
+                                    , const string text
+                                    , Node *p
+                                    , int fontSize = 0
+                                    , ALIGNMENT align = ALIGNMENT_CENTER
+                                    , const Color3B color = Color3B::BLACK
+                                    , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    , Vec2 origin = Vec2(INVALID_VALUE,INVALID_VALUE)
+                                    , Vec2 margin = Vec2(INVALID_VALUE,INVALID_VALUE)
+                                    , Vec2 innerMargin = Vec2(INVALID_VALUE,INVALID_VALUE)
+                                    , const string img = ""
+                                    , bool isBGImg = true
+    ) {
+        return  addLabel(p
+                         , x
+                         , y
+                         , text
+                         , fontSize
+                         , align
+                         , color
+                         , p->getContentSize()
+                         , grid
+                         , origin
+                         , margin
+                         , innerMargin
+                         , img
+                         , isBGImg
+                         );
+    };
+    // Text Button --------------------------------------------------------------------------------
     MenuItemLabel* addTextButtonRaw(
-			Menu* &pMenu
-			, int x
-            , int y
-            , const string text
-            , Node* p
-            , const ccMenuCallback& callback
-            , int fontSize = 0
-            , ALIGNMENT align = ALIGNMENT_CENTER
-            , const Color3B color = Color3B::BLACK
-            , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , const string img = ""
-            , bool isBGImg = true
-            , bool isAttachParent = true
-    );
-
+                                    Menu* &pMenu
+                                    , int x
+                                    , int y
+                                    , const string text
+                                    , Node* p
+                                    , const ccMenuCallback& callback
+                                    , int fontSize = 0
+                                    , ALIGNMENT align = ALIGNMENT_CENTER
+                                    , const Color3B color = Color3B::BLACK
+                                    , Size dimension    = Size(INVALID_VALUE, INVALID_VALUE)
+                                    , Vec2 grid         = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    , Vec2 origin       = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    , Vec2 margin       = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    , const string img = ""
+                                    , bool isBGImg = true
+                                    , bool isAttachParent = true
+                                    , Vec2 specificPos = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    );
+    MenuItemLabel * addTextButton(int x
+                                  , int y
+                                  , const string text
+                                  , Node* p
+                                  , const ccMenuCallback& callback
+                                  , int fontSize = 0
+                                  , ALIGNMENT align = ALIGNMENT_CENTER
+                                  , const Color3B color = Color3B::BLACK
+                                  , Size dimension    = Size(INVALID_VALUE, INVALID_VALUE)
+                                  , Vec2 grid         = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                  , Vec2 origin       = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                  , Vec2 margin       = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                  , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                  , const string img = ""
+                                  , bool isBGImg = true)
+    {
+        Menu * pMenu = NULL;
+        return addTextButtonRaw(pMenu, x, y, text, p, callback, fontSize, align, color, dimension, grid, origin, margin, innerMargin, img, isBGImg);
+    };
+    
+    MenuItemLabel* addTextButtonAutoDimension(int x
+                                              , int y
+                                              , const string text
+                                              , Node* p
+                                              , const ccMenuCallback& callback
+                                              , int fontSize = 0
+                                              , ALIGNMENT align = ALIGNMENT_CENTER
+                                              , const Color3B color = Color3B::BLACK
+                                              , Vec2 grid         = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                              , Vec2 origin       = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                              , Vec2 margin       = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                              , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                              , const string img = ""
+                                              , bool isBGImg = true)
+    {
+        return addTextButton(x, y, text, p, callback, fontSize, align, color, p->getContentSize(), grid, origin, margin, innerMargin, img, isBGImg);
+    }
+    
+    // Sprite Button --------------------------------------------------------------------------------
+    MenuItemImage * addSpriteButtonRaw(Menu* &pMenu
+                                       , int x
+                                       , int y
+                                       , const string normalImg
+                                       , const string selectImg
+                                       , Node *p
+                                       , const ccMenuCallback &callback
+                                       , ALIGNMENT align = ALIGNMENT_CENTER
+                                       , Size dimension    = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                                       , Vec2 grid         = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                       , Vec2 origin       = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                       , Vec2 margin       = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                       , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                       , Vec2 specificPos  = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                       );
+    
 	MenuItemImage * addSpriteButton(int x
-		, int y
-		, const string normalImg
-		, const string selectImg
-		, Node *p
-		, const ccMenuCallback &callback
-		, ALIGNMENT align = ALIGNMENT_CENTER
-		, Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size origin = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size margin = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-	) {
+                                    , int y
+                                    , const string normalImg
+                                    , const string selectImg
+                                    , Node *p
+                                    , const ccMenuCallback &callback
+                                    , ALIGNMENT align = ALIGNMENT_CENTER
+                                    , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                                    , Vec2 grid         = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    , Vec2 origin       = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    , Vec2 margin       = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE))
+    {
 		Menu * pMenu = NULL;
-		return addSpriteButtonRaw(pMenu, x, y, normalImg, selectImg, p, callback, align, dimension, grid, origin, margin);
+		return addSpriteButtonRaw(pMenu, x, y, normalImg, selectImg, p, callback, align, dimension, grid, origin, margin, innerMargin);
 	};
-
-	MenuItemImage * addSpriteButtonRaw(
-		Menu* &pMenu
-		, int x
-		, int y
-		, const string normalImg
-		, const string selectImg
-		, Node *p
-		, const ccMenuCallback &callback
-		, ALIGNMENT align = ALIGNMENT_CENTER
-		, Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size origin = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size margin = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-	);
-
+    
+    // Sprite --------------------------------------------------------------------------------
     Sprite* addSprite(int x
-            , int y
-            , const string img
-            , Node* p
-            , ALIGNMENT align = ALIGNMENT_CENTER
-            , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
+                      , int y
+                      , const string img
+                      , Node* p
+                      , ALIGNMENT align = ALIGNMENT_CENTER
+                      , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                      , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                      , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                      , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                      , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)
     );
 
     Sprite* addSpriteFixedSize(const Size &spriteSize
-            , int x
-            , int y
-            , const string img
-            , Node* p
-            , ALIGNMENT align = ALIGNMENT_CENTER
-            , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-    );
+                               , int x
+                               , int y
+                               , const string img
+                               , Node* p
+                               , ALIGNMENT align = ALIGNMENT_CENTER
+                               , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                               , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                               , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                               , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                               , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE))
+    {
+            Sprite * sprite = addSprite(x, y, img, p, align, dimension, grid, origin, margin, innerMargin);
+            sprite->setContentSize(spriteSize);
+            return sprite;
+    };
 
     Sprite* addSpriteAutoDimension(int x
-            , int y
-            , const string img
-            , Node* p
-            , ALIGNMENT align = ALIGNMENT_CENTER
-            , Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-            , Size origin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-            , Size margin = Size(GRID_INVALID_VALUE,GRID_INVALID_VALUE)
-    );
+                                   , int y
+                                   , const string img
+                                   , Node* p
+                                   , ALIGNMENT align = ALIGNMENT_CENTER
+                                   , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                   , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                   , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                   , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE))
+    {
+        return addSprite(x, y, img, p, align, p->getContentSize(), grid, origin, margin, innerMargin);
+    };
+    
+    // addProgressBar --------------------------------------------------------------------------------
+    LoadingBar * addProgressBar(int x
+                                , int y
+                                , const string img
+                                , Node * p
+                                , Vec2 scaleSize
+                                , float defaultVal = 0.f
+                                , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                                , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                , LoadingBar::Direction direction = LoadingBar::Direction::LEFT
+                                );
     
     Sprite * getfittedSprite(const string sz, Node * node) {
         Sprite * sprite = Sprite::create(sz);
@@ -369,20 +432,7 @@ public:
             , const string bgImg = ""
             , Size innerSize = Size(0, 0)
 			, Node * parent = NULL
-    );
-
-    LoadingBar * addProgressBar(int x
-            , int y
-            , const string img
-            , Node * p
-            , float width
-            , float defaultVal = 0.f
-			, Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-			, Size grid = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-			, Size origin = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-			, Size margin = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-			, LoadingBar::Direction direction = LoadingBar::Direction::LEFT
-    );
+                               );
 
 	Sequence * createActionFocus() { 
 		float raiseDuration = 0.3f;
@@ -575,7 +625,7 @@ private:
     const Vec2 getNoneAnchorPoint(){
         return Vec2(0,1.75);
     };
-
+/*
     void getPoint(int x, int y
             , float &pointX_Center, float &pointY_Center
             , float &pointX_None, float &pointY_None
@@ -583,8 +633,26 @@ private:
             , Size dimension
             , Size grid
             , Size origin
-            , Size margin);
-    
+            , Size margin) {
+        getPoint(x,y
+                 , pointX_Center, pointY_Center
+                 , ALIGNMENT_CENTER
+                 , dimension
+                 , grid
+                 , origin
+                 , margin
+                 );
+        
+        getPoint(x,y
+                 , pointX_None, pointY_None
+                 , ALIGNMENT_NONE
+                 , dimension
+                 , grid
+                 , origin
+                 , margin
+                 );
+    };
+   */
     bool isExistVec2(vector<Vec2> &vec, Vec2 point);
 };
 

@@ -18,13 +18,21 @@ using namespace rapidjson;
 namespace WIZARD {
 	enum OBJECT_TYPE {
 		OBJECT_TYPE_LABEL = 0,
-		OBJECT_TYPE_BUTTON,
-		OBJECT_TYPE_SPRITE,
         OBJECT_TYPE_LABEL_SPRITE,
+        
+		OBJECT_TYPE_BUTTON,
         OBJECT_TYPE_BUTTON_SPRITE,
+        OBJECT_TYPE_BUTTON_CIRCLE,
+        OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW,
+        
+		OBJECT_TYPE_SPRITE,
 		OBJECT_TYPE_SPRITE_BUTTON,
+        OBJECT_TYPE_SPRITE_BUTTON_CIRCLE,
+        
 		OBJECT_TYPE_LOADINGBAR,
+        
 		OBJECT_TYPE_CIRCLE,
+        
         OBJECT_TYPE_RECT,
         OBJECT_TYPE_RECT_ROUND,
         OBJECT_TYPE_RECT_ROUND_SHADOW,
@@ -38,8 +46,8 @@ namespace WIZARD {
 		int link;
 		string img;
         string img_selected;
-		Color3B color;
-		GLubyte opacity;
+		Color3B color, color_second;
+		GLubyte opacity, opacity_second;
 		string text;
 		float fontSize;
 
@@ -168,7 +176,7 @@ private:
 	map<int, Node*> mNodeMap;
 
 	void drawBackground(WIZARD::_Background &bg);
-	void drawNode(WIZARD::_Node &node);
+	void drawNode(WIZARD::_Node &node, int seq);
     
     bool mIsDrawGrid;
     Size mGrid;

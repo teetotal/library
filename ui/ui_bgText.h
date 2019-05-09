@@ -7,7 +7,7 @@
 
 #ifndef ui_bgText_h
 #define ui_bgText_h
-
+/*
 #include "ui.h"
 class ui_bgText {
 public:
@@ -137,4 +137,6 @@ private:
     void drawBG(Node * pParent);
     void setBGSize();
 };
+ 
+*/
 #endif /* ui_bgText_h */

@@ -18,7 +18,7 @@ void gui::init(const char* font, int fontSize, Color4F bgColor, bool useSpriteCa
     mResolution = Director::getInstance()->getWinSizeInPixels();
 
 
-    mOriginX =origin.x;
+    mOriginX = origin.x;
     mOriginY = origin.y;
 
     mVisibleX = visibleSize.width;
@@ -44,33 +44,28 @@ float gui::getSizeFromRealPixel(float x){
     return mVisibleX * x / mResolution.width;
 }
 
-bool gui::getPoint(int x, int y, Vec2 &point, ALIGNMENT align
-        , Size dimension
-        , Size grid
-        , Size origin
-        , Size margin){
-
-    return getPoint(x, y, point.x, point.y, align, dimension, grid, origin, margin);
-
-}
-
 bool gui::getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align
         , Size dimension
-        , Size grid
-        , Size origin
-        , Size margin){
+        , Vec2 grid
+        , Vec2 origin
+        , Vec2 margin
+        , Vec2 innerMargin
+    ){
 
-    int gridX = grid.width == GRID_INVALID_VALUE ? GRID_X : grid.width;
-    int gridY = grid.height == GRID_INVALID_VALUE ? GRID_Y : grid.height;
+    int gridX = grid.x == INVALID_VALUE ? GRID_X : grid.x;
+    int gridY = grid.y == INVALID_VALUE ? GRID_Y : grid.y;
 
-    float originX = origin.width == GRID_INVALID_VALUE ? mOriginX : origin.width;
-    float originY = origin.height == GRID_INVALID_VALUE ? mOriginY : origin.height;
+    float originX = origin.x == INVALID_VALUE ? mOriginX : origin.x;
+    float originY = origin.y == INVALID_VALUE ? mOriginY : origin.y;
 
-    float marginX = margin.width == GRID_INVALID_VALUE ? GRID_MARGIN : margin.width;
-    float marginY = margin.height == GRID_INVALID_VALUE ? GRID_MARGIN : margin.height;
+    float marginX = margin.x == INVALID_VALUE ? GRID_MARGIN : margin.x;
+    float marginY = margin.y == INVALID_VALUE ? GRID_MARGIN : margin.y;
+    
+    float innerMarginX = innerMargin.x == INVALID_VALUE ? GRID_INNER_MARGIN : innerMargin.x;
+//    float innerMarginY = innerMargin.y == INVALID_VALUE ? GRID_INNER_MARGIN : innerMargin.y;
 
-    float dimensionX = dimension.width == GRID_INVALID_VALUE ? mVisibleX : dimension.width - (marginX * 2.f);
-    float dimensionY = dimension.height == GRID_INVALID_VALUE ? mVisibleY : dimension.height - (marginY * 2.f);
+    float dimensionX = dimension.width == INVALID_VALUE ? mVisibleX : dimension.width - (marginX * 2.f);
+    float dimensionY = dimension.height == INVALID_VALUE ? mVisibleY : dimension.height - (marginY * 2.f);
 
     float gridWidth = dimensionX / gridX;
     float gridHeight = dimensionY / gridY;
@@ -88,41 +83,17 @@ bool gui::getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align
         case ALIGNMENT_CENTER:
             pointX += gridWidth / 2.f;
             break;
+        case ALIGNMENT_LEFT:
+            pointX += innerMarginX;
+            break;
         case ALIGNMENT_RIGHT:
             pointX += gridWidth;
+            pointX -= innerMarginX;
             break;
         default:
             break;
     }
     return true;
-}
-
-void gui::getPoint(int x, int y
-        , float &pointX_Center, float &pointY_Center
-        , float &pointX_None, float &pointY_None
-        , ALIGNMENT align
-        , Size dimension
-        , Size grid
-        , Size origin
-        , Size margin) {
-
-    getPoint(x,y
-            , pointX_Center, pointY_Center
-            , ALIGNMENT_CENTER
-            , dimension
-            , grid
-            , origin
-            , margin
-    );
-
-    getPoint(x,y
-            , pointX_None, pointY_None
-            , ALIGNMENT_NONE
-            , dimension
-            , grid
-            , origin
-            , margin
-    );
 }
 
 void gui::setAnchorPoint(Node * p, ALIGNMENT align) {
@@ -139,26 +110,29 @@ void gui::setAnchorPoint(Node * p, ALIGNMENT align) {
     }
 };
 
-bool gui::drawGrid(Node * p
-        , Size dimension
-        , Size grid
-        , Size origin
-        , Size margin){
-    int gridX = grid.width == GRID_INVALID_VALUE ? GRID_X : grid.width;
-    int gridY = grid.height == GRID_INVALID_VALUE ? GRID_Y : grid.height;
+bool gui::drawGrid(Node * p, Size dimension, Vec2 grid, Vec2 origin, Vec2 margin, Color4F color){
+    int gridX = grid.x == INVALID_VALUE ? GRID_X : grid.x;
+    int gridY = grid.y == INVALID_VALUE ? GRID_Y : grid.y;
 
     for(int x = 0; x <= gridX; x++){
         auto draw = DrawNode::create();
         float startX, startY, endX, endY;
-        getPoint(x,0, startX, startY, ALIGNMENT_NONE, dimension
-                , grid
-                , origin
-                , margin);
+        getPoint(x
+                 ,0
+                 , startX
+                 , startY
+                 , ALIGNMENT_NONE
+                 , dimension
+                 , grid
+                 , origin
+                 , margin
+                 , Vec2::ZERO
+                 );
         getPoint(x, gridY, endX, endY, ALIGNMENT_NONE, dimension
                 , grid
                 , origin
                 , margin);
-        draw->drawLine(Point(startX, startY), Point(endX, endY), Color4F::GRAY);
+        draw->drawLine(Point(startX, startY), Point(endX, endY), color);
         p->addChild(draw);
     }
 
@@ -173,7 +147,7 @@ bool gui::drawGrid(Node * p
                 , grid
                 , origin
                 , margin);
-        draw->drawLine(Point(startX, startY), Point(endX, endY), Color4F::GRAY);
+        draw->drawLine(Point(startX, startY), Point(endX, endY), color);
         p->addChild(draw);
     }
 
@@ -214,80 +188,45 @@ Sprite * gui::addBG(const string bgImg, Node * parent, bool isOnLayer) {
     return bg;
 }
 
-Label * gui::addLabel(int x
-        , int y
-        , const string &text
-        , Node *p
-        , int fontSize
-        , ALIGNMENT align
-        , const Color3B color
-        , const string img
-        , bool isBGImg
-){
- return  addLabel(p, x, y, text, fontSize, align, color
-         , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-         , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-         , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-         , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-         , img
-         , isBGImg
-    );
-}
-
-Label * gui::addLabelAutoDimension(int x
-        , int y
-        , const string text
-        , Node *p
-        , int fontSize
-        , ALIGNMENT align
-        , const Color3B color
-        , Size grid
-        , Size origin
-        , Size margin
-        , const string img
-        , bool isBGImg
-){
-    return  addLabel(p, x, y, text, fontSize, align, color
-            , p->getContentSize()
-            , grid
-            , origin
-            , margin
-            , img
-            , isBGImg
-    );
-}
-
 Label * gui::createLabel(int x, int y, const string text,int fontSize, ALIGNMENT align, const Color3B color
                          , Size dimension
-                         , Size grid
-                         , Size origin
-                         , Size margin
+                         , Vec2 grid
+                         , Vec2 origin
+                         , Vec2 margin
+                         , Vec2 innerMargin
                     ){
     if(fontSize == 0)
         fontSize = mDefaultFontSize;
     
     Label * label = Label::createWithTTF(text, mDefaultFont, fontSize);
     label->setColor(color);
-    label->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin));
+    label->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
     setAnchorPoint(label, align);
     
     return label;
 }
 
-Label * gui::addLabel(Node *p, int x, int y, const string text, int fontSize, ALIGNMENT align, const Color3B color
-        , Size dimension
-        , Size grid
-        , Size origin
-        , Size margin
-        , const string img
-        , bool isBGImg
-){
+Label * gui::addLabel(Node *p
+                      , int x
+                      , int y
+                      , const string text
+                      , int fontSize
+                      , ALIGNMENT align
+                      , const Color3B color
+                      , Size dimension
+                      , Vec2 grid
+                      , Vec2 origin
+                      , Vec2 margin
+                      , Vec2 innerMargin
+                      , const string img
+                      , bool isBGImg)
+{
 
-    Label * label = createLabel(x, y, text, fontSize, align, color, dimension, grid, origin, margin);
+    Label * label = createLabel(x, y, text, fontSize, align, color, dimension, grid, origin, margin, innerMargin);
 
     if(img.compare("") != 0){
-        Size sizePerGrid = Size((p->getContentSize().width / grid.width) - (margin.width * 2.f)
-                                , (p->getContentSize().height / grid.height) - (margin.height * 2.f));
+        Size sizePerGrid = Size((p->getContentSize().width / grid.x) - (margin.x * 2.f) - (innerMargin.x * 2.f)
+                                , (p->getContentSize().height / grid.y) - (margin.y * 2.f) - (innerMargin.y * 2.f));
         
         auto sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
         if(sizePerGrid.width > sizePerGrid.height)
@@ -323,27 +262,24 @@ Label * gui::addLabel(Node *p, int x, int y, const string text, int fontSize, AL
 
     return label;
 }
-MenuItemLabel * gui::addTextButtonAutoDimension(int x, int y, const string text, Node *p, const ccMenuCallback &callback
-        , int fontSize, ALIGNMENT align, const Color3B color
-        , Size grid
-        , Size origin
-        , Size margin
-        , const string img
-        , bool isBGImg
-){
-    return addTextButton(x, y, text, p, callback, fontSize, align, color, p->getContentSize(), grid, origin, margin, img, isBGImg);
-}
 
-MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu, int x, int y, const string text, Node *p, const ccMenuCallback &callback
-        , int fontSize, ALIGNMENT align, const Color3B color
-        , Size dimension
-        , Size grid
-        , Size origin
-        , Size margin
-        , const string img
-        , bool isBGImg
-        , bool isAttachParent
-) {
+MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
+                                      , int x
+                                      , int y
+                                      , const string text
+                                      , Node *p
+                                      , const ccMenuCallback &callback
+                                      , int fontSize, ALIGNMENT align, const Color3B color
+                                      , Size dimension
+                                      , Vec2 grid
+                                      , Vec2 origin
+                                      , Vec2 margin
+                                      , Vec2 innerMargin
+                                      , const string img
+                                      , bool isBGImg
+                                      , bool isAttachParent
+                                      , Vec2 specificPos)
+{
     /*
     auto pItem = MenuItemFont::create(text, callback);
     pItem->setColor(color);	
@@ -355,12 +291,13 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu, int x, int y, const string t
     auto label = Label::createWithTTF(text, mDefaultFont, fontSize);
     label->setColor(color);
     auto pItem = MenuItemLabel::create(label, callback);
-    
+    Node * child = NULL;
     pMenu = Menu::create(pItem, NULL);
-   
-    if(img.compare("") != 0){
-        Size sizePerGrid = Size((p->getContentSize().width / grid.width) - (margin.width * 2.f)
-                                , (p->getContentSize().height / grid.height) - (margin.height * 2.f));
+    child = pMenu;
+    
+    if(img.compare("") != 0) {
+        Size sizePerGrid = Size((p->getContentSize().width / grid.x) - (margin.x * 2.f) - (innerMargin.x * 2.f)
+                                , (p->getContentSize().height / grid.y) - (margin.y * 2.f) - (innerMargin.y * 2.f));
         
         auto sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
         if(sizePerGrid.width > sizePerGrid.height)
@@ -369,34 +306,72 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu, int x, int y, const string t
             setScale(sprite, sizePerGrid.width);
         //bg
         if(isBGImg){
-            sprite->setPosition(getPointVec2(x, y, ALIGNMENT_CENTER, dimension, grid, origin, margin));
+            sprite->setPosition(getPointVec2(x, y, ALIGNMENT_CENTER, dimension, grid, origin, margin, innerMargin));
             setAnchorPoint(sprite, ALIGNMENT_CENTER);
             p->addChild(sprite);
-            pMenu->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin));
             setAnchorPoint(pItem, align);
-            p->addChild(pMenu);
-
-        }else{
+            pMenu->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
+            
+        } else{
             float spriteWidth = sprite->getContentSize().width * sprite->getScale();
             float labelWidth = label->getContentSize().width;
             setAnchorPoint(sprite, ALIGNMENT_LEFT);
             setAnchorPoint(pItem, ALIGNMENT_LEFT);
-            sprite->setPosition(Vec2(0, sizePerGrid.height / 2.f));
+            sprite->setPosition(Vec2(0.f, sizePerGrid.height / 2.f));
             pMenu->setPosition(Vec2(spriteWidth, sprite->getPosition().y));
             
             auto layer = createLayout(Size(spriteWidth + labelWidth, sizePerGrid.height));
             layer->addChild(sprite);
             layer->addChild(pMenu);
             
-            layer->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin));
+            layer->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
             setAnchorPoint(layer, align);
-            p->addChild(layer);
+            
+            child = layer;
         }
-    }else{
-        pMenu->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin));
+    } else{
         setAnchorPoint(pItem, align);
-        p->addChild(pMenu);
     }
+    
+    if(specificPos.x != GRID_INVALID_VALUE && specificPos.y != GRID_INVALID_VALUE) {
+        child->setPosition(specificPos);
+    } else {
+        child->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
+    }
+    
+    if(isAttachParent)
+        p->addChild(child);
+    
+    return pItem;
+}
+
+MenuItemImage * gui::addSpriteButtonRaw(Menu* &pMenu
+                                        , int x
+                                        , int y
+                                        , const string normalImg
+                                        , const string selectImg
+                                        , Node *p
+                                        , const ccMenuCallback &callback
+                                        , ALIGNMENT align
+                                        , Size dimension
+                                        , Vec2 grid
+                                        , Vec2 origin
+                                        , Vec2 margin
+                                        , Vec2 innerMargin
+                                        , Vec2 specificPos)
+{
+    auto pItem = MenuItemImage::create(normalImg, selectImg, callback);
+    pMenu = Menu::create(pItem, NULL);
+    
+    setAnchorPoint(pItem, align);
+    if(specificPos.x != INVALID_VALUE && specificPos.y != INVALID_VALUE) {
+        pMenu->setPosition(specificPos);
+    } else {
+        pMenu->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
+    }
+    
+    p->addChild(pMenu);
+    
     return pItem;
 }
 
@@ -541,23 +516,35 @@ ScrollView * gui::addScrollView(Vec2 p1, Vec2 p2, Size size, Size grid, Size ori
     return sv;
 }
 
-LoadingBar * gui::addProgressBar(int x, int y, const string img, Node * p, float width, float defaultVal, Size dimension, Size grid, Size origin, Size margin
-	, LoadingBar::Direction direction)
+LoadingBar * gui::addProgressBar(int x
+                                 , int y
+                                 , const string img
+                                 , Node * p
+                                 , Vec2 scaleSize
+                                 , float defaultVal
+                                 , Size dimension
+                                 , Vec2 grid
+                                 , Vec2 origin
+                                 , Vec2 margin
+                                 , Vec2 innerMargin
+                                 , LoadingBar::Direction direction)
 {
 	
-    Vec2 point;
-    getPoint(x, y, point, ALIGNMENT_CENTER, dimension, grid, origin, margin);
+    Vec2 point = getPointVec2(x, y, ALIGNMENT_LEFT, dimension, grid, origin, margin, innerMargin);
+    
     LoadingBar * loadingBar = LoadingBar::create(img);
+    setAnchorPoint(loadingBar, ALIGNMENT_LEFT);
     loadingBar->setDirection(direction);
     loadingBar->setPosition(point);
     loadingBar->setPercent(defaultVal);
-    setScale(loadingBar, width);
+    loadingBar->setScale(scaleSize.x / loadingBar->getContentSize().width, scaleSize.y / loadingBar->getContentSize().height);
     
 	//progress backgroung image
 	auto bgProgress = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
-	bgProgress->setOpacity(50);
+    setAnchorPoint(bgProgress, ALIGNMENT_LEFT);
+    bgProgress->setOpacity(50);
 	bgProgress->setPosition(point);
-    setScale(bgProgress, width);
+    bgProgress->setScale(scaleSize.x / bgProgress->getContentSize().width, scaleSize.y / bgProgress->getContentSize().height);
 	
 	p->addChild(bgProgress);
 	p->addChild(loadingBar);
@@ -565,23 +552,19 @@ LoadingBar * gui::addProgressBar(int x, int y, const string img, Node * p, float
     return loadingBar;
 }
 
-Sprite *
-gui::addSpriteAutoDimension(int x, int y, const string img, Node *p, ALIGNMENT align, Size grid,
-                            Size origin, Size margin) {
-    return addSprite(x, y, img, p, align, p->getContentSize(), grid, origin, margin);
-}
-
-Sprite *
-gui::addSpriteFixedSize(const Size &spriteSize, int x, int y, const string img, Node *p, ALIGNMENT align, Size dimension, Size grid, Size origin,
-               Size margin){
-    Sprite * sprite = addSprite(x, y, img, p, align, dimension, grid, origin, margin);
-    sprite->setContentSize(spriteSize);
-    return sprite;
-}
-Sprite * gui::addSprite(int x, int y, const string img, Node *p, ALIGNMENT align, Size dimension, Size grid, Size origin,
-               Size margin) {
+Sprite * gui::addSprite(int x
+                        , int y
+                        , const string img
+                        , Node *p
+                        , ALIGNMENT align
+                        , Size dimension
+                        , Vec2 grid
+                        , Vec2 origin
+                        , Vec2 margin
+                        , Vec2 innerMargin)
+{
 	Sprite * sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
-    sprite->setPosition(getPointVec2(x, y, align, dimension, grid, origin));
+    sprite->setPosition(getPointVec2(x, y, align, dimension, grid, origin, innerMargin));
     setAnchorPoint(sprite, align);
     p->addChild(sprite);
     return sprite;
@@ -673,30 +656,6 @@ Layout * gui::addQuantityLayer(Node * p, Size size, Size margin
     return layerQunatity;
 }
 
-MenuItemImage * gui::addSpriteButtonRaw(
-	Menu* &pMenu
-	, int x
-	, int y
-	, const string normalImg
-	, const string selectImg
-	, Node *p
-	, const ccMenuCallback &callback
-	, ALIGNMENT align
-	, Size dimension
-	, Size grid
-	, Size origin
-	, Size margin
-) {
-	auto pItem = MenuItemImage::create(normalImg, selectImg, callback);
-	pMenu = Menu::create(pItem, NULL);
-    pMenu->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin));
-    setAnchorPoint(pItem, align);
-    
-	p->addChild(pMenu);
-	
-	return pItem;
-}
-
 DrawNode * gui::drawLine(Node * p, Vec2 start, Vec2 end, Color4F color, GLfloat width)
 {
     auto draw = DrawNode::create();
@@ -745,7 +704,7 @@ DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color){
 
 DrawNode * gui::drawRectRound (Node * p, Vec2 pos, Size size, Color4F color){
     auto draw = DrawNode::create();
-    float ratio = 0.06f / 2.f;
+    float ratio = 0.04f / 2.f;
     Vec2 origin = Vec2(pos.x - size.width / 2.f, pos.y - size.height / 2.f);
     Vec2 dest = Vec2(pos.x + size.width / 2.f, pos.y + size.height / 2.f);
     Vec2 marignBound = Vec2(size.width * ratio, size.height * ratio);
