@@ -34,7 +34,7 @@ void gui::init(const char* font, int fontSize, Color4F bgColor, bool useSpriteCa
 
 	mUseSpriteCache = useSpriteCache;
 }
-
+// about pixel --------------------------------------------------------------------------------
 float gui::getRealPixel(float x){
     return mResolution.width * x / mVisibleX;
 }
@@ -43,7 +43,7 @@ float gui::getSizeFromRealPixel(float x){
 
     return mVisibleX * x / mResolution.width;
 }
-
+// Get Point --------------------------------------------------------------------------------
 bool gui::getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align
         , Size dimension
         , Vec2 grid
@@ -95,7 +95,7 @@ bool gui::getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align
     }
     return true;
 }
-
+// setAnchorPoint --------------------------------------------------------------------------------
 void gui::setAnchorPoint(Node * p, ALIGNMENT align) {
     switch(align) {
         case ALIGNMENT_CENTER:
@@ -109,7 +109,7 @@ void gui::setAnchorPoint(Node * p, ALIGNMENT align) {
             break;
     }
 };
-
+// drawGrid --------------------------------------------------------------------------------
 bool gui::drawGrid(Node * p, Size dimension, Vec2 grid, Vec2 origin, Vec2 margin, Color4F color){
     int gridX = grid.x == INVALID_VALUE ? GRID_X : grid.x;
     int gridY = grid.y == INVALID_VALUE ? GRID_Y : grid.y;
@@ -174,7 +174,7 @@ bool gui::drawPoint(Node *p) {
     }
     return true;
 }
-
+// addBG --------------------------------------------------------------------------------
 Sprite * gui::addBG(const string bgImg, Node * parent, bool isOnLayer) {
     auto bg = (mUseSpriteCache == false) ? Sprite::create(bgImg) : Sprite::createWithSpriteFrameName(bgImg);
     bg->setContentSize(Director::getInstance()->getVisibleSize());
@@ -187,7 +187,7 @@ Sprite * gui::addBG(const string bgImg, Node * parent, bool isOnLayer) {
     
     return bg;
 }
-
+// Label --------------------------------------------------------------------------------
 Label * gui::createLabel(int x, int y, const string text,int fontSize, ALIGNMENT align, const Color3B color
                          , Size dimension
                          , Vec2 grid
@@ -224,7 +224,7 @@ Label * gui::addLabel(Node *p
 
     Label * label = createLabel(x, y, text, fontSize, align, color, dimension, grid, origin, margin, innerMargin);
 
-    if(img.compare("") != 0){
+    if(img.compare("") != 0) {
         Size sizePerGrid = Size((p->getContentSize().width / grid.x) - (margin.x * 2.f) - (innerMargin.x * 2.f)
                                 , (p->getContentSize().height / grid.y) - (margin.y * 2.f) - (innerMargin.y * 2.f));
         
@@ -235,7 +235,7 @@ Label * gui::addLabel(Node *p
             setScale(sprite, sizePerGrid.width);
         //bg
         if(isBGImg){
-            sprite->setPosition(getPointVec2(x, y, ALIGNMENT_CENTER, dimension, grid, origin, margin));
+            sprite->setPosition(getPointVec2(x, y, ALIGNMENT_CENTER, dimension, grid, origin, margin, innerMargin));
             setAnchorPoint(sprite, ALIGNMENT_CENTER);
             p->addChild(sprite);
             p->addChild(label);
@@ -252,7 +252,7 @@ Label * gui::addLabel(Node *p
             layer->addChild(sprite);
             layer->addChild(label);
             
-            layer->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin));
+            layer->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
             setAnchorPoint(layer, align);
             p->addChild(layer);
         }
@@ -262,7 +262,7 @@ Label * gui::addLabel(Node *p
 
     return label;
 }
-
+// Text Button --------------------------------------------------------------------------------
 MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
                                       , int x
                                       , int y
@@ -344,7 +344,7 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
     
     return pItem;
 }
-
+// Sprite Button --------------------------------------------------------------------------------
 MenuItemImage * gui::addSpriteButtonRaw(Menu* &pMenu
                                         , int x
                                         , int y
@@ -374,8 +374,187 @@ MenuItemImage * gui::addSpriteButtonRaw(Menu* &pMenu
     
     return pItem;
 }
+// Sprite --------------------------------------------------------------------------------
+Sprite * gui::addSprite(int x
+                        , int y
+                        , const string img
+                        , Node *p
+                        , ALIGNMENT align
+                        , Size dimension
+                        , Vec2 grid
+                        , Vec2 origin
+                        , Vec2 margin
+                        , Vec2 innerMargin)
+{
+    Sprite * sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
+    sprite->setPosition(getPointVec2(x, y, align, dimension, grid, origin, innerMargin));
+    setAnchorPoint(sprite, align);
+    p->addChild(sprite);
+    return sprite;
+}
+// addProgressBar --------------------------------------------------------------------------------
+LoadingBar * gui::addProgressBar(int x
+                                 , int y
+                                 , const string img
+                                 , Node * p
+                                 , Vec2 scaleSize
+                                 , float defaultVal
+                                 , Size dimension
+                                 , Vec2 grid
+                                 , Vec2 origin
+                                 , Vec2 margin
+                                 , Vec2 innerMargin
+                                 , LoadingBar::Direction direction)
+{
+    
+    Vec2 point = getPointVec2(x, y, ALIGNMENT_LEFT, dimension, grid, origin, margin, innerMargin);
+    
+    LoadingBar * loadingBar = LoadingBar::create(img);
+    setAnchorPoint(loadingBar, ALIGNMENT_LEFT);
+    loadingBar->setDirection(direction);
+    loadingBar->setPosition(point);
+    loadingBar->setPercent(defaultVal);
+    loadingBar->setScale(scaleSize.x / loadingBar->getContentSize().width, scaleSize.y / loadingBar->getContentSize().height);
+    
+    //progress backgroung image
+    auto bgProgress = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
+    setAnchorPoint(bgProgress, ALIGNMENT_LEFT);
+    bgProgress->setOpacity(50);
+    bgProgress->setPosition(point);
+    bgProgress->setScale(scaleSize.x / bgProgress->getContentSize().width, scaleSize.y / bgProgress->getContentSize().height);
+    
+    p->addChild(bgProgress);
+    p->addChild(loadingBar);
+    
+    return loadingBar;
+}
+// draws --------------------------------------------------------------------------------
+DrawNode * gui::drawLine(Node * p, Vec2 start, Vec2 end, Color4F color, GLfloat width)
+{
+    auto draw = DrawNode::create();
+    draw->setLineWidth(width);
+    draw->drawLine(start, end, color);
+    
+    p->addChild(draw);
+    return draw;
+}
 
+DrawNode * gui::drawCircle(Node * p, Vec2 center, float radius, Color4F color){
+    auto draw = DrawNode::create();
+    draw->drawDot(center, radius, color);
+    draw->setContentSize(Size(radius * 2, radius * 2));
+    p->addChild(draw);
+    return draw;
+}
 
+DrawNode * gui::drawTriangle(Node * p, Vec2 a, Vec2 b, Vec2 c, Color4F color){
+    auto draw = DrawNode::create();
+    draw->drawTriangle(a, b, c, color);
+    
+    p->addChild(draw);
+    return draw;
+}
+
+DrawNode * gui::drawRect(Node * p, Vec2 pos1, Vec2 pos2, Vec2 pos3, Vec2 pos4, Color4F color){
+    auto draw = DrawNode::create();
+    
+    draw->drawRect(pos1, pos2, pos3, pos4, color);
+    
+    p->addChild(draw);
+    return draw;
+}
+
+DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color){
+    auto draw = DrawNode::create();
+    
+    Vec2 origin = Vec2(pos.x - size.width / 2, pos.y - size.height / 2);
+    Vec2 dest = Vec2(pos.x + size.width / 2, pos.y + size.height / 2);
+    draw->drawSolidRect(origin, dest, color);
+    
+    p->addChild(draw);
+    return draw;
+}
+
+DrawNode * gui::drawRectRound (Node * p, Vec2 pos, Size size, Color4F color){
+    auto draw = DrawNode::create();
+    float ratio = 0.04f / 2.f;
+    Vec2 origin = Vec2(pos.x - size.width / 2.f, pos.y - size.height / 2.f);
+    Vec2 dest = Vec2(pos.x + size.width / 2.f, pos.y + size.height / 2.f);
+    Vec2 marignBound = Vec2(size.width * ratio, size.height * ratio);
+    float margin = (marignBound.x > marignBound.y) ? marignBound.x : marignBound.y;
+    
+    Vec2 poli[9] = {
+        Vec2(origin.x + margin    , origin.y)
+        , Vec2(dest.x - margin  , origin.y)
+        , Vec2(dest.x           , origin.y + margin)
+        , Vec2(dest.x           , dest.y - margin)
+        , Vec2(dest.x - margin  , dest.y)
+        , Vec2(origin.x + margin, dest.y)
+        , Vec2(origin.x         , dest.y - margin)
+        , Vec2(origin.x         , origin.y + margin)
+        , Vec2(origin.x + margin, origin.y)
+    };
+    
+    draw->drawSolidPoly(poli, 9, color);
+    p->addChild(draw);
+    
+    return draw;
+}
+
+DrawNode * gui::drawRectRoundShadow (Node * p, Vec2 pos, Size size, Color4F color){
+    Color4F colorShadow = Color4F(color);
+    float f = 0.3f;
+    colorShadow.r = std::fmax(0, colorShadow.r - f);
+    colorShadow.g = std::fmax(0, colorShadow.g - f);
+    colorShadow.b = std::fmax(0, colorShadow.b - f);
+    
+    drawRectRound(p, Vec2(pos.x + 1, pos.y -1), size, colorShadow);
+    return drawRectRound(p, pos, size, color);
+}
+
+DrawNode * gui::drawDiamond(Node * p, Vec2 pos, Size size, Color4F color){
+    auto draw = DrawNode::create();
+    
+    Vec2 vLeft = Vec2(pos.x - size.width / 2, pos.y);
+    Vec2 vRight = Vec2(pos.x + size.width / 2, pos.y);
+    Vec2 vTop = Vec2(pos.x, pos.y + size.height / 2);
+    Vec2 vBottom = Vec2(pos.x, pos.y - size.height / 2);
+    
+    draw->drawTriangle(vLeft, vRight, vTop, color);
+    draw->drawTriangle(vLeft, vRight, vBottom, color);
+    
+    p->addChild(draw);
+    
+    return draw;
+}
+
+float gui::drawDiamond(cocos2d::Node *p, Vec2 center, float h, float degrees, cocos2d::Color4F color) {
+    double xLen = getTanLen(h, degrees);
+    Vec2 vLeft = Vec2(center.x - xLen, center.y);
+    Vec2 vRight = Vec2(center.x + xLen, center.y);
+    
+    Vec2 vTop = Vec2(center.x, center.y + h);
+    Vec2 vBottom = Vec2(center.x, center.y - h);
+    
+    auto draw = DrawNode::create();
+    
+    draw->drawTriangle(vLeft, vRight, vTop, color);
+    draw->drawTriangle(vLeft, vRight, vBottom, color);
+    
+    p->addChild(draw);
+    
+    return xLen;
+}
+
+void gui::drawDiamondTile(Node * p, Vec2 counts, Color4F color) {
+    Vec2 grid = Vec2(p->getContentSize().width / counts.x, p->getContentSize().height / counts.y);
+    for(int x=0; x < counts.x; x++ ) {
+        for(int y=0; y < counts.y; y++ ) {
+            Vec2 pos = Vec2(x * grid.x + (grid.x / 2.f), y * grid.y + (grid.y / 2.f));
+            drawDiamond(p, pos, Size(grid), color);
+        }
+    }
+}
 LayerColor * gui::createModalLayer(LayerColor * &layerBG, Size size, const string bgImg, Color4B bgColor) {
 	mModalTouchCnt = 0;
     //layerBG = LayerColor::create(Color4B::BLACK);
@@ -516,60 +695,6 @@ ScrollView * gui::addScrollView(Vec2 p1, Vec2 p2, Size size, Size grid, Size ori
     return sv;
 }
 
-LoadingBar * gui::addProgressBar(int x
-                                 , int y
-                                 , const string img
-                                 , Node * p
-                                 , Vec2 scaleSize
-                                 , float defaultVal
-                                 , Size dimension
-                                 , Vec2 grid
-                                 , Vec2 origin
-                                 , Vec2 margin
-                                 , Vec2 innerMargin
-                                 , LoadingBar::Direction direction)
-{
-	
-    Vec2 point = getPointVec2(x, y, ALIGNMENT_LEFT, dimension, grid, origin, margin, innerMargin);
-    
-    LoadingBar * loadingBar = LoadingBar::create(img);
-    setAnchorPoint(loadingBar, ALIGNMENT_LEFT);
-    loadingBar->setDirection(direction);
-    loadingBar->setPosition(point);
-    loadingBar->setPercent(defaultVal);
-    loadingBar->setScale(scaleSize.x / loadingBar->getContentSize().width, scaleSize.y / loadingBar->getContentSize().height);
-    
-	//progress backgroung image
-	auto bgProgress = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
-    setAnchorPoint(bgProgress, ALIGNMENT_LEFT);
-    bgProgress->setOpacity(50);
-	bgProgress->setPosition(point);
-    bgProgress->setScale(scaleSize.x / bgProgress->getContentSize().width, scaleSize.y / bgProgress->getContentSize().height);
-	
-	p->addChild(bgProgress);
-	p->addChild(loadingBar);
-
-    return loadingBar;
-}
-
-Sprite * gui::addSprite(int x
-                        , int y
-                        , const string img
-                        , Node *p
-                        , ALIGNMENT align
-                        , Size dimension
-                        , Vec2 grid
-                        , Vec2 origin
-                        , Vec2 margin
-                        , Vec2 innerMargin)
-{
-	Sprite * sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
-    sprite->setPosition(getPointVec2(x, y, align, dimension, grid, origin, innerMargin));
-    setAnchorPoint(sprite, align);
-    p->addChild(sprite);
-    return sprite;
-}
-
 void gui::addBGScrolling(const string img, Node * p, float duration){
     auto sprite1 = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
     auto sprite2 = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
@@ -656,132 +781,6 @@ Layout * gui::addQuantityLayer(Node * p, Size size, Size margin
     return layerQunatity;
 }
 
-DrawNode * gui::drawLine(Node * p, Vec2 start, Vec2 end, Color4F color, GLfloat width)
-{
-    auto draw = DrawNode::create();
-    draw->setLineWidth(width);
-    draw->drawLine(start, end, color);
-    
-    p->addChild(draw);
-    return draw;
-}
-
-DrawNode * gui::drawCircle(Node * p, Vec2 center, float radius, Color4F color){
-    auto draw = DrawNode::create();
-    draw->drawDot(center, radius, color);
-    draw->setContentSize(Size(radius * 2, radius * 2));
-    p->addChild(draw);
-    return draw;
-}
-
-DrawNode * gui::drawTriangle(Node * p, Vec2 a, Vec2 b, Vec2 c, Color4F color){
-    auto draw = DrawNode::create();
-    draw->drawTriangle(a, b, c, color);
-    
-    p->addChild(draw);
-    return draw;
-}
-
-DrawNode * gui::drawRect(Node * p, Vec2 pos1, Vec2 pos2, Vec2 pos3, Vec2 pos4, Color4F color){
-    auto draw = DrawNode::create();
-   
-    draw->drawRect(pos1, pos2, pos3, pos4, color);
-    
-    p->addChild(draw);
-    return draw;
-}
-
-DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color){
-    auto draw = DrawNode::create();
-    
-    Vec2 origin = Vec2(pos.x - size.width / 2, pos.y - size.height / 2);
-    Vec2 dest = Vec2(pos.x + size.width / 2, pos.y + size.height / 2);
-    draw->drawSolidRect(origin, dest, color);
-
-    p->addChild(draw);    
-    return draw;
-}
-
-DrawNode * gui::drawRectRound (Node * p, Vec2 pos, Size size, Color4F color){
-    auto draw = DrawNode::create();
-    float ratio = 0.04f / 2.f;
-    Vec2 origin = Vec2(pos.x - size.width / 2.f, pos.y - size.height / 2.f);
-    Vec2 dest = Vec2(pos.x + size.width / 2.f, pos.y + size.height / 2.f);
-    Vec2 marignBound = Vec2(size.width * ratio, size.height * ratio);
-    float margin = (marignBound.x > marignBound.y) ? marignBound.x : marignBound.y;
-    
-    Vec2 poli[9] = {
-              Vec2(origin.x + margin    , origin.y)
-                , Vec2(dest.x - margin  , origin.y)
-                , Vec2(dest.x           , origin.y + margin)
-                , Vec2(dest.x           , dest.y - margin)
-                , Vec2(dest.x - margin  , dest.y)
-                , Vec2(origin.x + margin, dest.y)
-                , Vec2(origin.x         , dest.y - margin)
-                , Vec2(origin.x         , origin.y + margin)
-                , Vec2(origin.x + margin, origin.y)
-            };
-    
-    draw->drawSolidPoly(poli, 9, color);
-    p->addChild(draw);
-    
-    return draw;
-}
-
-DrawNode * gui::drawRectRoundShadow (Node * p, Vec2 pos, Size size, Color4F color){
-    Color4F colorShadow = Color4F(color);
-    float f = 0.3f;
-    colorShadow.r = std::fmax(0, colorShadow.r - f);
-    colorShadow.g = std::fmax(0, colorShadow.g - f);
-    colorShadow.b = std::fmax(0, colorShadow.b - f);
-    
-    drawRectRound(p, Vec2(pos.x + 1, pos.y -1), size, colorShadow);
-    return drawRectRound(p, pos, size, color);
-}
-
-DrawNode * gui::drawDiamond(Node * p, Vec2 pos, Size size, Color4F color){
-    auto draw = DrawNode::create();
-    
-    Vec2 vLeft = Vec2(pos.x - size.width / 2, pos.y);
-    Vec2 vRight = Vec2(pos.x + size.width / 2, pos.y);
-    Vec2 vTop = Vec2(pos.x, pos.y + size.height / 2);
-    Vec2 vBottom = Vec2(pos.x, pos.y - size.height / 2);
-    
-    draw->drawTriangle(vLeft, vRight, vTop, color);
-    draw->drawTriangle(vLeft, vRight, vBottom, color);
-    
-    p->addChild(draw);
-    
-    return draw;
-}
-
-float gui::drawDiamond(cocos2d::Node *p, Vec2 center, float h, float degrees, cocos2d::Color4F color) {
-    double xLen = getTanLen(h, degrees);
-    Vec2 vLeft = Vec2(center.x - xLen, center.y);
-    Vec2 vRight = Vec2(center.x + xLen, center.y);
-
-    Vec2 vTop = Vec2(center.x, center.y + h);
-    Vec2 vBottom = Vec2(center.x, center.y - h);
-    
-    auto draw = DrawNode::create();
-    
-    draw->drawTriangle(vLeft, vRight, vTop, color);
-    draw->drawTriangle(vLeft, vRight, vBottom, color);
-    
-    p->addChild(draw);
-    
-    return xLen;
-}
-
-void gui::drawDiamondTile(Node * p, Vec2 counts, Color4F color) {
-    Vec2 grid = Vec2(p->getContentSize().width / counts.x, p->getContentSize().height / counts.y);
-    for(int x=0; x < counts.x; x++ ) {
-        for(int y=0; y < counts.y; y++ ) {
-            Vec2 pos = Vec2(x * grid.x + (grid.x / 2.f), y * grid.y + (grid.y / 2.f));
-            drawDiamond(p, pos, Size(grid), color);
-        }
-    }
-}
 
 void gui::addTiles(Node * p
                    , Rect dimension

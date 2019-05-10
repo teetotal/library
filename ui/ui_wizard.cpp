@@ -128,10 +128,12 @@ int WIZARD::_Object::getObjectType(const string type)
 	return OBJECT_TYPE_LABEL;
 }
 
-bool WIZARD::_Node::load(rapidjson::Value & p)
+bool WIZARD::_Node::load(rapidjson::Value & pValue)
 {
 	this->isGradient = false;
-	this->id = p["id"].GetInt();
+	this->id = pValue["id"].GetInt();
+    rapidjson::Value & p = (pValue.HasMember("include")) ? getJsonValue(pValue["include"]["path"].GetString())[pValue["include"]["key"].GetString()] : pValue;
+    
     this->dimensionStart.x = p["dimension"][rapidjson::SizeType(0)].GetFloat();
 	this->dimensionStart.y = p["dimension"][rapidjson::SizeType(1)].GetFloat();
 	this->dimensionEnd.x = p["dimension"][rapidjson::SizeType(2)].GetFloat();
@@ -196,9 +198,12 @@ bool WIZARD::_Node::load(rapidjson::Value & p)
 	return true;
 }
 
-bool WIZARD::_Background::load(rapidjson::Value & p)
+bool WIZARD::_Background::load(rapidjson::Value & pValue)
 {
-    this->id = p["id"].GetInt();
+    this->id = pValue["id"].GetInt();
+    
+    rapidjson::Value & p = (pValue.HasMember("include")) ? getJsonValue(pValue["include"]["path"].GetString())[pValue["include"]["key"].GetString()] : pValue;
+    
 	if (p["img"].IsNull())
 		this->img = NULL_STRING_VALUE;
 	else {
@@ -259,6 +264,20 @@ bool WIZARD::_Background::load(rapidjson::Value & p)
 	return true;
 }
 
+rapidjson::Document WIZARD::getJsonValue(const string& path) {
+    string fullpath = FileUtils::getInstance()->fullPathForFilename(path);
+    string sz = FileUtils::getInstance()->getStringFromFile(fullpath);
+    
+    rapidjson::Document d;
+    d.Parse(sz.c_str());
+    if (d.HasParseError()) {
+        CCLOG("loadFromJson Failure. ErrorCode: %d, ErrorOffset: %zu", d.GetParseError(), d.GetErrorOffset());
+        //return false;
+    }
+    return d;
+}
+
+
 bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 {
     //////////////////////////////
@@ -284,7 +303,10 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 		}
 		return true;
 	}
-
+    
+    rapidjson::Document d = WIZARD::getJsonValue(path);
+    /*
+    // parse from json file
 	string fullpath = FileUtils::getInstance()->fullPathForFilename(path);
 	string sz = FileUtils::getInstance()->getStringFromFile(fullpath);
 
@@ -294,7 +316,7 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 		CCLOG("loadFromJson Failure. ErrorCode: %d, ErrorOffset: %zu", d.GetParseError(), d.GetErrorOffset());		
 		return false;
 	}
-
+    */
 	WIZARD::_Background bg;
 	bg.load(d["background"]);
 	ui_wizard_share::inst()->setBackground(sceneName, bg);
@@ -346,7 +368,7 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
                               , mGrid
                               , Vec2(INVALID_VALUE, INVALID_VALUE)
                               , Vec2::ZERO
-                              , Color4F::MAGENTA
+                              , Color4F::GRAY
                               );
 }
 
@@ -394,7 +416,7 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
     
 	//draw grid line
     if(mIsDrawGrid) {
-        gui::inst()->drawGrid(layoutBG, layoutBG->getContentSize(), node.gridSize, Size::ZERO, Size::ZERO, (seq % 2 == 1) ? Color4F::BLACK : Color4F::GRAY);
+        gui::inst()->drawGrid(layoutBG, layoutBG->getContentSize(), node.gridSize, Size::ZERO, Size::ZERO, (seq % 2 == 1) ? Color4F::MAGENTA : Color4F::GREEN);
     }
     
 	for (size_t n = 0; n < node.mObjects.size(); n++) {

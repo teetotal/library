@@ -125,10 +125,10 @@ public:
     void initDefaultWithSpriteCache(const char* font = "fonts/arial.ttf") {
         init(font, GRID_DEFAULT_FONT_SIZE, Color4F::WHITE, true);
     };
-
+    
+    // about pixel --------------------------------------------------------------------------------
     float getRealPixel(float x);
     float getSizeFromRealPixel(float x);
-
     // Get Point --------------------------------------------------------------------------------
     bool getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align = ALIGNMENT_NONE
                   , Size dimension = Size(INVALID_VALUE, INVALID_VALUE)
@@ -180,7 +180,7 @@ public:
                   , Color4F color = Color4F::GRAY
     );
     bool drawPoint(Node * p);
-    
+    // addBG --------------------------------------------------------------------------------
     Sprite * addBG(const string bgImg, Node * parent, bool isOnLayer = false /* Scene이 아닌 layer에 이미지 올릴때 true */);
     // Label --------------------------------------------------------------------------------
     Label * createLabel(int x
@@ -399,6 +399,18 @@ public:
         sprite->setContentSize(node->getContentSize());
         return sprite;
     };
+    
+    // draws --------------------------------------------------------------------------------
+    DrawNode * drawLine             (Node * p, Vec2 start,  Vec2 end,       Color4F color = Color4F::GRAY, GLfloat width = 3.f);
+    DrawNode * drawCircle           (Node * p, Vec2 pos,    float radius,   Color4F color);
+    DrawNode * drawTriangle         (Node * p, Vec2 a,      Vec2 b,         Vec2 c,     Color4F color);
+    DrawNode * drawRect             (Node * p, Vec2 pos,    Size size,      Color4F color);
+    DrawNode * drawRect             (Node * p, Vec2 pos1,   Vec2 pos2,      Vec2 pos3,  Vec2 pos4, Color4F color);
+    DrawNode * drawRectRound        (Node * p, Vec2 pos,    Size size,      Color4F color);
+    DrawNode * drawRectRoundShadow  (Node * p, Vec2 pos,    Size size,      Color4F color);
+    DrawNode * drawDiamond          (Node * p, Vec2 pos,    Size size,      Color4F color);
+    float drawDiamond               (Node * p, Vec2 center, float h,        float degrees,  Color4F color);
+    void drawDiamondTile            (Node * p, Vec2 counts, Color4F color);
 
     LayerColor * addPopup(LayerColor * &pBG
             , Node * p
@@ -534,16 +546,7 @@ public:
 		p->setPosition(getCenter());
 		pParent->addChild(p);
 	};
-    DrawNode * drawLine(Node * p, Vec2 start, Vec2 end, Color4F color = Color4F::GRAY, GLfloat width = 3.f);
-    DrawNode * drawCircle(Node * p, Vec2 pos, float radius, Color4F color);
-    DrawNode * drawTriangle(Node * p, Vec2 a, Vec2 b, Vec2 c, Color4F color);
-    DrawNode * drawRect(Node * p, Vec2 pos, Size size, Color4F color);
-    DrawNode * drawRect(Node * p, Vec2 pos1, Vec2 pos2, Vec2 pos3, Vec2 pos4, Color4F color);
-    DrawNode * drawRectRound (Node * p, Vec2 pos, Size size, Color4F color);
-    DrawNode * drawRectRoundShadow (Node * p, Vec2 pos, Size size, Color4F color);
-    DrawNode * drawDiamond(Node * p, Vec2 pos, Size size, Color4F color);
-    float drawDiamond(Node * p, Vec2 center, float h, float degrees, Color4F color);
-    void drawDiamondTile(Node * p, Vec2 counts, Color4F);
+    
     
     float getTanLen(float h, float degrees) {
 //        const double pi = std::acos(-1);
@@ -573,7 +576,7 @@ public:
     //벡터 외적. 음수 = false
     bool vectorCross(Vec2 a, Vec2 b, Vec2 c, Vec2 x);
     
-    string getStar(int point){
+    const string getStar(int point){
         //★☆
         /*
          1-25 ☆

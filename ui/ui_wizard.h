@@ -83,6 +83,8 @@ namespace WIZARD {
 	};
 
 	typedef vector<WIZARD::_Node> VEC_NODES;
+    
+    rapidjson::Document getJsonValue(const string& path);
 };
 /* ===============================================
 	ui_wizard_share
@@ -149,6 +151,7 @@ private:
 	map<string, WIZARD::VEC_NODES> mSharedNodes;
 	map<string, WIZARD::_Background> mSharedBackgounds;
 };
+
 /* ===============================================
 	ui_wizard
 ================================================== */
@@ -181,6 +184,5 @@ private:
     bool mIsDrawGrid;
     Size mGrid;
 };
-
 
 #endif //PROJ_ANDROID_UI_WIZARD_H
