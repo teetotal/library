@@ -65,6 +65,7 @@ namespace WIZARD {
 		Color3B color, color_end;
         GLubyte opacity, opacity_end;
 		bool isGradient;
+        bool visible;
 		vector<_Object> mObjects;
 
 		bool load(rapidjson::Value &p);

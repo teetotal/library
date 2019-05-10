@@ -8,6 +8,9 @@ ui_wizard_share * ui_wizard_share::hInstance = NULL;
 
 bool WIZARD::_Object::load(rapidjson::Value & p)
 {
+    this->opacity = (GLubyte)0xFF;
+    this->opacity_second = (GLubyte)0xFF;
+    
 	this->id = p["id"].GetInt();
 	this->position.x = p["position"][rapidjson::SizeType(0)].GetFloat();
 	this->position.y = p["position"][rapidjson::SizeType(1)].GetFloat();
@@ -50,9 +53,6 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
         }
 		//SpriteFrameCache::getInstance()->removeSpriteFrameByName("btn_bg");	
 	}
-    
-    this->opacity = (GLubyte)0xFF;
-    this->opacity_second = (GLubyte)0xFF;
     
     if (!p["color"].IsNull()) {
         if (p["color"].IsArray() && p["color"][rapidjson::SizeType(0)].IsArray()) {
@@ -131,6 +131,8 @@ int WIZARD::_Object::getObjectType(const string type)
 bool WIZARD::_Node::load(rapidjson::Value & pValue)
 {
 	this->isGradient = false;
+    this->visible = true;
+    
 	this->id = pValue["id"].GetInt();
     rapidjson::Value & p = (pValue.HasMember("include")) ? getJsonValue(pValue["include"]["path"].GetString())[pValue["include"]["key"].GetString()] : pValue;
     
@@ -194,6 +196,10 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
 			this->mObjects.push_back(object);
 		}
 	}
+    
+    if(p.HasMember("visible")) {
+        this->visible = p["visible"].GetBool();
+    }
 	
 	return true;
 }
@@ -569,9 +575,10 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                                                            , layoutBG
                                                            , obj.alignment
                                                            , node.gridSize
-                                                           , Size::ZERO
-                                                           , node.innerMargin);
-            
+                                                           , Vec2::ZERO
+                                                           , Vec2::ZERO
+                                                           , node.innerMargin
+                                                           );
                 if (sizePerGrid.width > sizePerGrid.height)
                     gui::inst()->setScaleByHeight(pObj, sizePerGrid.height);
                 else
@@ -588,7 +595,8 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                                                     , obj.alignment
                                                     , layoutBG->getContentSize()
                                                     , node.gridSize
-                                                    , Size::ZERO
+                                                    , Vec2::ZERO
+                                                    , Vec2::ZERO
                                                     , node.innerMargin);
                 
                 if (sizePerGrid.width > sizePerGrid.height)
@@ -667,7 +675,7 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
 		if(obj.id > 0)
 			mNodeMap[obj.id] = pObj;
 	}
-	
+    layoutBG->setVisible(node.visible);
 	this->addChild(layoutBG);
 }
 

@@ -384,11 +384,15 @@ Sprite * gui::addSprite(int x
                         , Vec2 grid
                         , Vec2 origin
                         , Vec2 margin
-                        , Vec2 innerMargin)
+                        , Vec2 innerMargin
+                        , const Size &spriteSize)
 {
     Sprite * sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
-    sprite->setPosition(getPointVec2(x, y, align, dimension, grid, origin, innerMargin));
+    if(spriteSize.width != INVALID_VALUE && spriteSize.height != INVALID_VALUE) {
+        sprite->setScale(spriteSize.width / sprite->getContentSize().width, spriteSize.height / sprite->getContentSize().height);
+    }
     setAnchorPoint(sprite, align);
+    sprite->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
     p->addChild(sprite);
     return sprite;
 }

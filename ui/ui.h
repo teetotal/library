@@ -341,29 +341,30 @@ public:
                       , const string img
                       , Node* p
                       , ALIGNMENT align = ALIGNMENT_CENTER
-                      , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                      , Size dimension = Size(INVALID_VALUE, INVALID_VALUE)
                       , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
                       , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
                       , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
                       , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                      , const Size &spriteSize = Size(INVALID_VALUE, INVALID_VALUE)
     );
 
-    Sprite* addSpriteFixedSize(const Size &spriteSize
-                               , int x
-                               , int y
-                               , const string img
-                               , Node* p
-                               , ALIGNMENT align = ALIGNMENT_CENTER
-                               , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-                               , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
-                               , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
-                               , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
-                               , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE))
-    {
-            Sprite * sprite = addSprite(x, y, img, p, align, dimension, grid, origin, margin, innerMargin);
-            sprite->setContentSize(spriteSize);
-            return sprite;
-    };
+//    Sprite* addSpriteFixedSize(const Size &spriteSize
+//                               , int x
+//                               , int y
+//                               , const string img
+//                               , Node* p
+//                               , ALIGNMENT align = ALIGNMENT_CENTER
+//                               , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+//                               , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+//                               , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
+//                               , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
+//                               , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE))
+//    {
+//            Sprite * sprite = addSprite(x, y, img, p, align, dimension, grid, origin, margin, innerMargin);
+//            sprite->setContentSize(spriteSize);
+//            return sprite;
+//    };
 
     Sprite* addSpriteAutoDimension(int x
                                    , int y
@@ -373,9 +374,10 @@ public:
                                    , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
                                    , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
                                    , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
-                                   , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE))
+                                   , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                   , const Size &spriteSize = Size(INVALID_VALUE, INVALID_VALUE))
     {
-        return addSprite(x, y, img, p, align, p->getContentSize(), grid, origin, margin, innerMargin);
+        return addSprite(x, y, img, p, align, p->getContentSize(), grid, origin, margin, innerMargin, spriteSize);
     };
     
     // addProgressBar --------------------------------------------------------------------------------
