@@ -62,7 +62,7 @@ bool gui::getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align
     float marginY = margin.y == INVALID_VALUE ? GRID_MARGIN : margin.y;
     
     float innerMarginX = innerMargin.x == INVALID_VALUE ? GRID_INNER_MARGIN : innerMargin.x;
-//    float innerMarginY = innerMargin.y == INVALID_VALUE ? GRID_INNER_MARGIN : innerMargin.y;
+    float innerMarginY = innerMargin.y == INVALID_VALUE ? GRID_INNER_MARGIN : innerMargin.y;
 
     float dimensionX = dimension.width == INVALID_VALUE ? mVisibleX : dimension.width - (marginX * 2.f);
     float dimensionY = dimension.height == INVALID_VALUE ? mVisibleY : dimension.height - (marginY * 2.f);
@@ -77,18 +77,45 @@ bool gui::getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align
     if(align == ALIGNMENT_NONE)
         return true;
     
-    pointY -= gridHeight/ 2.f;
-    
     switch(align){
         case ALIGNMENT_CENTER:
             pointX += gridWidth / 2.f;
+            pointY -= gridHeight/ 2.f;
+            break;
+        case ALIGNMENT_CENTER_TOP:
+            pointX += gridWidth / 2.f;
+            pointY -= innerMarginY;
+            break;
+        case ALIGNMENT_CENTER_BOTTOM:
+            pointX += gridWidth / 2.f;
+            pointY -= gridHeight - innerMarginY;
             break;
         case ALIGNMENT_LEFT:
             pointX += innerMarginX;
+            pointY -= gridHeight/ 2.f;
+            break;
+        case ALIGNMENT_LEFT_TOP:
+            pointX += innerMarginX;
+            pointY -= innerMarginY;
+            break;
+        case ALIGNMENT_LEFT_BOTTOM:
+            pointX += innerMarginX;
+            pointY -= gridHeight - innerMarginY;
             break;
         case ALIGNMENT_RIGHT:
             pointX += gridWidth;
             pointX -= innerMarginX;
+            pointY -= gridHeight/ 2.f;
+            break;
+        case ALIGNMENT_RIGHT_TOP:
+            pointX += gridWidth;
+            pointX -= innerMarginX;
+            pointY -= innerMarginY;
+            break;
+        case ALIGNMENT_RIGHT_BOTTOM:
+            pointX += gridWidth;
+            pointX -= innerMarginX;
+            pointY -= gridHeight - innerMarginY;
             break;
         default:
             break;
@@ -101,11 +128,31 @@ void gui::setAnchorPoint(Node * p, ALIGNMENT align) {
         case ALIGNMENT_CENTER:
             p->setAnchorPoint(Vec2(0.5, 0.5));
             break;
+        case ALIGNMENT_CENTER_TOP:
+            p->setAnchorPoint(Vec2(0.5, 1));
+            break;
+        case ALIGNMENT_CENTER_BOTTOM:
+            p->setAnchorPoint(Vec2(0.5, 0));
+            break;
+        case ALIGNMENT_LEFT:
+            p->setAnchorPoint(Vec2(0, 0.5));
+            break;
+        case ALIGNMENT_LEFT_TOP:
+            p->setAnchorPoint(Vec2(0, 1));
+            break;
+        case ALIGNMENT_LEFT_BOTTOM:
+            p->setAnchorPoint(Vec2(0, 0));
+            break;
         case ALIGNMENT_RIGHT:
             p->setAnchorPoint(Vec2(1, 0.5));
             break;
+        case ALIGNMENT_RIGHT_TOP:
+            p->setAnchorPoint(Vec2(1, 1));
+            break;
+        case ALIGNMENT_RIGHT_BOTTOM:
+            p->setAnchorPoint(Vec2(1, 0));
+            break;
         default:
-            p->setAnchorPoint(Vec2(0, 0.5));
             break;
     }
 };

@@ -46,10 +46,11 @@ namespace WIZARD {
 		int link;
 		string img;
         string img_selected;
-		Color3B color, color_second;
-		GLubyte opacity, opacity_second;
+		Color3B color, color_second, bgColor;
+		GLubyte opacity, opacity_second, bgOpacity;
 		string text;
 		float fontSize;
+        bool hasBgColor;
 
 		bool load(rapidjson::Value &p);
 		int getObjectType(const string type);
