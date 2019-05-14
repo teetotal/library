@@ -420,6 +420,9 @@ public:
     float drawDiamond               (Node * p, Vec2 center, float h,        float degrees,  Color4F color);
     void drawDiamondTile            (Node * p, Vec2 counts, Color4F color);
 
+    // set modal  --------------------------------------------------------------------------------
+    void setModal(Node * layer);
+    
     LayerColor * addPopup(LayerColor * &pBG
             , Node * p
             , Size size

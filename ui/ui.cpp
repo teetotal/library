@@ -606,6 +606,19 @@ void gui::drawDiamondTile(Node * p, Vec2 counts, Color4F color) {
         }
     }
 }
+
+// set modal  --------------------------------------------------------------------------------
+void gui::setModal(Node * layer) {
+    auto listener = EventListenerTouchOneByOne::create();
+    listener->setSwallowTouches(true);
+    listener->onTouchBegan = [this](Touch *touch,Event*event)->bool {
+        return true;
+    };
+    
+    auto dispatcher = Director::getInstance()->getEventDispatcher();
+    dispatcher->addEventListenerWithSceneGraphPriority(listener, layer);
+}
+
 LayerColor * gui::createModalLayer(LayerColor * &layerBG, Size size, const string bgImg, Color4B bgColor) {
 	mModalTouchCnt = 0;
     //layerBG = LayerColor::create(Color4B::BLACK);
@@ -673,9 +686,11 @@ Layout * gui::createLayout(Size size, const string bgImg, bool hasBGColor, Color
         l->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
     }	
 
-    if(bgImg.compare("") != 0)
+    if(bgImg.compare("") != 0){
         l->setBackGroundImage(bgImg);
-
+        l->setBackGroundImageScale9Enabled(true);
+    }
+    
     l->setContentSize(size);
 
     return l;

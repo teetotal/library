@@ -57,10 +57,10 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
     CCLOG("Start WIZARD::_Object::load type");
 	this->type = (OBJECT_TYPE)getObjectType(p["type"].GetString());
     CCLOG("Start WIZARD::_Object::load link");
-	this->link = p["link"].IsNull() ? NULL_INT_VALUE : p["link"].GetInt();
+	this->link = ( !p.HasMember("link") || p["link"].IsNull()) ? NULL_INT_VALUE : p["link"].GetInt();
 	
     CCLOG("Start WIZARD::_Object::load img");
-    if (p["img"].IsNull()) {
+    if (!p.HasMember("img") || p["img"].IsNull()) {
 		this->img = NULL_STRING_VALUE;
         this->img_selected = NULL_STRING_VALUE;
     }
@@ -138,9 +138,9 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
     }
     
     CCLOG("Start WIZARD::_Object::load text");
-	this->text = p["text"].IsNull() ? NULL_STRING_VALUE : p["text"].GetString();
+	this->text = (!p.HasMember("text") || p["text"].IsNull()) ? NULL_STRING_VALUE : p["text"].GetString();
     CCLOG("Start WIZARD::_Object::load fontSize");
-	this->fontSize = p["fontSize"].GetFloat();
+    this->fontSize = (!p.HasMember("fontSize") || p["fontSize"].IsNull()) ? 0 : p["fontSize"].GetFloat();
 
 	return true;
 }
