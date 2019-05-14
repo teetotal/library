@@ -57,8 +57,8 @@ namespace WIZARD {
 	};
 	struct _Node {
 		int id;
-		Vec2 dimensionStart;
-		Vec2 dimensionEnd;
+		Vec2 dimensionStart, dimensionEnd;
+		Vec2 dimensionInnerStart, dimensionInnerEnd;
 		Size margin;
         Size innerMargin;
 		Size gridSize;
@@ -67,6 +67,7 @@ namespace WIZARD {
         GLubyte opacity, opacity_end;
 		bool isGradient;
         bool visible;
+        bool isScrollView;
 		vector<_Object> mObjects;
 
 		bool load(rapidjson::Value &p);

@@ -182,6 +182,7 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
     CCLOG("Start WIZARD::_Node::load");
 	this->isGradient = false;
     this->visible = true;
+    this->isScrollView = false;
     
 	this->id = pValue["id"].GetInt();
     CCLOG("Start WIZARD::_Node::load id=%d", id);
@@ -194,6 +195,16 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
 	this->dimensionStart.y = p["dimension"][rapidjson::SizeType(1)].GetFloat();
 	this->dimensionEnd.x = p["dimension"][rapidjson::SizeType(2)].GetFloat();
 	this->dimensionEnd.y = p["dimension"][rapidjson::SizeType(3)].GetFloat();
+    
+    if(p.HasMember("dimensionInner") && !p["dimensionInner"].IsNull()) {
+        CCLOG("Start WIZARD::_Node::load dimensionInner");
+        this->dimensionInnerStart.x = p["dimensionInner"][rapidjson::SizeType(0)].GetFloat();
+        this->dimensionInnerStart.y = p["dimensionInner"][rapidjson::SizeType(1)].GetFloat();
+        this->dimensionInnerEnd.x = p["dimensionInner"][rapidjson::SizeType(2)].GetFloat();
+        this->dimensionInnerEnd.y = p["dimensionInner"][rapidjson::SizeType(3)].GetFloat();
+        
+        this->isScrollView = true;
+    }
     
     CCLOG("Start WIZARD::_Node::load margin");
 	this->margin.width = p["margin"][rapidjson::SizeType(0)].GetFloat();
@@ -454,7 +465,27 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
 		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
 		, Size::ZERO
 	);
-	Size size = Size(end.x - start.x, start.y - end.y);
+    
+    Size size = Size(end.x - start.x, start.y - end.y);
+    Size scrollviewSize = size;
+    //margin에 따른 사이즈 수정 필요
+    if(node.isScrollView) {
+        Vec2 startInner= gui::inst()->getPointVec2(node.dimensionInnerStart.x, node.dimensionInnerStart.y, ALIGNMENT_NONE
+                                                   , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                                                   , mGrid
+                                                   , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                                                   , Size::ZERO
+                                                   );
+        Vec2 endInner = gui::inst()->getPointVec2(node.dimensionInnerEnd.x, node.dimensionInnerEnd.y, ALIGNMENT_NONE
+                                                  , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                                                  , mGrid
+                                                  , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                                                  , Size::ZERO
+                                                  );
+        
+        size = Size(endInner.x - startInner.x, startInner.y - endInner.y);
+    }
+    
     Size sizeColored = Size(size.width - (node.margin.width * 2.f), size.height - (node.margin.height * 2.f));
     Size sizePerGridNoMargin = Size((sizeColored.width / node.gridSize.width), (sizeColored.height / node.gridSize.height));
     Size sizePerGrid = Size(sizePerGridNoMargin.width - (node.innerMargin.width * 2.f), sizePerGridNoMargin.height - (node.innerMargin.height * 2.f));
@@ -462,21 +493,33 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
     
 	//background colored layer
     Node * layoutBG;
-    if (node.img.length() > 0 || !node.isGradient) {
-        layoutBG = gui::inst()->createLayout(sizeColored, node.img, true, node.color);
-    }
-    else {
+    ScrollView * sv;
+    
+    if (node.isGradient) {
         Color4B gradientStart = Color4B(node.color);
         gradientStart.a = node.opacity;
-
+        
         Color4B gradientEnd = Color4B(node.color_end);
         gradientEnd.a = node.opacity_end;
-
+        
         layoutBG = LayerGradient::create(gradientStart, gradientEnd);
         layoutBG->setContentSize(sizeColored);
     }
-    layoutBG->setPosition(Vec2(start.x + node.margin.width, end.y + node.margin.height));
-    layoutBG->setOpacity(node.opacity);
+    else
+    {
+        layoutBG = gui::inst()->createLayout(sizeColored, node.img, true, node.color);
+        layoutBG->setOpacity(node.opacity);
+    }
+    
+    
+    if(node.isScrollView) {
+        layoutBG->setPosition(Vec2::ZERO);
+        sv = gui::inst()->addScrollView(scrollviewSize, sizeColored, Vec2(start.x + node.margin.width, end.y + node.margin.height), this);
+    } else {
+        layoutBG->setPosition(Vec2(start.x + node.margin.width, end.y + node.margin.height));
+    }
+    
+    
     
     if(node.id >= 0)
         mNodeMap[node.id] = layoutBG;
@@ -745,7 +788,13 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
 		if(obj.id > 0)
 			mNodeMap[obj.id] = pObj;
 	}
-    layoutBG->setVisible(node.visible);
-	this->addChild(layoutBG);
+    
+    if(node.isScrollView) {
+        sv->setVisible(node.visible);
+        sv->addChild(layoutBG);
+    } else {
+        layoutBG->setVisible(node.visible);
+        this->addChild(layoutBG);
+    }
 }
 

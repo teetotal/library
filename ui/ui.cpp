@@ -327,11 +327,6 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
                                       , bool isAttachParent
                                       , Vec2 specificPos)
 {
-    /*
-    auto pItem = MenuItemFont::create(text, callback);
-    pItem->setColor(color);	
-    
-     */
     if(fontSize == 0)
         fontSize = mDefaultFontSize;
     
@@ -479,6 +474,7 @@ LoadingBar * gui::addProgressBar(int x
     
     return loadingBar;
 }
+
 // draws --------------------------------------------------------------------------------
 DrawNode * gui::drawLine(Node * p, Vec2 start, Vec2 end, Color4F color, GLfloat width)
 {
@@ -619,6 +615,51 @@ void gui::setModal(Node * layer) {
     dispatcher->addEventListenerWithSceneGraphPriority(listener, layer);
 }
 
+// createLayout  --------------------------------------------------------------------------------
+Layout * gui::createLayout(Size size, const string bgImg, bool hasBGColor, Color3B bgColor){
+    Layout* l = Layout::create();
+    if(hasBGColor){
+        l->setBackGroundColor(bgColor);
+        l->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
+    }
+    
+    if(bgImg.compare("") != 0){
+        l->setBackGroundImage(bgImg);
+        l->setBackGroundImageScale9Enabled(true);
+    }
+    
+    l->setContentSize(size);
+    
+    return l;
+}
+
+// addScrollView  --------------------------------------------------------------------------------
+ScrollView * gui::addScrollView(Size size, Size innerSize, Vec2 position, Node * parent) {
+    ScrollView * sv = ScrollView::create();
+    sv->setContentSize(size);
+    sv->setPosition(position);
+    sv->setInnerContainerSize(innerSize);
+    ScrollView::Direction d = ScrollView::Direction::NONE;
+    
+    if(size.width < innerSize.width && size.height < innerSize.height) {
+        d = ScrollView::Direction::BOTH;
+    }
+    else if(size.width < innerSize.width) {
+        d = ScrollView::Direction::HORIZONTAL;
+    }
+    else if(size.height < innerSize.height) {
+        d = ScrollView::Direction::VERTICAL;
+    }
+    
+    sv->setDirection(d);
+    sv->setScrollBarPositionFromCorner(Vec2::ZERO);
+    
+    if (parent != NULL)
+    parent->addChild(sv);
+    
+    return sv;
+}
+
 LayerColor * gui::createModalLayer(LayerColor * &layerBG, Size size, const string bgImg, Color4B bgColor) {
 	mModalTouchCnt = 0;
     //layerBG = LayerColor::create(Color4B::BLACK);
@@ -679,23 +720,6 @@ LayerColor * gui::addPopup(LayerColor * &layerBG, Node * p, Size size, const str
     return layer;
 }
 
-Layout * gui::createLayout(Size size, const string bgImg, bool hasBGColor, Color3B bgColor){
-    Layout* l = Layout::create();
-    if(hasBGColor){
-        l->setBackGroundColor(bgColor);
-        l->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-    }	
-
-    if(bgImg.compare("") != 0){
-        l->setBackGroundImage(bgImg);
-        l->setBackGroundImageScale9Enabled(true);
-    }
-    
-    l->setContentSize(size);
-
-    return l;
-}
-
 void gui::addLayoutToScrollView(ScrollView * p, Layout * e, float margin, int newlineInterval){
     ssize_t nCount = p->getChildrenCount();
     float x, y;
@@ -723,43 +747,6 @@ Size gui::getScrollViewSize(Vec2 p1, Vec2 p2, Size size, Size grid, Size origin,
 	return Size(svX2 - svX1, std::max(svY1, svY2) - std::min(svY1, svY2));
 }
 
-ScrollView * gui::addScrollView(Vec2 p1, Vec2 p2, Size size, Size grid, Size origin, Size margin, const string bgImg, Size innerSize, Node * parent){
-	
-//    if (size.width <= 0) size = Director::getInstance()->getVisibleSize();
-
-    ScrollView * sv = ScrollView::create();
-//    sv->setBackGroundColor(Color3B::GRAY);
-//    sv->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-    if(bgImg.compare("") != 0)
-        sv->setBackGroundImage(bgImg);
-
-    float svX1, svY1, svX2, svY2;
-    getPoint(p1.x, p1.y, svX1, svY1, ALIGNMENT_NONE, size, grid, origin, margin);
-    getPoint(p2.x, p2.y, svX2, svY2, ALIGNMENT_NONE, size, grid, origin, margin);
-
-    sv->setPosition(Vec2(std::min(svX1, svX2), std::min(svY1, svY2)));
-    sv->setContentSize(Size(svX2 - svX1, std::max(svY1, svY2) - std::min(svY1, svY2)));
-    
-    if(innerSize.width > 0 && innerSize.height > 0)
-        sv->setInnerContainerSize(innerSize);
-
-    ScrollView::Direction d = ScrollView::Direction::NONE;
-
-    if(sv->getContentSize().width < sv->getInnerContainerSize().width
-       && sv->getContentSize().height < sv->getInnerContainerSize().height)
-        d = ScrollView::Direction::BOTH;
-    else if(sv->getContentSize().width < sv->getInnerContainerSize().width)
-        d = ScrollView::Direction::HORIZONTAL;
-    else if(sv->getContentSize().height < sv->getInnerContainerSize().height)
-        d = ScrollView::Direction::VERTICAL;
-  
-    sv->setDirection(d);
-//    sv->setPropagateTouchEvents(true);
-	if (parent != NULL)
-		parent->addChild(sv);
-
-    return sv;
-}
 
 void gui::addBGScrolling(const string img, Node * p, float duration){
     auto sprite1 = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);

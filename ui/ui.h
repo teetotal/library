@@ -423,6 +423,12 @@ public:
     // set modal  --------------------------------------------------------------------------------
     void setModal(Node * layer);
     
+    // createLayout  --------------------------------------------------------------------------------
+    Layout * createLayout(Size size, const string bgImg = "", bool hasBGColor = false, Color3B bgColor = Color3B::WHITE);
+    
+    // addScrollView  --------------------------------------------------------------------------------
+    ScrollView * addScrollView(Size size, Size innerSize, Vec2 position, Node * parent);
+    
     LayerColor * addPopup(LayerColor * &pBG
             , Node * p
             , Size size
@@ -433,12 +439,6 @@ public:
             , Size size
             , const string bgImg = ""
             , Color4B bgColor = Color4B::WHITE
-    );
-
-    Layout * createLayout(Size size
-            , const string bgImg = ""
-            , bool hasBGColor = false
-            , Color3B bgColor = Color3B::WHITE
     );
 
     void addLayoutToScrollView(ScrollView * p
