@@ -35,6 +35,9 @@ void gui::init(const char* font, int fontSize, Color4F bgColor, bool useSpriteCa
     mVisibleY = mVisibleSize.height;
 
     mDefaultFont = font;
+    auto label = Label::createWithTTF("A", mDefaultFont, 10);
+    mDefaultFontLabelSize = label->getContentSize();
+    
     mDefaultFontSize = fontSize;
 
     MenuItemFont::setFontName(font);
@@ -245,15 +248,31 @@ Sprite * gui::addBG(const string bgImg, Node * parent, bool isOnLayer) {
     return bg;
 }
 // Label --------------------------------------------------------------------------------
-Label * gui::createLabel(int x, int y, const string text,int fontSize, ALIGNMENT align, const Color3B color
+Label * gui::createLabel(int x
+                         , int y
+                         , const string text
+                         , float fontSize
+                         , ALIGNMENT align
+                         , const Color3B color
                          , Size dimension
                          , Vec2 grid
                          , Vec2 origin
                          , Vec2 margin
                          , Vec2 innerMargin
-                    ){
-    if(fontSize == 0)
-        fontSize = mDefaultFontSize;
+                    ) {
+    switch((int)fontSize) {
+        case 0:
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin));
+            break;
+        case -1:
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.75f);
+            break;
+        case -2:
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.5f);
+            break;
+        default:
+            break;
+    }
     
     Label * label = Label::createWithTTF(text, mDefaultFont, fontSize);
     label->setColor(color);
@@ -267,7 +286,7 @@ Label * gui::addLabel(Node *p
                       , int x
                       , int y
                       , const string text
-                      , int fontSize
+                      , float fontSize
                       , ALIGNMENT align
                       , const Color3B color
                       , Size dimension
@@ -326,7 +345,9 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
                                       , const string text
                                       , Node *p
                                       , const ccMenuCallback &callback
-                                      , int fontSize, ALIGNMENT align, const Color3B color
+                                      , float fontSize
+                                      , ALIGNMENT align
+                                      , const Color3B color
                                       , Size dimension
                                       , Vec2 grid
                                       , Vec2 origin
@@ -337,8 +358,19 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
                                       , bool isAttachParent
                                       , Vec2 specificPos)
 {
-    if(fontSize == 0)
-        fontSize = mDefaultFontSize;
+    switch((int)fontSize) {
+        case 0:
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin));
+            break;
+        case -1:
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.75f);
+            break;
+        case -2:
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.5f);
+            break;
+        default:
+            break;
+    }
     
     auto label = Label::createWithTTF(text, mDefaultFont, fontSize);
     label->setColor(color);
@@ -671,6 +703,15 @@ ScrollView * gui::addScrollView(Size size, Size innerSize, Vec2 position, Node *
     parent->addChild(sv);
     
     return sv;
+}
+
+// getGridSize  --------------------------------------------------------------------------------
+Size gui::getGridSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin) {
+    Size size;
+    size.width  = ((dimension.width -(margin.x * 2)) / grid.x) - (innerMargin.x * 2);
+    size.height = ((dimension.height - (margin.y * 2)) / grid.y) - (innerMargin.y * 2);
+    
+    return size;
 }
 
 LayerColor * gui::createModalLayer(LayerColor * &layerBG, Size size, const string bgImg, Color4B bgColor) {

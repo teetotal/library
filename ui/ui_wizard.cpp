@@ -655,6 +655,16 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
             {
                 auto p = gui::inst()->drawCircle(layoutBG, circleCenter, min / 2.f, Color4F(obj.color_second));
                 p->setOpacity(obj.opacity_second);
+                auto listener = EventListenerTouchOneByOne::create();
+                listener->setSwallowTouches(true);
+                listener->onTouchBegan = [=](Touch *touch, Event*event)->bool {
+                    this->callback(this, obj.id, obj.link);
+                    return true;
+                };
+                
+                Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, p);
+                
+                float fontSize = gui::inst()->getFontSize(layoutBG->getContentSize(), node.gridSize, node.margin, node.innerMargin, 0.75f);
                 
                 Menu * pMenu;
                 pObj = gui::inst()->addTextButtonRaw(pMenu
@@ -663,7 +673,7 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                                                      , sz
                                                      , layoutBG
                                                      , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                                                     , obj.fontSize
+                                                     , fontSize
                                                      , ALIGNMENT_CENTER
                                                      , obj.color
                                                      , layoutBG->getContentSize()
@@ -681,13 +691,22 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                 break;
             case WIZARD::OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW:
             {
-                gui::inst()->drawRectRoundShadow(layoutBG, center, sizePerGrid, Color4F(obj.color_second, obj.opacity_second / 255.f));
+                auto rect = gui::inst()->drawRectRoundShadow(layoutBG, center, sizePerGrid, Color4F(obj.color_second, obj.opacity_second / 255.f));
+                auto listener = EventListenerTouchOneByOne::create();
+                listener->setSwallowTouches(true);
+                listener->onTouchBegan = [=](Touch *touch, Event*event)->bool {
+                    this->callback(this, obj.id, obj.link);
+                    return true;
+                };
+                
+                Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, rect);
+                
                 pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
                                                                , obj.position.y
                                                                , sz
                                                                , layoutBG
                                                                , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                                                               , obj.fontSize
+                                                               , -1
                                                                , obj.alignment
                                                                , obj.color
                                                                , node.gridSize

@@ -192,7 +192,7 @@ public:
     Label * createLabel(int x
                         , int y
                         , const string text
-                        , int fontSize = 0
+                        , float fontSize = 0.f
                         , ALIGNMENT align = ALIGNMENT_CENTER
                         , const Color3B color = Color3B::BLACK
                         , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
@@ -206,7 +206,7 @@ public:
                      , int x
                      , int y
                      , const string text
-                     , int fontSize = 0
+                     , float fontSize = 0.f
                      , ALIGNMENT align = ALIGNMENT_CENTER
                      , const Color3B color = Color3B::BLACK
                      , Size dimension = Size(INVALID_VALUE, INVALID_VALUE)
@@ -222,7 +222,7 @@ public:
                                     , int y
                                     , const string text
                                     , Node *p
-                                    , int fontSize = 0
+                                    , float fontSize = 0.f
                                     , ALIGNMENT align = ALIGNMENT_CENTER
                                     , const Color3B color = Color3B::BLACK
                                     , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
@@ -256,7 +256,7 @@ public:
                                     , const string text
                                     , Node* p
                                     , const ccMenuCallback& callback
-                                    , int fontSize = 0
+                                    , float fontSize = 0.f
                                     , ALIGNMENT align = ALIGNMENT_CENTER
                                     , const Color3B color = Color3B::BLACK
                                     , Size dimension    = Size(INVALID_VALUE, INVALID_VALUE)
@@ -269,12 +269,13 @@ public:
                                     , bool isAttachParent = true
                                     , Vec2 specificPos = Vec2(INVALID_VALUE, INVALID_VALUE)
                                     );
+    
     MenuItemLabel * addTextButton(int x
                                   , int y
                                   , const string text
                                   , Node* p
                                   , const ccMenuCallback& callback
-                                  , int fontSize = 0
+                                  , float fontSize = 0.f
                                   , ALIGNMENT align = ALIGNMENT_CENTER
                                   , const Color3B color = Color3B::BLACK
                                   , Size dimension    = Size(INVALID_VALUE, INVALID_VALUE)
@@ -294,7 +295,7 @@ public:
                                               , const string text
                                               , Node* p
                                               , const ccMenuCallback& callback
-                                              , int fontSize = 0
+                                              , float fontSize = 0.f
                                               , ALIGNMENT align = ALIGNMENT_CENTER
                                               , const Color3B color = Color3B::BLACK
                                               , Vec2 grid         = Vec2(INVALID_VALUE, INVALID_VALUE)
@@ -428,6 +429,21 @@ public:
     
     // addScrollView  --------------------------------------------------------------------------------
     ScrollView * addScrollView(Size size, Size innerSize, Vec2 position, Node * parent);
+    
+    // get fontSize  --------------------------------------------------------------------------------
+    /*
+         10: mDefaultFontLabelSize = x : size
+         x = 10 * size / mDefaultFontLabelSize
+     */
+    float getFontSize(Size size, float scale = 1.f) {
+        return ( 10.f * size.height / mDefaultFontLabelSize.height ) * scale;
+    }
+    
+    float getFontSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin, float scale) {
+        return getFontSize(getGridSize(dimension, grid, margin, innerMargin), scale);
+    }
+    // getGridSize  --------------------------------------------------------------------------------
+    Size getGridSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin);
     
     LayerColor * addPopup(LayerColor * &pBG
             , Node * p
@@ -632,6 +648,7 @@ public:
     
     const char* mDefaultFont;
     int mDefaultFontSize;
+    Size mDefaultFontLabelSize; // font 10 A에 대한 라벨 크기
 	bool mUseSpriteCache;
 private:
     static gui * hInstance;
