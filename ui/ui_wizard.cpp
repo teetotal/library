@@ -13,8 +13,11 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
     this->opacity_second = (GLubyte)0xFF;
     this->bgOpacity = (GLubyte)0xFF;
     this->hasBgColor = false;
+    this->id = -1;
     
-	this->id = p["id"].GetInt();
+    if(p.HasMember("id") && !p["id"].IsNull())
+        this->id = p["id"].GetInt();
+    
     CCLOG("Start WIZARD::_Object::load id=%d", id);
     
     CCLOG("Start WIZARD::_Object::load position");
@@ -141,6 +144,8 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
 	this->text = (!p.HasMember("text") || p["text"].IsNull()) ? NULL_STRING_VALUE : p["text"].GetString();
     CCLOG("Start WIZARD::_Object::load fontSize");
     this->fontSize = (!p.HasMember("fontSize") || p["fontSize"].IsNull()) ? 0 : p["fontSize"].GetFloat();
+    CCLOG("Start WIZARD::_Object::load visible");
+    this->visible = (!p.HasMember("visible") || p["visible"].IsNull()) ? true : p["visible"].GetBool();
 
 	return true;
 }
@@ -169,6 +174,8 @@ int WIZARD::_Object::getObjectType(const string type)
 		return OBJECT_TYPE_CIRCLE;
     else if (type.compare("rectangle") == 0)
         return OBJECT_TYPE_RECT;
+    else if (type.compare("rectangle_line") == 0)
+        return OBJECT_TYPE_RECT_LINE;
     else if (type.compare("rectangle_round") == 0)
         return OBJECT_TYPE_RECT_ROUND;
     else if (type.compare("rectangle_round_shadow") == 0)
@@ -183,8 +190,11 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
 	this->isGradient = false;
     this->visible = true;
     this->isScrollView = false;
+    this->id = -1;
     
-	this->id = pValue["id"].GetInt();
+    if(pValue.HasMember("id") && !pValue["id"].IsNull())
+        this->id = pValue["id"].GetInt();
+	
     CCLOG("Start WIZARD::_Node::load id=%d", id);
     
     CCLOG("Start WIZARD::_Node::load include");
@@ -335,10 +345,11 @@ bool WIZARD::_Background::load(rapidjson::Value & pValue)
     //tile
     CCLOG("Start WIZARD::_Background::load tile");
     if (!p["tile"].IsNull()) {
-        this->tileColor = Color4F(Color4B(p["tile"]["color"][rapidjson::SizeType(0)].GetInt()
-                                          , p["tile"]["color"][rapidjson::SizeType(1)].GetInt()
-                                          , p["tile"]["color"][rapidjson::SizeType(2)].GetInt()
-                                          , p["tile"]["color"][rapidjson::SizeType(3)].GetInt()));
+        float rgba[4];
+        for(int n=0; n < 4; n++){
+            rgba[n] = p["tile"]["color"][rapidjson::SizeType(n)].GetFloat() / 255.f;
+        }
+        this->tileColor = Color4F(rgba[0], rgba[1], rgba[2], rgba[3]);
         this->tileNum = Vec2(
                              p["tile"]["num"][rapidjson::SizeType(0)].GetInt()
                              , p["tile"]["num"][rapidjson::SizeType(1)].GetInt()
@@ -467,7 +478,7 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
 	);
     
     Size size = Size(end.x - start.x, start.y - end.y);
-    Size scrollviewSize = size;
+    Size scrollviewSize;
     //margin에 따른 사이즈 수정 필요
     if(node.isScrollView) {
         Vec2 startInner= gui::inst()->getPointVec2(node.dimensionInnerStart.x, node.dimensionInnerStart.y, ALIGNMENT_NONE
@@ -482,8 +493,9 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                                                   , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
                                                   , Size::ZERO
                                                   );
-        
+        scrollviewSize = Size(size.width - (node.margin.width * 2.f), size.height - (node.margin.height * 2.f));
         size = Size(endInner.x - startInner.x, startInner.y - endInner.y);
+        
     }
     
     Size sizeColored = Size(size.width - (node.margin.width * 2.f), size.height - (node.margin.height * 2.f));
@@ -531,7 +543,11 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
     
 	for (size_t n = 0; n < node.mObjects.size(); n++) {
 		WIZARD::_Object obj = node.mObjects[n];
-		string sz = getText(obj.text, obj.id);
+        
+        string sz = obj.text;
+        if(obj.id > 0)
+            sz = getText(obj.text, obj.id);
+        
 		Vec2 center = gui::inst()->getPointVec2(obj.position.x
 			, obj.position.y
 			, ALIGNMENT_CENTER
@@ -774,6 +790,9 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
             case WIZARD::OBJECT_TYPE_RECT:
                 pObj = gui::inst()->drawRect(layoutBG, center, sizePerGrid, Color4F(obj.color));
                 break;
+            case WIZARD::OBJECT_TYPE_RECT_LINE:
+                pObj = gui::inst()->drawRect(layoutBG, center, sizePerGrid, Color4F(obj.color), false);
+                break;
             case WIZARD::OBJECT_TYPE_RECT_ROUND:
                 pObj = gui::inst()->drawRectRound(layoutBG, center, sizePerGrid, Color4F(obj.color));
                 break;
@@ -784,7 +803,7 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                 break;
         }
 		pObj->setOpacity(obj.opacity);
-		
+        pObj->setVisible(obj.visible);
 		if(obj.id > 0)
 			mNodeMap[obj.id] = pObj;
 	}

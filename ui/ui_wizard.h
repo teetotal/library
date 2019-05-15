@@ -34,6 +34,7 @@ namespace WIZARD {
 		OBJECT_TYPE_CIRCLE,
         
         OBJECT_TYPE_RECT,
+        OBJECT_TYPE_RECT_LINE,
         OBJECT_TYPE_RECT_ROUND,
         OBJECT_TYPE_RECT_ROUND_SHADOW,
 	};
@@ -51,6 +52,7 @@ namespace WIZARD {
 		string text;
 		float fontSize;
         bool hasBgColor;
+        bool visible;
 
 		bool load(rapidjson::Value &p);
 		int getObjectType(const string type);

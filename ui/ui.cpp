@@ -10,19 +10,29 @@ void gui::init(const char* font, int fontSize, Color4F bgColor, bool useSpriteCa
 	if (mIsInitialized)
 		return;
 	mIsInitialized = true;
-
+    
+    Rect rect = Director::getInstance()->getSafeAreaRect();
+    /*
+     XS: origin [26, 61.5], size [427, 209]
+     6s: origin [0, 25.0], size [480, 269.8]
+     */
+    mVisibleSize = rect.size;
+    mOrigin = rect.origin;
+    
+/*
     auto visibleSize = Director::getInstance()->getVisibleSize();
     mVisibleSize = visibleSize;
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     mOrigin = origin;
+ */
     mResolution = Director::getInstance()->getWinSizeInPixels();
 
 
-    mOriginX = origin.x;
-    mOriginY = origin.y;
+    mOriginX = mOrigin.x;
+    mOriginY = mOrigin.y;
 
-    mVisibleX = visibleSize.width;
-    mVisibleY = visibleSize.height;
+    mVisibleX = mVisibleSize.width;
+    mVisibleY = mVisibleSize.height;
 
     mDefaultFont = font;
     mDefaultFontSize = fontSize;
@@ -511,12 +521,15 @@ DrawNode * gui::drawRect(Node * p, Vec2 pos1, Vec2 pos2, Vec2 pos3, Vec2 pos4, C
     return draw;
 }
 
-DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color){
+DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color, bool isSolid){
     auto draw = DrawNode::create();
     
     Vec2 origin = Vec2(pos.x - size.width / 2, pos.y - size.height / 2);
     Vec2 dest = Vec2(pos.x + size.width / 2, pos.y + size.height / 2);
-    draw->drawSolidRect(origin, dest, color);
+    if(isSolid)
+        draw->drawSolidRect(origin, dest, color);
+    else
+        draw->drawRect(origin, dest, color);
     
     p->addChild(draw);
     return draw;
