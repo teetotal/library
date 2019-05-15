@@ -536,6 +536,15 @@ DrawNode * gui::drawCircle(Node * p, Vec2 center, float radius, Color4F color){
     return draw;
 }
 
+DrawNode * gui::drawCircleForPhysics(Node * p, Vec2 center, float radius, Color4F color){
+    auto draw = DrawNode::create();
+    draw->drawDot(Vec2(radius, radius), radius, color);
+    draw->setContentSize(Size(radius * 2, radius * 2));
+    draw->setPosition(center);
+    p->addChild(draw);
+    return draw;
+}
+
 DrawNode * gui::drawTriangle(Node * p, Vec2 a, Vec2 b, Vec2 c, Color4F color){
     auto draw = DrawNode::create();
     draw->drawTriangle(a, b, c, color);
