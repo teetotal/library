@@ -2,8 +2,8 @@
 // Created by Jung, DaeCheon on 19/10/2018.
 //
 
-#ifndef PROJ_ANDROID_UI_COLOR_H
-#define PROJ_ANDROID_UI_COLOR_H
+#ifndef _UI_COLOR_H
+#define _UI_COLOR_H
 
 #include "ui.h"
 
@@ -23,47 +23,44 @@ public:
     };
     
     struct COLOR_RGB{
-        int R[2];
-        int G[2];
-        int B[2];
+        int R;
+        int G;
+        int B;
+        int A;
         string name;
         
         COLOR_RGB(){
-            R[0] = -1;
-            G[0] = -1;
-            B[0] = -1;
-            
-            R[1] = -1;
-            G[1] = -1;
-            B[1] = -1;
-            
+            R = -1;
+            G = -1;
+            B = -1;
+            A = 255;
+        };
+        
+        COLOR_RGB(int r, int g, int b, int a){
+            this->R = r;
+            this->G = g;
+            this->B = b;
+            this->A = a;
         };
     };
     
-    typedef vector<COLOR_RGB> COLOR_VECTOR;
     
-    COLOR_VECTOR * get(){
-        return &mVec;
-    };
-    void add(COLOR_RGB &color){
-        mVec.push_back(color);
-    };
-//    void add(int R, int G, int B, string name);
-    COLOR_RGB getColor(int idx);
-    Color3B getColor3B(int idx, int colorIdx);
-    Color4F getColor4F(int idx, int colorIdx);
-    Color4B getColor4B(int idx, int colorIdx);
-    Color4B getColor4B(int idx, int colorIdx, float opacity){
-        Color4B color = getColor4B(idx, colorIdx);
-        color.a = opacity;
-        return color;
+    void set(const string name, int r, int g, int b, int a) {
+        if(!hasColor(name)) mMap[name] = COLOR_RGB(r, g, b, a);
     };
     
+    COLOR_RGB getColor(const string& name);
+    Color3B getColor3B(const string& name);
+    Color4F getColor4F(const string& name);
+    Color4B getColor4B(const string& name);
     
 private:
-    COLOR_VECTOR mVec;
+    typedef map<string, COLOR_RGB> COLOR_MAP;
+    COLOR_MAP mMap;
     static ui_color * hInst;
+    
+    bool hasColor(const string& name);
 };
 
 
-#endif //PROJ_ANDROID_UI_COLOR_H
+#endif //_UI_COLOR_H

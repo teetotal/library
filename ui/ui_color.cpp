@@ -5,37 +5,35 @@
 #include "ui_color.h"
 
 ui_color * ui_color::hInst = NULL;
-//
-//void ui_color::add(int R, int G, int B, string name){
-//    COLOR_RGB color;
-//    color.R = R;
-//    color.G = G;
-//    color.B = B;
-//    color.name = name;
-//    mVec.push_back(color);
-//}
 
-ui_color::COLOR_RGB ui_color::getColor(int idx){
-    return mVec[idx];
-}
-
-Color3B ui_color::getColor3B(int idx, int colorIdx){
-    COLOR_RGB color = getColor(idx);
-    GLubyte R, G, B;
-    R = (GLubyte)color.R[colorIdx];
-    G = (GLubyte)color.G[colorIdx];
-    B = (GLubyte)color.B[colorIdx];
-    Color3B color3B = Color3B(R, G,B);
+ui_color::COLOR_RGB ui_color::getColor(const string& name) {
+    if(hasColor(name))
+        return mMap[name];
     
-    return color3B;
+    return COLOR_RGB();
 }
 
-Color4F ui_color::getColor4F(int idx, int colorIdx){
-    Color4F color = Color4F(getColor3B(idx, colorIdx));
-    return color;
+Color3B ui_color::getColor3B(const string& name){
+    COLOR_RGB color = getColor(name);
+    return Color3B(color.R, color.G, color.B);
 }
 
-Color4B ui_color::getColor4B(int idx, int colorIdx){
-    Color4B color = Color4B(getColor3B(idx, colorIdx));
-    return color;
+Color4B ui_color::getColor4B(const string& name) {
+    COLOR_RGB color = getColor(name);
+    return Color4B(color.R, color.G, color.B, color.A);
+}
+
+Color4F ui_color::getColor4F(const string& name){
+    COLOR_RGB color = getColor(name);
+    return Color4F(((float)color.R) / 255.f
+                   , ((float)color.G) / 255.f
+                   , ((float)color.B) / 255.f
+                   , ((float)color.A) / 255.f);
+}
+
+bool ui_color::hasColor(const string& name) {
+    if(mMap.find(name) == mMap.end()) {
+        return false;
+    }
+    return true;
 }

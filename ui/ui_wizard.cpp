@@ -380,7 +380,7 @@ rapidjson::Document WIZARD::getJsonValue(const string& path) {
 }
 
 
-bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
+bool ui_wizard::loadFromJson(const string& sceneName, const string& path, const string& pathPalette)
 {
     //////////////////////////////
     // 1. super init first

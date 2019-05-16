@@ -7,6 +7,7 @@
 
 #include "library/PhysicsScene.h"
 #include "ui/ui.h"
+#include "ui/ui_color.h"
 #include "json/document.h"
 #include "json/stringbuffer.h"
 #include "json/writer.h"
@@ -151,10 +152,15 @@ public:
 		}
 		return true;
 	};
+    
+    ui_color * getPalette() {
+        return &mPalette;
+    }
 private:
 	static ui_wizard_share * hInstance;
 	map<string, WIZARD::VEC_NODES> mSharedNodes;
 	map<string, WIZARD::_Background> mSharedBackgounds;
+    ui_color mPalette;
 };
 
 /* ===============================================
@@ -162,7 +168,8 @@ private:
 ================================================== */
 class ui_wizard : public PhysicsScene {	
 protected:
-	bool loadFromJson(const string& sceneName, const string& path);
+    // palette 정보 share에 있는지 확인하고 node, obj, backgroud에 적용
+	bool loadFromJson(const string& sceneName, const string& path, const string& pathPalette = "");
 	Node * getNodeById(int id);
 	void pushScene(Scene * pScene) {
 		Director::getInstance()->pushScene(pScene);
