@@ -412,7 +412,6 @@ public:
     // draws --------------------------------------------------------------------------------
     DrawNode * drawLine             (Node * p, Vec2 start,  Vec2 end,       Color4F color = Color4F::GRAY, GLfloat width = 3.f);
     DrawNode * drawCircle           (Node * p, Vec2 pos,    float radius,   Color4F color);
-    DrawNode * drawCircleForPhysics (Node * p, Vec2 center, float radius, Color4F color);
     DrawNode * drawTriangle         (Node * p, Vec2 a,      Vec2 b,         Vec2 c,     Color4F color);
     DrawNode * drawRect             (Node * p, Vec2 pos,    Size size,      Color4F color,  bool isSolid = true);
     DrawNode * drawRect             (Node * p, Vec2 pos1,   Vec2 pos2,      Vec2 pos3,  Vec2 pos4, Color4F color);
@@ -445,6 +444,11 @@ public:
     }
     // getGridSize  --------------------------------------------------------------------------------
     Size getGridSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin);
+    
+    // getColor4F  --------------------------------------------------------------------------------
+    static Color4F getColor4F(int r, int g, int b, int a = 255) {
+        return Color4F((float)r / 255.f, (float)g / 255.f, (float)b / 255.f, (float)a / 255.f);
+    };
     
     LayerColor * addPopup(LayerColor * &pBG
             , Node * p

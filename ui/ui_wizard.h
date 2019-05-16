@@ -2,8 +2,8 @@
 // Created by Jung, DaeCheon on 25/04/2019.
 //
 
-#ifndef PROJ_ANDROID_UI_WIZARD_H
-#define PROJ_ANDROID_UI_WIZARD_H
+#ifndef _UI_WIZARD_H
+#define _UI_WIZARD_H
 
 #include "library/PhysicsScene.h"
 #include "ui/ui.h"
@@ -190,4 +190,4 @@ private:
     Size mGrid;
 };
 
-#endif //PROJ_ANDROID_UI_WIZARD_H
+#endif //_UI_WIZARD_H

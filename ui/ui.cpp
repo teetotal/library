@@ -35,8 +35,10 @@ void gui::init(const char* font, int fontSize, Color4F bgColor, bool useSpriteCa
     mVisibleY = mVisibleSize.height;
 
     mDefaultFont = font;
-    auto label = Label::createWithTTF("A", mDefaultFont, 10);
-    mDefaultFontLabelSize = label->getContentSize();
+    auto labelHeight = Label::createWithTTF("j", mDefaultFont, 10);
+    auto labelWidth = Label::createWithTTF("M", mDefaultFont, 10);
+    mDefaultFontLabelSize.width = labelWidth->getContentSize().width;
+    mDefaultFontLabelSize.height = labelHeight->getContentSize().height;
     
     mDefaultFontSize = fontSize;
 
@@ -374,10 +376,12 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
     
     auto label = Label::createWithTTF(text, mDefaultFont, fontSize);
     label->setColor(color);
+    
     auto pItem = MenuItemLabel::create(label, callback);
     Node * child = NULL;
     pMenu = Menu::create(pItem, NULL);
     child = pMenu;
+
     
     if(img.compare("") != 0) {
         Size sizePerGrid = Size((p->getContentSize().width / grid.x) - (margin.x * 2.f) - (innerMargin.x * 2.f)
@@ -532,15 +536,6 @@ DrawNode * gui::drawCircle(Node * p, Vec2 center, float radius, Color4F color){
     auto draw = DrawNode::create();
     draw->drawDot(center, radius, color);
     draw->setContentSize(Size(radius * 2, radius * 2));
-    p->addChild(draw);
-    return draw;
-}
-
-DrawNode * gui::drawCircleForPhysics(Node * p, Vec2 center, float radius, Color4F color){
-    auto draw = DrawNode::create();
-    draw->drawDot(Vec2(radius, radius), radius, color);
-    draw->setContentSize(Size(radius * 2, radius * 2));
-    draw->setPosition(center);
     p->addChild(draw);
     return draw;
 }

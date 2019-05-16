@@ -14,6 +14,7 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
     this->bgOpacity = (GLubyte)0xFF;
     this->hasBgColor = false;
     this->id = -1;
+    this->link = -1;
     
     if(p.HasMember("id") && !p["id"].IsNull())
         this->id = p["id"].GetInt();
@@ -655,16 +656,8 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
             {
                 auto p = gui::inst()->drawCircle(layoutBG, circleCenter, min / 2.f, Color4F(obj.color_second));
                 p->setOpacity(obj.opacity_second);
-                auto listener = EventListenerTouchOneByOne::create();
-                listener->setSwallowTouches(true);
-                listener->onTouchBegan = [=](Touch *touch, Event*event)->bool {
-                    this->callback(this, obj.id, obj.link);
-                    return true;
-                };
                 
-                Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, p);
-                
-                float fontSize = gui::inst()->getFontSize(layoutBG->getContentSize(), node.gridSize, node.margin, node.innerMargin, 0.75f);
+                float fontSize = gui::inst()->getFontSize(layoutBG->getContentSize(), node.gridSize, node.margin, node.innerMargin, 0.8f);
                 
                 Menu * pMenu;
                 pObj = gui::inst()->addTextButtonRaw(pMenu
@@ -691,15 +684,26 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                 break;
             case WIZARD::OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW:
             {
-                auto rect = gui::inst()->drawRectRoundShadow(layoutBG, center, sizePerGrid, Color4F(obj.color_second, obj.opacity_second / 255.f));
-                auto listener = EventListenerTouchOneByOne::create();
-                listener->setSwallowTouches(true);
-                listener->onTouchBegan = [=](Touch *touch, Event*event)->bool {
-                    this->callback(this, obj.id, obj.link);
-                    return true;
-                };
+                gui::inst()->drawRectRoundShadow(layoutBG, center, sizePerGrid, Color4F(obj.color_second, obj.opacity_second / 255.f));
+                float fontSize = gui::inst()->getFontSize(sizePerGrid);
+                int fontLength = (int)(sizePerGrid.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
+                string szM = "";
+                for(int n = 0; n < fontLength; n++) {
+                    szM += "M";
+                }
                 
-                Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, rect);
+                gui::inst()->addTextButtonAutoDimension(obj.position.x
+                                                               , obj.position.y
+                                                               , szM
+                                                               , layoutBG
+                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                               , fontSize
+                                                               , obj.alignment
+                                                               , Color3B::WHITE
+                                                               , node.gridSize
+                                                               , Vec2::ZERO
+                                                               , Vec2::ZERO
+                                                               , node.innerMargin)->setOpacity(0);
                 
                 pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
                                                                , obj.position.y
