@@ -6,26 +6,50 @@
 
 ui_wizard_share * ui_wizard_share::hInstance = NULL;
 
+// _base -------------------------------------------------------------------------------------------
+void WIZARD::_base::getColorFromJson(rapidjson::Value &p, COLOR_RGB * color) {
+    if (p.IsInt()) {
+        color->set(0, 0, 0, p.GetInt());
+    }
+    else if (p.IsString()) {
+        COLOR_RGB c = ui_wizard_share::inst()->getPalette()->getColor(p.GetString());
+        color->set(c);
+    }
+    else {
+        color->set(p[rapidjson::SizeType(0)].GetInt()
+                   , p[rapidjson::SizeType(1)].GetInt()
+                   , p[rapidjson::SizeType(2)].GetInt()
+                   , (p.GetArray().Size() == 4) ? p[rapidjson::SizeType(3)].GetInt() : 255);
+    }
+}
+
+void WIZARD::_base::getColorFromJson(rapidjson::Value &p, COLOR_RGB * color1, COLOR_RGB * color2) {
+    if (p.IsArray() && p.GetArray().Size() == 2) {
+        getColorFromJson(p[rapidjson::SizeType(0)], color1);
+        getColorFromJson(p[rapidjson::SizeType(1)], color2);
+    } else {
+        getColorFromJson(p, color1);
+    }
+}
+// _Object -------------------------------------------------------------------------------------------
 bool WIZARD::_Object::load(rapidjson::Value & p)
 {
     CCLOG("Start WIZARD::_Object::load");
     this->opacity = (GLubyte)0xFF;
     this->opacity_second = (GLubyte)0xFF;
-    this->bgOpacity = (GLubyte)0xFF;
-    this->hasBgColor = false;
     this->id = -1;
     this->link = -1;
     
     if(p.HasMember("id") && !p["id"].IsNull())
         this->id = p["id"].GetInt();
     
-    CCLOG("Start WIZARD::_Object::load id=%d", id);
+    CCLOG("WIZARD::_Object::load id=%d", id);
     
-    CCLOG("Start WIZARD::_Object::load position");
+    CCLOG("WIZARD::_Object::load position");
 	this->position.x = p["position"][rapidjson::SizeType(0)].GetFloat();
 	this->position.y = p["position"][rapidjson::SizeType(1)].GetFloat();
     
-    CCLOG("Start WIZARD::_Object::load alignment");
+    CCLOG("WIZARD::_Object::load alignment");
 	const string szAlignment = p["alignment"].GetString();
 	if (szAlignment.compare("none") == 0) {
 		this->alignment = ALIGNMENT_NONE;
@@ -58,12 +82,19 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
         this->alignment = ALIGNMENT_RIGHT_BOTTOM;
     }
     
-    CCLOG("Start WIZARD::_Object::load type");
+    CCLOG("WIZARD::_Object::load type");
 	this->type = (OBJECT_TYPE)getObjectType(p["type"].GetString());
     CCLOG("Start WIZARD::_Object::load link");
 	this->link = ( !p.HasMember("link") || p["link"].IsNull()) ? NULL_INT_VALUE : p["link"].GetInt();
+    
+    CCLOG("WIZARD::_Object::load text");
+    this->text = (!p.HasMember("text") || p["text"].IsNull()) ? NULL_STRING_VALUE : p["text"].GetString();
+    CCLOG("WIZARD::_Object::load fontSize");
+    this->fontSize = (!p.HasMember("fontSize") || p["fontSize"].IsNull()) ? 0 : p["fontSize"].GetFloat();
+    CCLOG("WIZARD::_Object::load visible");
+    this->visible = (!p.HasMember("visible") || p["visible"].IsNull()) ? true : p["visible"].GetBool();
 	
-    CCLOG("Start WIZARD::_Object::load img");
+    CCLOG("WIZARD::_Object::load img");
     if (!p.HasMember("img") || p["img"].IsNull()) {
 		this->img = NULL_STRING_VALUE;
         this->img_selected = NULL_STRING_VALUE;
@@ -86,68 +117,28 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
 		//SpriteFrameCache::getInstance()->removeSpriteFrameByName("btn_bg");	
 	}
     
-    CCLOG("Start WIZARD::_Object::load color");
+    CCLOG("WIZARD::_Object::load color");
     if (p.HasMember("color") && !p["color"].IsNull()) {
-        if (p["color"].IsArray() && p["color"][rapidjson::SizeType(0)].IsArray()) {
-            this->color = Color3B(
-                                  p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(0)].GetInt()
-                                  , p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(1)].GetInt()
-                                  , p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(2)].GetInt()
-                                  );
-            this->opacity = (p["color"][rapidjson::SizeType(0)].GetArray().Size() == 4) ?
-            (GLubyte)p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
-            
-            if (p["color"].GetArray().Size() == rapidjson::SizeType(2)) {
-                this->color_second = Color3B(
-                                          p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(0)].GetInt()
-                                          , p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(1)].GetInt()
-                                          , p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(2)].GetInt()
-                                          );
-                this->opacity_second = (p["color"][rapidjson::SizeType(1)].GetArray().Size() == 4) ?
-                (GLubyte)p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
-            }
-        }
-        else {
-            if (p["color"].IsInt()) {
-                this->opacity = (GLubyte)p["color"].GetInt();
-            }
-            else {
-                this->color = Color3B(
-                                      p["color"][rapidjson::SizeType(0)].GetInt()
-                                      , p["color"][rapidjson::SizeType(1)].GetInt()
-                                      , p["color"][rapidjson::SizeType(2)].GetInt()
-                                      );
-                
-                this->opacity = (p["color"].GetArray().Size() == 4) ? (GLubyte)p["color"][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
-            }
+        COLOR_RGB color1, color2;
+        getColorFromJson(p["color"], &color1, &color2);
+        this->color = color1.getColor3B();
+        this->opacity = color1.getA();
+        if(color2.isValidColor) {
+            this->color_second = color2.getColor3B();
+            this->opacity_second = color2.getA();
         }
     }
     
-    CCLOG("Start WIZARD::_Object::load bgColor");
+    CCLOG("WIZARD::_Object::load bgColor");
     if (p.HasMember("bgColor") && !p["bgColor"].IsNull()) {
-        this->hasBgColor = true;
-        
-        if (p["bgColor"].IsInt()) {
-            this->bgOpacity = (GLubyte)p["bgColor"].GetInt();
-        }
-        else {
-            this->bgColor = Color3B(
-                                  p["bgColor"][rapidjson::SizeType(0)].GetInt()
-                                  , p["bgColor"][rapidjson::SizeType(1)].GetInt()
-                                  , p["bgColor"][rapidjson::SizeType(2)].GetInt()
-                                  );
-            
-            this->bgOpacity = (p["bgColor"].GetArray().Size() == 4) ? (GLubyte)p["bgColor"][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
+        COLOR_RGB color1, color2;
+        getColorFromJson(p["bgColor"], &color1, &color2);
+        this->bgColor.set(color1);
+        if(color2.isValidColor) {
+            this->bgColor_second.set(color2);
         }
     }
     
-    CCLOG("Start WIZARD::_Object::load text");
-	this->text = (!p.HasMember("text") || p["text"].IsNull()) ? NULL_STRING_VALUE : p["text"].GetString();
-    CCLOG("Start WIZARD::_Object::load fontSize");
-    this->fontSize = (!p.HasMember("fontSize") || p["fontSize"].IsNull()) ? 0 : p["fontSize"].GetFloat();
-    CCLOG("Start WIZARD::_Object::load visible");
-    this->visible = (!p.HasMember("visible") || p["visible"].IsNull()) ? true : p["visible"].GetBool();
-
 	return true;
 }
 
@@ -184,11 +175,10 @@ int WIZARD::_Object::getObjectType(const string type)
     
 	return OBJECT_TYPE_LABEL;
 }
-
+// _Node -------------------------------------------------------------------------------------------
 bool WIZARD::_Node::load(rapidjson::Value & pValue)
 {
     CCLOG("Start WIZARD::_Node::load");
-	this->isGradient = false;
     this->visible = true;
     this->isScrollView = false;
     this->id = -1;
@@ -196,12 +186,12 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
     if(pValue.HasMember("id") && !pValue["id"].IsNull())
         this->id = pValue["id"].GetInt();
 	
-    CCLOG("Start WIZARD::_Node::load id=%d", id);
+    CCLOG("WIZARD::_Node::load id=%d", id);
     
-    CCLOG("Start WIZARD::_Node::load include");
+    CCLOG("WIZARD::_Node::load include");
     rapidjson::Value & p = (pValue.HasMember("include")) ? getJsonValue(pValue["include"]["path"].GetString())[pValue["include"]["key"].GetString()] : pValue;
     
-    CCLOG("Start WIZARD::_Node::load dimension");
+    CCLOG("WIZARD::_Node::load dimension");
     this->dimensionStart.x = p["dimension"][rapidjson::SizeType(0)].GetFloat();
 	this->dimensionStart.y = p["dimension"][rapidjson::SizeType(1)].GetFloat();
 	this->dimensionEnd.x = p["dimension"][rapidjson::SizeType(2)].GetFloat();
@@ -217,61 +207,32 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
         this->isScrollView = true;
     }
     
-    CCLOG("Start WIZARD::_Node::load margin");
+    CCLOG("WIZARD::_Node::load margin");
 	this->margin.width = p["margin"][rapidjson::SizeType(0)].GetFloat();
 	this->margin.height = p["margin"][rapidjson::SizeType(1)].GetFloat();
     
-    CCLOG("Start WIZARD::_Node::load innerMargin");
+    CCLOG("WIZARD::_Node::load innerMargin");
     this->innerMargin.width = p["innerMargin"][rapidjson::SizeType(0)].GetFloat();
     this->innerMargin.height = p["innerMargin"][rapidjson::SizeType(1)].GetFloat();
     
-    CCLOG("Start WIZARD::_Node::load gridSize");
+    CCLOG("WIZARD::_Node::load gridSize");
 	this->gridSize.width = p["gridSize"][rapidjson::SizeType(0)].GetFloat();
 	this->gridSize.height = p["gridSize"][rapidjson::SizeType(1)].GetFloat();
     
-    CCLOG("Start WIZARD::_Node::load img");
+    CCLOG("WIZARD::_Node::load img");
 	this->img = p["img"].IsNull() ? NULL_STRING_VALUE : p["img"].GetString();
     
-    CCLOG("Start WIZARD::_Node::load color");
-	if (!p["color"].IsNull()) {
-		if (p["color"].IsArray() && p["color"][rapidjson::SizeType(0)].IsArray()) {
-			this->color = Color3B(
-				p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(0)].GetInt()
-				, p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(1)].GetInt()
-				, p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(2)].GetInt()
-			);
-			this->opacity = (p["color"][rapidjson::SizeType(0)].GetArray().Size() == 4) ? 
-				(GLubyte)p["color"][rapidjson::SizeType(0)][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
-			
-			if (p["color"].GetArray().Size() == rapidjson::SizeType(2)) {
-				this->color_end = Color3B(
-					p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(0)].GetInt()
-					, p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(1)].GetInt()
-					, p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(2)].GetInt()
-				);
-				this->opacity_end = (p["color"][rapidjson::SizeType(1)].GetArray().Size() == 4) ?
-					(GLubyte)p["color"][rapidjson::SizeType(1)][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
+    CCLOG("WIZARD::_Node::load color");
+    if (p.HasMember("color") && !p["color"].IsNull()) {
+        COLOR_RGB color1, color2;
+        getColorFromJson(p["color"], &color1, &color2);
+        this->color.set(color1);
+        if(color2.isValidColor) {
+            this->color_second.set(color2);
+        }
+    }
 
-				this->isGradient = true;
-			}
-		}
-		else {
-			if (p["color"].IsInt()) {
-				this->opacity = (GLubyte)p["color"].GetInt();
-			}
-			else {
-				this->color = Color3B(
-					p["color"][rapidjson::SizeType(0)].GetInt()
-					, p["color"][rapidjson::SizeType(1)].GetInt()
-					, p["color"][rapidjson::SizeType(2)].GetInt()
-				);
-
-				this->opacity = (p["color"].GetArray().Size() == 4) ? (GLubyte)p["color"][rapidjson::SizeType(3)].GetInt() : (GLubyte)0xFF;
-			}
-		}
-	}
-
-    CCLOG("Start WIZARD::_Node::load objects");
+    CCLOG("WIZARD::_Node::load objects");
 	if (p.HasMember("objects")) {
 		const rapidjson::Value& objects = p["objects"];
 		for (rapidjson::SizeType i = 0; i < objects.Size(); i++)
@@ -284,24 +245,24 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
 		}
 	}
     
-    CCLOG("Start WIZARD::_Node::load visible");
+    CCLOG("WIZARD::_Node::load visible");
     if(p.HasMember("visible")) {
         this->visible = p["visible"].GetBool();
     }
 	
 	return true;
 }
-
+// _Background -------------------------------------------------------------------------------------------
 bool WIZARD::_Background::load(rapidjson::Value & pValue)
 {
     CCLOG("Start WIZARD::_Background::load");
     
     this->id = pValue["id"].GetInt();
-    CCLOG("Start WIZARD::_Background::load id=%d", id);
+    CCLOG("WIZARD::_Background::load id=%d", id);
     
-    CCLOG("Start WIZARD::_Background::load include");
+    CCLOG("WIZARD::_Background::load include");
     rapidjson::Value & p = (pValue.HasMember("include")) ? getJsonValue(pValue["include"]["path"].GetString())[pValue["include"]["key"].GetString()] : pValue;
-    CCLOG("Start WIZARD::_Background::load img");
+    CCLOG("WIZARD::_Background::load img");
 	if (p["img"].IsNull())
 		this->img = NULL_STRING_VALUE;
 	else {
@@ -310,56 +271,31 @@ bool WIZARD::_Background::load(rapidjson::Value & pValue)
 			SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
 	}
 
-	this->isGradient = false;
-    this->hasTile = false;
     this->isDrawGrid = false;
     //bgColor
-    CCLOG("Start WIZARD::_Background::load bgColor");
+    CCLOG("WIZARD::_Background::load bgColor");
 	if (!p["bgColor"].IsNull()) {
-		if (p["bgColor"][rapidjson::SizeType(0)].IsArray()) {
-            int rgba[4];
-            for(int n=0; n < 4; n++){
-                rgba[n] = p["bgColor"][rapidjson::SizeType(0)][rapidjson::SizeType(n)].GetInt();
-            }
-            
-            this->bgColor = Color4B(rgba[0], rgba[1], rgba[2], rgba[3]);
-
-			if (p["bgColor"].GetArray().Size() == rapidjson::SizeType(2)) {
-                int rgba[4];
-                for(int n=0; n < 4; n++){
-                    rgba[n] = p["bgColor"][rapidjson::SizeType(1)][rapidjson::SizeType(n)].GetInt();
-                }
-                
-				this->bgColor_end = Color4B(rgba[0], rgba[1], rgba[2], rgba[3]);
-				this->isGradient = true;
-			}
-		}
-		else {
-            int rgba[4];
-            for(int n=0; n < 4; n++){
-                rgba[n] = p["bgColor"][rapidjson::SizeType(n)].GetInt();
-            }
-            
-			this->bgColor = Color4B(rgba[0], rgba[1], rgba[2], rgba[3]);
-		}
+        COLOR_RGB color1, color2;
+        getColorFromJson(p["bgColor"], &color1, &color2);
+        this->bgColor.set(color1);
+        if(color2.isValidColor) {
+            this->bgColor_second.set(color2);
+        }
 	}
     //tile
-    CCLOG("Start WIZARD::_Background::load tile");
+    CCLOG("WIZARD::_Background::load tile");
     if (!p["tile"].IsNull()) {
-        float rgba[4];
-        for(int n=0; n < 4; n++){
-            rgba[n] = p["tile"]["color"][rapidjson::SizeType(n)].GetFloat() / 255.f;
-        }
-        this->tileColor = Color4F(rgba[0], rgba[1], rgba[2], rgba[3]);
+        COLOR_RGB color1;
+        getColorFromJson(p["tile"]["color"], &color1);
+        this->tileColor.set(color1);
         this->tileNum = Vec2(
                              p["tile"]["num"][rapidjson::SizeType(0)].GetInt()
                              , p["tile"]["num"][rapidjson::SizeType(1)].GetInt()
         );
-        this->hasTile = true;
     }
     
     //isDrawGrid
-    CCLOG("Start WIZARD::_Background::load isDrawGrid");
+    CCLOG("WIZARD::_Background::load isDrawGrid");
     if(!p["isDrawGrid"].IsNull())
         this->isDrawGrid = p["isDrawGrid"].GetBool();
     
@@ -379,7 +315,7 @@ rapidjson::Document WIZARD::getJsonValue(const string& path) {
     return d;
 }
 
-
+// ui_wizard -------------------------------------------------------------------------------------------
 bool ui_wizard::loadFromJson(const string& sceneName, const string& path, const string& pathPalette)
 {
     //////////////////////////////
@@ -406,7 +342,32 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path, const 
 		return true;
 	}
     
+    if(pathPalette.compare("") != 0 && ui_wizard_share::inst()->insertPalettePath(pathPalette)) {
+        rapidjson::Document dPalette = WIZARD::getJsonValue(pathPalette);
+        
+        for (auto& m : dPalette.GetObject())
+        {
+            int rgba[4];
+            for(int n=0; n < 4; n++) rgba[n] = m.value[n].GetInt();
+            
+            ui_wizard_share::inst()->getPalette()->set(m.name.GetString()
+                                                       , rgba[0]
+                                                       , rgba[1]
+                                                       , rgba[2]
+                                                       , rgba[3]);
+            
+            CCLOG("Insert Palette %s\t[ %d, %d, %d, %d ]"
+                  , m.name.GetString()
+                  , rgba[0]
+                  , rgba[1]
+                  , rgba[2]
+                  , rgba[3]
+                  );
+        }
+    }
+    
     rapidjson::Document d = WIZARD::getJsonValue(path);
+    
     
 	WIZARD::_Background bg;
 	bg.load(d["background"]);
@@ -437,9 +398,9 @@ Node * ui_wizard::getNodeById(int id)
 void ui_wizard::drawBackground(WIZARD::_Background & bg)
 {
     mIsDrawGrid = bg.isDrawGrid;
-	auto p = (bg.isGradient) ? LayerGradient::create(bg.bgColor, bg.bgColor_end) : LayerColor::create(bg.bgColor);
+	auto p = (bg.bgColor_second.isValidColor) ? LayerGradient::create(bg.bgColor.getColor4B(), bg.bgColor_second.getColor4B()) : LayerColor::create(bg.bgColor.getColor4B());
 	p->setContentSize(Director::getInstance()->getVisibleSize());
-	p->setAnchorPoint(Vec2(0, 0));
+    p->setAnchorPoint(Vec2::ZERO);
 	p->setPosition(Director::getInstance()->getVisibleOrigin());
 	this->addChild(p);
 
@@ -449,8 +410,8 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
     
     mNodeMap[bg.id] = p;
     
-    if(bg.hasTile) {
-        gui::inst()->drawDiamondTile(p, bg.tileNum, bg.tileColor);
+    if(bg.tileColor.isValidColor) {
+        gui::inst()->drawDiamondTile(p, bg.tileNum, bg.tileColor.getColor4F());
     }
     
     if(bg.isDrawGrid)
@@ -508,20 +469,14 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
     Node * layoutBG;
     ScrollView * sv;
     
-    if (node.isGradient) {
-        Color4B gradientStart = Color4B(node.color);
-        gradientStart.a = node.opacity;
-        
-        Color4B gradientEnd = Color4B(node.color_end);
-        gradientEnd.a = node.opacity_end;
-        
-        layoutBG = LayerGradient::create(gradientStart, gradientEnd);
+    if (node.color_second.isValidColor) {
+        layoutBG = LayerGradient::create(node.color.getColor4B(), node.color_second.getColor4B());
         layoutBG->setContentSize(sizeColored);
     }
     else
     {
-        layoutBG = gui::inst()->createLayout(sizeColored, node.img, true, node.color);
-        layoutBG->setOpacity(node.opacity);
+        layoutBG = gui::inst()->createLayout(sizeColored, node.img, true, node.color.getColor3B());
+        layoutBG->setOpacity(node.color.getA());
     }
     
     
@@ -569,11 +524,19 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
         Vec2 circleCenter = position;
         
         //bg color
-        if(obj.hasBgColor) {
-            auto bg = gui::inst()->createLayout(sizePerGridNoMargin, "", true, obj.bgColor);
-            bg->setOpacity(obj.bgOpacity);
-            bg->setPosition(gui::inst()->getPointVec2(obj.position.x, obj.position.y, ALIGNMENT_CENTER, layoutBG->getContentSize(), node.gridSize, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO));
-            gui::inst()->setAnchorPoint(bg, ALIGNMENT_CENTER);
+        if(obj.bgColor.isValidColor) {
+            Node * bg;
+            if(obj.bgColor_second.isValidColor) {
+                bg = LayerGradient::create(obj.bgColor.getColor4B(), obj.bgColor_second.getColor4B());
+                bg->setContentSize(sizePerGridNoMargin);
+                bg->setPosition(gui::inst()->getPointVec2(obj.position.x, obj.position.y, ALIGNMENT_LEFT_BOTTOM, layoutBG->getContentSize(), node.gridSize, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO));
+            } else {
+                bg = gui::inst()->createLayout(sizePerGridNoMargin, "", true, obj.bgColor.getColor3B());
+                bg->setOpacity(obj.bgColor.getA());
+                gui::inst()->setAnchorPoint(bg, ALIGNMENT_CENTER);
+                bg->setPosition(gui::inst()->getPointVec2(obj.position.x, obj.position.y, ALIGNMENT_CENTER, layoutBG->getContentSize(), node.gridSize, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO));
+            }
+            
             layoutBG->addChild(bg);
         }
         
@@ -839,4 +802,3 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
         this->addChild(layoutBG);
     }
 }
-

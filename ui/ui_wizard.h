@@ -39,8 +39,13 @@ namespace WIZARD {
         OBJECT_TYPE_RECT_ROUND,
         OBJECT_TYPE_RECT_ROUND_SHADOW,
 	};
+    
+    struct _base {
+        void getColorFromJson(rapidjson::Value &p, COLOR_RGB * color);
+        void getColorFromJson(rapidjson::Value &p, COLOR_RGB * color1, COLOR_RGB * color2);
+    };
 
-	struct _Object {
+    struct _Object : _base {
 		int id;
 		Vec2 position;
 		ALIGNMENT alignment;
@@ -48,17 +53,21 @@ namespace WIZARD {
 		int link;
 		string img;
         string img_selected;
-		Color3B color, color_second, bgColor;
-		GLubyte opacity, opacity_second, bgOpacity;
+        
+        Color3B color, color_second;
+		GLubyte opacity, opacity_second;
+        
+        COLOR_RGB bgColor, bgColor_second;
+        
 		string text;
 		float fontSize;
-        bool hasBgColor;
+        
         bool visible;
 
 		bool load(rapidjson::Value &p);
 		int getObjectType(const string type);
 	};
-	struct _Node {
+    struct _Node : _base {
 		int id;
 		Vec2 dimensionStart, dimensionEnd;
 		Vec2 dimensionInnerStart, dimensionInnerEnd;
@@ -66,9 +75,7 @@ namespace WIZARD {
         Size innerMargin;
 		Size gridSize;
 		string img;
-		Color3B color, color_end;
-        GLubyte opacity, opacity_end;
-		bool isGradient;
+		COLOR_RGB color, color_second;
         bool visible;
         bool isScrollView;
 		vector<_Object> mObjects;
@@ -76,12 +83,10 @@ namespace WIZARD {
 		bool load(rapidjson::Value &p);
 	};
 
-	struct _Background {
+    struct _Background : _base {
         int id;
 		string img;
-		Color4B bgColor, bgColor_end;
-        Color4F tileColor;
-		bool isGradient, hasTile;
+		COLOR_RGB bgColor, bgColor_second, tileColor;
         Vec2 tileNum;
         bool isDrawGrid;
         
@@ -156,11 +161,24 @@ public:
     ui_color * getPalette() {
         return &mPalette;
     }
+    bool insertPalettePath(const string& path) {
+        if(!hasPalettePath(path)) {
+            mPalettePaths.insert(path);
+            return true;
+        }
+        return false;
+    }
+    
+    bool hasPalettePath(const string& path) {
+        return  mPalettePaths.find(path) != mPalettePaths.end();
+    }
+    
 private:
 	static ui_wizard_share * hInstance;
 	map<string, WIZARD::VEC_NODES> mSharedNodes;
 	map<string, WIZARD::_Background> mSharedBackgounds;
     ui_color mPalette;
+    set<string> mPalettePaths;
 };
 
 /* ===============================================

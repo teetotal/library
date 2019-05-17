@@ -7,6 +7,26 @@
 
 #include "ui.h"
 
+struct COLOR_RGB{
+    int R;
+    int G;
+    int B;
+    int A;
+    bool isValidColor;
+    
+    COLOR_RGB() : R(-1) , G(-1), B(-1), A(255), isValidColor(false) { };
+    COLOR_RGB(int r, int g, int b, int a) : R(r) , G(g), B(b), A(a), isValidColor(true) { };
+    void set(int r, int g, int b, int a);
+    void set(COLOR_RGB& p);
+    Color3B getColor3B();
+    Color4F getColor4F();
+    Color4B getColor4B();
+    
+    GLubyte getA() {
+        return (GLubyte)this->A;
+    }
+};
+
 class ui_color {
 public:
     ui_color() {
@@ -21,29 +41,6 @@ public:
         
         return hInst;
     };
-    
-    struct COLOR_RGB{
-        int R;
-        int G;
-        int B;
-        int A;
-        string name;
-        
-        COLOR_RGB(){
-            R = -1;
-            G = -1;
-            B = -1;
-            A = 255;
-        };
-        
-        COLOR_RGB(int r, int g, int b, int a){
-            this->R = r;
-            this->G = g;
-            this->B = b;
-            this->A = a;
-        };
-    };
-    
     
     void set(const string name, int r, int g, int b, int a) {
         if(!hasColor(name)) mMap[name] = COLOR_RGB(r, g, b, a);
