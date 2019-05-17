@@ -231,6 +231,15 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
             this->color_second.set(color2);
         }
     }
+    //tile
+    if (p.HasMember("tile") && !p["tile"].IsNull()) {
+        CCLOG("WIZARD::_Node::load tile");
+        COLOR_RGB color1;
+        getColorFromJson(p["tile"]["color"], &color1);
+        this->colorTile.set(color1);
+        this->tileNum = Vec2(p["tile"]["num"][rapidjson::SizeType(0)].GetInt()
+                             , p["tile"]["num"][rapidjson::SizeType(1)].GetInt());
+    }
 
     CCLOG("WIZARD::_Node::load objects");
 	if (p.HasMember("objects")) {
@@ -256,8 +265,7 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
 bool WIZARD::_Background::load(rapidjson::Value & pValue)
 {
     CCLOG("Start WIZARD::_Background::load");
-    
-    this->id = pValue["id"].GetInt();
+    this->id = (pValue.HasMember("id") && !pValue["id"].IsNull()) ? pValue["id"].GetInt() : -1;
     CCLOG("WIZARD::_Background::load id=%d", id);
     
     CCLOG("WIZARD::_Background::load include");
@@ -463,14 +471,30 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
     Size sizeColored = Size(size.width - (node.margin.width * 2.f), size.height - (node.margin.height * 2.f));
     Size sizePerGridNoMargin = Size((sizeColored.width / node.gridSize.width), (sizeColored.height / node.gridSize.height));
     Size sizePerGrid = Size(sizePerGridNoMargin.width - (node.innerMargin.width * 2.f), sizePerGridNoMargin.height - (node.innerMargin.height * 2.f));
-    float min = (sizePerGrid.width > sizePerGrid.height) ? sizePerGrid.height : sizePerGrid.width;
+    float min, max;
+    if(sizePerGrid.width > sizePerGrid.height) {
+        min = sizePerGrid.height;
+        max = sizePerGrid.width;
+    } else {
+        max = sizePerGrid.height;
+        min = sizePerGrid.width;
+    }
+    
+    float nodeMin, nodeMax;
+    if(sizeColored.width > sizeColored.height) {
+        nodeMin = sizeColored.height;
+        nodeMax = sizeColored.width;
+    } else {
+        nodeMax = sizeColored.height;
+        nodeMin = sizeColored.width;
+    }
     
 	//background colored layer
     Node * layoutBG;
     ScrollView * sv;
-    
     if (node.color_second.isValidColor) {
-        layoutBG = LayerGradient::create(node.color.getColor4B(), node.color_second.getColor4B());
+//        layoutBG = LayerGradient::create(node.color.getColor4B(), node.color_second.getColor4B());
+        layoutBG = LayerRadialGradient::create(node.color.getColor4B(), node.color_second.getColor4B(), nodeMax * 0.75, Vec2(sizeColored.width / 2.f, sizeColored.height / 2.f), 0.1f);
         layoutBG->setContentSize(sizeColored);
     }
     else
@@ -479,6 +503,10 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
         layoutBG->setOpacity(node.color.getA());
     }
     
+    //tile
+    if(node.colorTile.isValidColor) {
+        gui::inst()->drawDiamondTile(layoutBG, node.tileNum, node.colorTile.getColor4F());
+    }
     
     if(node.isScrollView) {
         layoutBG->setPosition(Vec2::ZERO);
@@ -486,8 +514,6 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
     } else {
         layoutBG->setPosition(Vec2(start.x + node.margin.width, end.y + node.margin.height));
     }
-    
-    
     
     if(node.id >= 0)
         mNodeMap[node.id] = layoutBG;

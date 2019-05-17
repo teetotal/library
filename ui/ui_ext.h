@@ -14,6 +14,6 @@ using namespace std;
 class guiExt {
 public:
     static DrawNode * drawCircleForPhysics (Node * p, Vec2 center, float radius, Color4F color);
-    static DrawNode * drawRectForPhysics(Node * p, Vec2 pos, Size size, Color4F color, bool isSolid);
+    static DrawNode * drawRectForPhysics(Node * p, Vec2 pos, Size size, Color4F color, bool isSolid = true, float thick = .5f);
 };
 #endif //_UI_EXT_H

@@ -75,7 +75,8 @@ namespace WIZARD {
         Size innerMargin;
 		Size gridSize;
 		string img;
-		COLOR_RGB color, color_second;
+		COLOR_RGB color, color_second, colorTile;
+        Vec2 tileNum;
         bool visible;
         bool isScrollView;
 		vector<_Object> mObjects;

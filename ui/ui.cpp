@@ -272,6 +272,9 @@ Label * gui::createLabel(int x
         case -2:
             fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.5f);
             break;
+        case -3:
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.25f);
+            break;
         default:
             break;
     }
@@ -369,6 +372,9 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
             break;
         case -2:
             fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.5f);
+            break;
+        case -3:
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.25f);
             break;
         default:
             break;
