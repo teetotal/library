@@ -35,11 +35,11 @@ void ui_progressbar::setValue(float f) {
     mBar = DrawNode::create();
     Vec2 origin, dest;
     if(mAlign == ALIGNMENT_RIGHT) {
-        origin = Vec2(size.width - margin2, margin2);
-        dest = Vec2(origin.x - value.width, margin2 + value.height);
+        origin = Vec2(size.width - mMargin, margin2);
+        dest = Vec2(origin.x - value.width, origin.y + value.height);
     } else {
-        origin = Vec2(margin2, margin2);
-        dest = Vec2(margin2 + value.width, margin2 + value.height);
+        origin = Vec2(mMargin, margin2);
+        dest = Vec2(origin.x + value.width, origin.y + value.height);
     }
     mBar->drawSolidRect(origin, dest, mColor.getColor4F());
     mLayer->addChild(mBar);

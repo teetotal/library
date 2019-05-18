@@ -33,8 +33,8 @@ struct COLOR_RGB{
     
     COLOR_RGB getColorWarm(int level = 30);
     COLOR_RGB getColorCool(int level = 30);
-    COLOR_RGB getColorDark(int level = 30);
-    COLOR_RGB getColorLight(int level = 30);
+    COLOR_RGB getColorDark(int level = 50);
+    COLOR_RGB getColorLight(int level = 50);
     
     GLubyte getA() {
         return (GLubyte)this->A;
