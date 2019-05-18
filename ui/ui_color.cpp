@@ -34,19 +34,82 @@ void COLOR_RGB::set(const Color3B& color, int a) {
     this->isValidColor = true;
 }
 
-Color3B COLOR_RGB::getColor3B(){
-    return Color3B(R, G, B);
+COLOR_RGB COLOR_RGB::getColor(COLOR_RGB_TYPE type, int level) {
+    COLOR_RGB color;
+    
+    switch(type) {
+        case COLOR_RGB_TYPE_WARM:
+        {
+            color = getColorWarm(level);
+            break;
+        }
+        case COLOR_RGB_TYPE_COOL:
+        {
+            color = getColorCool(level);
+            break;
+        }
+        case COLOR_RGB_TYPE_DARK:
+        {
+            color = getColorDark(level);
+            break;
+        }
+        case COLOR_RGB_TYPE_LIGHT:
+        {
+            color = getColorLight(level);
+            break;
+        }
+        default:
+            return COLOR_RGB(R, G, B, A);
+    }
+    
+    return color;
 }
 
-Color4B COLOR_RGB::getColor4B() {
-   return Color4B(R, G, B, A);
+Color3B COLOR_RGB::getColor3B(COLOR_RGB_TYPE type, int level) {
+    COLOR_RGB color = getColor(type, level);
+    return Color3B(color.R, color.G, color.B);
 }
 
-Color4F COLOR_RGB::getColor4F(){
-    return Color4F(((float)R) / 255.f
-                   , ((float)G) / 255.f
-                   , ((float)B) / 255.f
-                   , ((float)A) / 255.f);
+Color4B COLOR_RGB::getColor4B(COLOR_RGB_TYPE type, int level) {
+    COLOR_RGB color = getColor(type, level);
+    return Color4B(color.R, color.G, color.B, color.A);
+}
+
+Color4F COLOR_RGB::getColor4F(COLOR_RGB_TYPE type, int level){
+    COLOR_RGB color = getColor(type, level);
+    return Color4F(((float)color.R) / 255.f
+                   , ((float)color.G) / 255.f
+                   , ((float)color.B) / 255.f
+                   , ((float)color.A) / 255.f);
+}
+
+
+COLOR_RGB COLOR_RGB::getColorWarm(int level) {
+    COLOR_RGB color = COLOR_RGB(R, G, B, A);
+    color.R = std::min(255, color.R + level);
+    return color;
+}
+
+COLOR_RGB COLOR_RGB::getColorCool(int level) {
+    COLOR_RGB color = COLOR_RGB(R, G, B, A);
+    color.B = std::min(255, color.B + level);
+    return color;
+}
+
+COLOR_RGB COLOR_RGB::getColorDark(int level) {
+    COLOR_RGB color = COLOR_RGB(R, G, B, A);
+    color.R = std::max(0, color.R - level);
+    color.G = std::max(0, color.G - level);
+    color.B = std::max(0, color.B - level);
+    return color;
+}
+
+COLOR_RGB COLOR_RGB::getColorLight(int level) {
+    COLOR_RGB color = COLOR_RGB(R, G, B, A);
+    color.R = std::min(255, color.R + level);
+    color.G = std::min(255, color.G + level);
+    color.B = std::min(255, color.B + level);
+    return color;
 }
 
 //--------------------------------------------------------
@@ -56,7 +119,6 @@ COLOR_RGB ui_color::getColor(const string& name) {
     
     return COLOR_RGB();
 }
-
 Color3B ui_color::getColor3B(const string& name){
     return getColor(name).getColor3B();
 }

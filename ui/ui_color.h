@@ -6,7 +6,13 @@
 #define _UI_COLOR_H
 
 #include "ui.h"
-
+enum COLOR_RGB_TYPE {
+    COLOR_RGB_TYPE_NORMAL = 0,
+    COLOR_RGB_TYPE_WARM,
+    COLOR_RGB_TYPE_COOL,
+    COLOR_RGB_TYPE_DARK,
+    COLOR_RGB_TYPE_LIGHT
+};
 struct COLOR_RGB{
     int R;
     int G;
@@ -20,9 +26,15 @@ struct COLOR_RGB{
     void set(COLOR_RGB& p);
     void set(const Color3B & color, int a = 255);
     
-    Color3B getColor3B();
-    Color4F getColor4F();
-    Color4B getColor4B();
+    COLOR_RGB getColor(COLOR_RGB_TYPE type = COLOR_RGB_TYPE_NORMAL, int level = 30);
+    Color3B getColor3B(COLOR_RGB_TYPE type = COLOR_RGB_TYPE_NORMAL, int level = 30);
+    Color4F getColor4F(COLOR_RGB_TYPE type = COLOR_RGB_TYPE_NORMAL, int level = 30);
+    Color4B getColor4B(COLOR_RGB_TYPE type = COLOR_RGB_TYPE_NORMAL, int level = 30);
+    
+    COLOR_RGB getColorWarm(int level = 30);
+    COLOR_RGB getColorCool(int level = 30);
+    COLOR_RGB getColorDark(int level = 30);
+    COLOR_RGB getColorLight(int level = 30);
     
     GLubyte getA() {
         return (GLubyte)this->A;
@@ -49,6 +61,7 @@ public:
     };
     
     COLOR_RGB getColor(const string& name);
+
     Color3B getColor3B(const string& name);
     Color4F getColor4F(const string& name);
     Color4B getColor4B(const string& name);
