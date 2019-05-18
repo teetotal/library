@@ -8,21 +8,16 @@ void ui_progressbar::init(const Vec2 &zeroPosition, const Size &size, COLOR_RGB&
     mLayer = gui::inst()->createLayout(size);
     mLayer->setPosition(zeroPosition);
     
-    mMargin = size.height * 0.05f;
-    Size s90 = Size(size.width - (mMargin * 2.f), size.height - (mMargin * 2.f));
-    
-    
+    //outline
     gui::inst()->drawRect(mLayer
                          , Vec2(size.width / 2.f, size.height / 2.f)
                          , size
                          , outline.getColor4F());
     
-    Color4F colorBG = color.getColor4F();
-    float f = 0.4f;
-    colorBG.r = std::fmax(colorBG.r - f, 0.f);
-    colorBG.g = std::fmax(colorBG.g - f, 0.f);
-    colorBG.b = std::fmax(colorBG.b - f, 0.f);
-    
+    //bg
+    Color4F colorBG = color.getColor4F(COLOR_RGB_TYPE_DARK, 50);
+    mMargin = size.height * 0.05f;
+    Size s90 = Size(size.width - (mMargin * 2.f), size.height - (mMargin * 2.f));
     
     gui::inst()->drawRect(mLayer
                         , Vec2(size.width / 2.f, size.height / 2.f)
@@ -32,18 +27,19 @@ void ui_progressbar::init(const Vec2 &zeroPosition, const Size &size, COLOR_RGB&
 
 void ui_progressbar::setValue(float f) {
     Size size = mLayer->getContentSize();
-    Size value = Size(size.width * f, size.height - (mMargin * 2.f));
+    float margin2 = mMargin + (mMargin * .5f);
+    Size value = Size(size.width * f - (margin2 * 2.f), size.height - (margin2 * 2.f));
     if(mBar) {
         mLayer->removeChild(mBar);
     }
     mBar = DrawNode::create();
     Vec2 origin, dest;
     if(mAlign == ALIGNMENT_RIGHT) {
-        origin = Vec2(size.width - mMargin, mMargin);
-        dest = Vec2(origin.x - value.width, mMargin + value.height);
+        origin = Vec2(size.width - margin2, margin2);
+        dest = Vec2(origin.x - value.width, margin2 + value.height);
     } else {
-        origin = Vec2(mMargin, mMargin);
-        dest = Vec2(mMargin + value.width, mMargin + value.height);
+        origin = Vec2(margin2, margin2);
+        dest = Vec2(margin2 + value.width, margin2 + value.height);
     }
     mBar->drawSolidRect(origin, dest, mColor.getColor4F());
     mLayer->addChild(mBar);

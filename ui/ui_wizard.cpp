@@ -353,26 +353,48 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path, const 
     
     if(pathPalette.compare("") != 0 && ui_wizard_share::inst()->insertPalettePath(pathPalette)) {
         rapidjson::Document dPalette = WIZARD::getJsonValue(pathPalette);
+        int brightness = dPalette["brightness"].GetInt();
+        int tone = dPalette["tone"].GetInt();
         
         for (auto& m : dPalette.GetObject())
         {
+            string name = m.name.GetString();
+            if(name.compare("brightness") == 0 || name.compare("tone") == 0)
+                continue;
+            
             int rgba[4];
             for(int n=0; n < 4; n++) rgba[n] = m.value[n].GetInt();
+            COLOR_RGB color = COLOR_RGB(rgba[0], rgba[1], rgba[2], rgba[3]);
+            COLOR_RGB colorWarm = color.getColorWarm(tone);
+            COLOR_RGB colorCool = color.getColorCool(tone);
+            COLOR_RGB colorDark = color.getColorDark(brightness);
+            COLOR_RGB colorLight = color.getColorLight(brightness);
             
-            ui_wizard_share::inst()->getPalette()->set(m.name.GetString()
-                                                       , rgba[0]
-                                                       , rgba[1]
-                                                       , rgba[2]
-                                                       , rgba[3]);
-            
+            //color
+            ui_wizard_share::inst()->getPalette()->set(name, color);
+            //warm
+            ui_wizard_share::inst()->getPalette()->set(name + "_WARM", colorWarm);
+            //warm
+            ui_wizard_share::inst()->getPalette()->set(name + "_COOL", colorCool);
+            //warm
+            ui_wizard_share::inst()->getPalette()->set(name + "_DARK", colorDark);
+            //warm
+            ui_wizard_share::inst()->getPalette()->set(name + "_LIGHT", colorLight);
+        }
+        
+        ui_color::COLOR_MAP::iterator it;
+        for (it = ui_wizard_share::inst()->getPalette()->mMap.begin(); it != ui_wizard_share::inst()->getPalette()->mMap.end(); ++it) {
             CCLOG("Insert Palette %s\t[ %d, %d, %d, %d ]"
-                  , m.name.GetString()
-                  , rgba[0]
-                  , rgba[1]
-                  , rgba[2]
-                  , rgba[3]
+                  , it->first.c_str()
+                  , it->second.R
+                  , it->second.G
+                  , it->second.B
+                  , it->second.A
                   );
         }
+            
+        
+        
     }
     
     rapidjson::Document d = WIZARD::getJsonValue(path);
@@ -811,7 +833,7 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                                                      , Vec2::ZERO
                                                      , Vec2::ZERO
                                                      , node.innerMargin );
-                pObj= ui_progressbar::create(0.65, pos, sizePerGrid, color, color2, obj.alignment);
+                pObj= ui_progressbar::create(.65f, pos, sizePerGrid, color, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
             }
 //                pObj = gui::inst()->addProgressBar(obj.position.x

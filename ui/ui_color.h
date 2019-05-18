@@ -56,8 +56,13 @@ public:
         return hInst;
     };
     
-    void set(const string name, int r, int g, int b, int a) {
+    void set(const string& name, int r, int g, int b, int a) {
         if(!hasColor(name)) mMap[name] = COLOR_RGB(r, g, b, a);
+    };
+    void set(const string& name, COLOR_RGB& color) {
+        if(!hasColor(name)) {
+            mMap[name] = COLOR_RGB(color);
+        }
     };
     
     COLOR_RGB getColor(const string& name);
@@ -66,11 +71,11 @@ public:
     Color4F getColor4F(const string& name);
     Color4B getColor4B(const string& name);
     
-private:
     typedef map<string, COLOR_RGB> COLOR_MAP;
     COLOR_MAP mMap;
-    static ui_color * hInst;
     
+private:
+    static ui_color * hInst;
     bool hasColor(const string& name);
 };
 
