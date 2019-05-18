@@ -18,6 +18,8 @@ struct COLOR_RGB{
     COLOR_RGB(int r, int g, int b, int a) : R(r) , G(g), B(b), A(a), isValidColor(true) { };
     void set(int r, int g, int b, int a);
     void set(COLOR_RGB& p);
+    void set(const Color3B & color, int a = 255);
+    
     Color3B getColor3B();
     Color4F getColor4F();
     Color4B getColor4B();

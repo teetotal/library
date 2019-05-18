@@ -673,17 +673,24 @@ void gui::setModal(Node * layer) {
 // createLayout  --------------------------------------------------------------------------------
 Layout * gui::createLayout(Size size, const string bgImg, bool hasBGColor, Color3B bgColor){
     Layout* l = Layout::create();
+    l->setContentSize(size);
     if(hasBGColor){
         l->setBackGroundColor(bgColor);
         l->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
     }
     
     if(bgImg.compare("") != 0){
-        l->setBackGroundImage(bgImg);
-        l->setBackGroundImageScale9Enabled(true);
+        //l->setBackGroundImage(bgImg);
+        //l->setBackGroundImageScale9Enabled(true);
+        auto img = Sprite::create(bgImg);
+        float min = (l->getContentSize().width > l->getContentSize().height) ? l->getContentSize().height : l->getContentSize().width;
+        img->setScaleX(size.width / img->getContentSize().width);
+        img->setScaleY(size.height / img->getContentSize().height);
+        img->setPosition(Vec2(size.width / 2.f, size.height / 2.f));
+        l->addChild(img);
     }
     
-    l->setContentSize(size);
+    
     
     return l;
 }

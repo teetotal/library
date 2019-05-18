@@ -8,7 +8,7 @@ DrawNode * guiExt::drawCircleForPhysics(Node * p, Vec2 pos, float radius, Color4
     auto draw = DrawNode::create();
     
     Color4F centerCircleColor = color;
-    float opacity = (_OPACITY * 2) / ((radius - .1f) * 10);
+    float opacity = (_OPACITY * 8) / ((radius - .1f) * 10);
     centerCircleColor.a = 1;
 //
 //    draw->drawDot(Vec2(radius, radius), radius, bg);
@@ -50,8 +50,8 @@ DrawNode * guiExt::drawRectForPhysics(Node * p, Vec2 pos, Size size, Color4F col
         line2.b = std::fmax(0.f, line2.b - _OPACITY);
         
         for(float n=0; n < thick; n = n+ 0.1) {
-            draw->drawLine(Vec2(size.width - thick, size.height - n), Vec2(0, size.height - n), line1);
-            draw->drawLine(Vec2(n, size.height), Vec2(n, thick), line1);
+            draw->drawLine(Vec2(size.width - thick, size.height - n), Vec2(0, size.height - n), line2);
+            draw->drawLine(Vec2(n, size.height), Vec2(n, thick), line2);
             
             draw->drawLine(Vec2(size.width - n, size.height), Vec2(size.width - n, 0), line2);
             draw->drawLine(Vec2(size.width, n), Vec2(0, n), line2);

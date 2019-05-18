@@ -3,6 +3,7 @@
 //
 
 #include "ui_wizard.h"
+#include "ui_progressbar.h"
 
 ui_wizard_share * ui_wizard_share::hInstance = NULL;
 
@@ -292,7 +293,7 @@ bool WIZARD::_Background::load(rapidjson::Value & pValue)
 	}
     //tile
     CCLOG("WIZARD::_Background::load tile");
-    if (!p["tile"].IsNull()) {
+    if (p.HasMember("tile") && !p["tile"].IsNull()) {
         COLOR_RGB color1;
         getColorFromJson(p["tile"]["color"], &color1);
         this->tileColor.set(color1);
@@ -405,12 +406,27 @@ Node * ui_wizard::getNodeById(int id)
 
 void ui_wizard::drawBackground(WIZARD::_Background & bg)
 {
+    Size size = Director::getInstance()->getVisibleSize();
     mIsDrawGrid = bg.isDrawGrid;
-	auto p = (bg.bgColor_second.isValidColor) ? LayerGradient::create(bg.bgColor.getColor4B(), bg.bgColor_second.getColor4B()) : LayerColor::create(bg.bgColor.getColor4B());
-	p->setContentSize(Director::getInstance()->getVisibleSize());
+//    auto p = (bg.bgColor_second.isValidColor) ? LayerGradient::create(bg.bgColor.getColor4B(), bg.bgColor_second.getColor4B()) : LayerColor::create(bg.bgColor.getColor4B());
+    auto p = LayerColor::create(bg.bgColor.getColor4B());
+	p->setContentSize(size);
     p->setAnchorPoint(Vec2::ZERO);
 	p->setPosition(Director::getInstance()->getVisibleOrigin());
 	this->addChild(p);
+    
+    if (bg.bgColor_second.isValidColor) {
+        
+        auto gradient = LayerRadialGradient::create( bg.bgColor_second.getColor4B() //node.color.getColor4B()
+                                                    , bg.bgColor.getColor4B()
+                                                    , size.width / 1.5f
+                                                    , Vec2(size.width / 2.f, size.height / 4.f) //Vec2(sizeColored.width / 2.f, sizeColored.height / 2.f)
+                                                    , 0.0f);
+        
+        gradient->setContentSize(size);
+        p->addChild(gradient);
+        
+    }
 
 	if (bg.img.compare(NULL_STRING_VALUE) != 0) {
 		gui::inst()->addBG(bg.img, p, true);
@@ -490,18 +506,23 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
     }
     
 	//background colored layer
-    Node * layoutBG;
+    Node * layoutBG = gui::inst()->createLayout(sizeColored, node.img, true, node.color.getColor3B());
+    layoutBG->setOpacity(node.color.getA());
+    
     ScrollView * sv;
     if (node.color_second.isValidColor) {
-//        layoutBG = LayerGradient::create(node.color.getColor4B(), node.color_second.getColor4B());
-        layoutBG = LayerRadialGradient::create(node.color.getColor4B(), node.color_second.getColor4B(), nodeMax * 0.75, Vec2(sizeColored.width / 2.f, sizeColored.height / 2.f), 0.1f);
-        layoutBG->setContentSize(sizeColored);
+        
+        auto gradient = LayerRadialGradient::create( node.color_second.getColor4B() //node.color.getColor4B()
+                                                    , node.color.getColor4B()
+                                                    , nodeMax / 1.5f
+                                                    , Vec2(sizeColored.width / 2.f, sizeColored.height / 4.f) //Vec2(sizeColored.width / 2.f, sizeColored.height / 2.f)
+                                                    , 0.0f);
+
+        gradient->setContentSize(sizeColored);
+        layoutBG->addChild(gradient);
+        
     }
-    else
-    {
-        layoutBG = gui::inst()->createLayout(sizeColored, node.img, true, node.color.getColor3B());
-        layoutBG->setOpacity(node.color.getA());
-    }
+   
     
     //tile
     if(node.colorTile.isValidColor) {
@@ -778,18 +799,33 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
             }
                 break;
             case WIZARD::OBJECT_TYPE_LOADINGBAR:
-                pObj = gui::inst()->addProgressBar(obj.position.x
-                                                    , obj.position.y
-                                                    , obj.img
-                                                    , layoutBG
-                                                    , sizePerGrid
-                                                    , 90.f
-                                                    , layoutBG->getContentSize()
-                                                    , node.gridSize
-                                                    , Vec2::ZERO
-                                                    , Vec2::ZERO
-                                                    , node.innerMargin
-                                                );
+            {
+                COLOR_RGB color, color2;
+                color.set(obj.color, obj.opacity);
+                color2.set(obj.color_second, obj.opacity_second);
+                Vec2 pos = gui::inst()->getPointVec2(obj.position.x
+                                                     , obj.position.y
+                                                     , ALIGNMENT_LEFT_BOTTOM
+                                                     , layoutBG->getContentSize()
+                                                     , node.gridSize
+                                                     , Vec2::ZERO
+                                                     , Vec2::ZERO
+                                                     , node.innerMargin );
+                pObj= ui_progressbar::create(0.65, pos, sizePerGrid, color, color2, obj.alignment);
+                ((ui_progressbar*)pObj)->addParent(layoutBG);
+            }
+//                pObj = gui::inst()->addProgressBar(obj.position.x
+//                                                    , obj.position.y
+//                                                    , obj.img
+//                                                    , layoutBG
+//                                                    , sizePerGrid
+//                                                    , 90.f
+//                                                    , layoutBG->getContentSize()
+//                                                    , node.gridSize
+//                                                    , Vec2::ZERO
+//                                                    , Vec2::ZERO
+//                                                    , node.innerMargin
+//                                                );
                 break;
             case WIZARD::OBJECT_TYPE_CIRCLE:
                 pObj = gui::inst()->drawCircle(layoutBG
