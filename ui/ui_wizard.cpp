@@ -163,6 +163,12 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_SPRITE_BUTTON_CIRCLE;
 	else if (type.compare("loadingbar") == 0)
 		return OBJECT_TYPE_LOADINGBAR;
+    else if (type.compare("progressbar_0") == 0)
+        return OBJECT_TYPE_PROGRESSBAR_0;
+    else if (type.compare("progressbar_1") == 0)
+        return OBJECT_TYPE_PROGRESSBAR_1;
+    else if (type.compare("progressbar_2") == 0)
+        return OBJECT_TYPE_PROGRESSBAR_2;
 	else if (type.compare("circle") == 0)
 		return OBJECT_TYPE_CIRCLE;
     else if (type.compare("rectangle") == 0)
@@ -821,6 +827,20 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
             }
                 break;
             case WIZARD::OBJECT_TYPE_LOADINGBAR:
+                pObj = gui::inst()->addProgressBar(obj.position.x
+                                                    , obj.position.y
+                                                    , obj.img
+                                                    , layoutBG
+                                                    , sizePerGrid
+                                                    , 90.f
+                                                    , layoutBG->getContentSize()
+                                                    , node.gridSize
+                                                    , Vec2::ZERO
+                                                    , Vec2::ZERO
+                                                    , node.innerMargin
+                                                );
+                break;
+            case WIZARD::OBJECT_TYPE_PROGRESSBAR_0:
             {
                 COLOR_RGB color, color2;
                 color.set(obj.color, obj.opacity);
@@ -833,22 +853,44 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                                                      , Vec2::ZERO
                                                      , Vec2::ZERO
                                                      , node.innerMargin );
-                pObj= ui_progressbar::create(.65f, pos, sizePerGrid, color, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_0, .65f, pos, sizePerGrid, color, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
-            }
-//                pObj = gui::inst()->addProgressBar(obj.position.x
-//                                                    , obj.position.y
-//                                                    , obj.img
-//                                                    , layoutBG
-//                                                    , sizePerGrid
-//                                                    , 90.f
-//                                                    , layoutBG->getContentSize()
-//                                                    , node.gridSize
-//                                                    , Vec2::ZERO
-//                                                    , Vec2::ZERO
-//                                                    , node.innerMargin
-//                                                );
                 break;
+            }
+            case WIZARD::OBJECT_TYPE_PROGRESSBAR_1:
+            {
+                COLOR_RGB color, color2;
+                color.set(obj.color, obj.opacity);
+                color2.set(obj.color_second, obj.opacity_second);
+                Vec2 pos = gui::inst()->getPointVec2(obj.position.x
+                                                     , obj.position.y
+                                                     , ALIGNMENT_LEFT_BOTTOM
+                                                     , layoutBG->getContentSize()
+                                                     , node.gridSize
+                                                     , Vec2::ZERO
+                                                     , Vec2::ZERO
+                                                     , node.innerMargin );
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_1, .65f, pos, sizePerGrid, color, color2, obj.alignment);
+                ((ui_progressbar*)pObj)->addParent(layoutBG);
+                break;
+            }
+            case WIZARD::OBJECT_TYPE_PROGRESSBAR_2:
+            {
+                COLOR_RGB color, color2;
+                color.set(obj.color, obj.opacity);
+                color2.set(obj.color_second, obj.opacity_second);
+                Vec2 pos = gui::inst()->getPointVec2(obj.position.x
+                                                     , obj.position.y
+                                                     , ALIGNMENT_LEFT_BOTTOM
+                                                     , layoutBG->getContentSize()
+                                                     , node.gridSize
+                                                     , Vec2::ZERO
+                                                     , Vec2::ZERO
+                                                     , node.innerMargin );
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, .65f, pos, sizePerGrid, color, color2, obj.alignment);
+                ((ui_progressbar*)pObj)->addParent(layoutBG);
+                break;
+            }
             case WIZARD::OBJECT_TYPE_CIRCLE:
                 pObj = gui::inst()->drawCircle(layoutBG
                                                , circleCenter
