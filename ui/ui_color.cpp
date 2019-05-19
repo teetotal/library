@@ -16,7 +16,7 @@ void COLOR_RGB::set(int r, int g, int b, int a) {
     this->isValidColor = true;
 }
 
-void COLOR_RGB::set(COLOR_RGB& p) {
+void COLOR_RGB::set(const COLOR_RGB& p) {
     this->R = p.R;
     this->G = p.G;
     this->B = p.B;

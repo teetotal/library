@@ -23,7 +23,7 @@ struct COLOR_RGB{
     COLOR_RGB() : R(-1) , G(-1), B(-1), A(255), isValidColor(false) { };
     COLOR_RGB(int r, int g, int b, int a) : R(r) , G(g), B(b), A(a), isValidColor(true) { };
     void set(int r, int g, int b, int a);
-    void set(COLOR_RGB& p);
+    void set(const COLOR_RGB& p);
     void set(const Color3B & color, int a = 255);
     
     COLOR_RGB getColor(COLOR_RGB_TYPE type = COLOR_RGB_TYPE_NORMAL, int level = 30);
