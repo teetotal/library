@@ -5,6 +5,7 @@
 #include "ui_wizard.h"
 #include "ui_progressbar.h"
 #include "ui_ext.h"
+#include "../library/util.h"
 
 ui_wizard_share * ui_wizard_share::hInstance = NULL;
 
@@ -230,16 +231,16 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
     }
     
     CCLOG("WIZARD::_Node::load margin");
-	this->margin.width = p["margin"][rapidjson::SizeType(0)].GetFloat();
-	this->margin.height = p["margin"][rapidjson::SizeType(1)].GetFloat();
+	this->margin.x = p["margin"][rapidjson::SizeType(0)].GetFloat();
+	this->margin.y = p["margin"][rapidjson::SizeType(1)].GetFloat();
     
     CCLOG("WIZARD::_Node::load innerMargin");
-    this->innerMargin.width = p["innerMargin"][rapidjson::SizeType(0)].GetFloat();
-    this->innerMargin.height = p["innerMargin"][rapidjson::SizeType(1)].GetFloat();
+    this->innerMargin.x = p["innerMargin"][rapidjson::SizeType(0)].GetFloat();
+    this->innerMargin.y = p["innerMargin"][rapidjson::SizeType(1)].GetFloat();
     
     CCLOG("WIZARD::_Node::load gridSize");
-	this->gridSize.width = p["gridSize"][rapidjson::SizeType(0)].GetFloat();
-	this->gridSize.height = p["gridSize"][rapidjson::SizeType(1)].GetFloat();
+	this->gridSize.x = p["gridSize"][rapidjson::SizeType(0)].GetFloat();
+	this->gridSize.y = p["gridSize"][rapidjson::SizeType(1)].GetFloat();
     
     CCLOG("WIZARD::_Node::load img");
 	this->img = p["img"].IsNull() ? NULL_STRING_VALUE : p["img"].GetString();
@@ -534,24 +535,24 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
     if(node.isScrollView) {
         Vec2 startInner= gui::inst()->getPointVec2(node.dimensionInnerStart.x, node.dimensionInnerStart.y, ALIGNMENT_NONE
                                                    , Dimension
-                                                   , mGrid
+                                                   , Grid
                                                    , Origin
                                                    , Vec2::ZERO
                                                    );
         Vec2 endInner = gui::inst()->getPointVec2(node.dimensionInnerEnd.x, node.dimensionInnerEnd.y, ALIGNMENT_NONE
                                                   , Dimension
-                                                  , mGrid
+                                                  , Grid
                                                   , Origin
                                                   , Vec2::ZERO
                                                   );
-        scrollviewSize = Size(size.width - (node.margin.width * 2.f), size.height - (node.margin.height * 2.f));
+        scrollviewSize = Size(size.width - (node.margin.x * 2.f), size.height - (node.margin.y * 2.f));
         size = Size(endInner.x - startInner.x, startInner.y - endInner.y);
         
     }
     
-    Size sizeColored = Size(size.width - (node.margin.width * 2.f), size.height - (node.margin.height * 2.f));
-    Size sizePerGridNoMargin = Size((sizeColored.width / node.gridSize.width), (sizeColored.height / node.gridSize.height));
-    Size sizePerGrid = Size(sizePerGridNoMargin.width - (node.innerMargin.width * 2.f), sizePerGridNoMargin.height - (node.innerMargin.height * 2.f));
+    Size sizeColored = Size(size.width - (node.margin.x * 2.f), size.height - (node.margin.y * 2.f));
+    Size sizePerGridNoMargin = Size((sizeColored.width / node.gridSize.x), (sizeColored.height / node.gridSize.y));
+    Size sizePerGrid = Size(sizePerGridNoMargin.width - (node.innerMargin.x * 2.f), sizePerGridNoMargin.height - (node.innerMargin.y * 2.f));
     float min, max;
     if(sizePerGrid.width > sizePerGrid.height) {
         min = sizePerGrid.height;
@@ -580,7 +581,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                 , (node.color.getA() == 0) ? false : true
                                                 , node.color.getColor3B());
     layoutBG->setOpacity(node.color.getA());
-    layoutBG->setPosition(Vec2(start.x + node.margin.width, end.y + node.margin.height));
+    layoutBG->setPosition(Vec2(start.x + node.margin.x, end.y + node.margin.y));
     ScrollView * sv;
     if (node.color_second.isValidColor) {
         
@@ -603,7 +604,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
     
     if(node.isScrollView) {
         layoutBG->setPosition(Vec2::ZERO);
-        sv = gui::inst()->addScrollView(scrollviewSize, sizeColored, Vec2(start.x + node.margin.width, end.y + node.margin.height), NULL);
+        sv = gui::inst()->addScrollView(scrollviewSize, sizeColored, Vec2(start.x + node.margin.x, end.y + node.margin.y), NULL);
     }
     
     if(node.id >= 0)
@@ -611,7 +612,10 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
     
 	//draw grid line
     if(mIsDrawGrid) {
-        gui::inst()->drawGrid(layoutBG, layoutBG->getContentSize(), node.gridSize, Size::ZERO, Size::ZERO, (seq % 2 == 1) ? Color4F::MAGENTA : Color4F::GREEN);
+        int idx = getRandValue(6);
+        
+        Color4F lineColor = ui_wizard_share::inst()->_DRAWLINE_COLOR[idx];
+        gui::inst()->drawGrid(layoutBG, layoutBG->getContentSize(), node.gridSize, Size::ZERO, Size::ZERO, lineColor);
     }
     
 	for (size_t n = 0; n < node.mObjects.size(); n++) {
@@ -659,11 +663,11 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
         
         switch(obj.alignment) {
             case ALIGNMENT_LEFT:
-                position.x += node.innerMargin.width;
+                position.x += node.innerMargin.x;
                 circleCenter.x = position.x + (min / 2.f);
             break;
             case ALIGNMENT_RIGHT:
-                position.x -= node.innerMargin.width;
+                position.x -= node.innerMargin.x;
                 circleCenter.x = position.x - (min / 2.f);
             break;
             default:
@@ -860,8 +864,8 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                        , circleCenter
                                                        );
                 Size imgSize = sizePerGrid;
-                imgSize.width -= node.innerMargin.width * 2.f;
-                imgSize.height -= node.innerMargin.height * 2.f;
+                imgSize.width -= node.innerMargin.x * 2.f;
+                imgSize.height -= node.innerMargin.y * 2.f;
                 
                 if (imgSize.width > imgSize.height)
                     gui::inst()->setScaleByHeight(pObj, imgSize.height);
@@ -960,7 +964,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             case WIZARD::OBJECT_TYPE_LINE:
                 pObj = gui::inst()->drawLine(layoutBG
                                              , position
-                                             , Vec2(position.x + sizePerGrid.width + (node.innerMargin.width * 2.f), position.y)
+                                             , Vec2(position.x + sizePerGrid.width + (node.innerMargin.x * 2.f), position.y)
                                              , Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_COMPONENT:

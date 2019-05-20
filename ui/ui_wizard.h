@@ -54,7 +54,6 @@ namespace WIZARD {
     struct _Object : _base {
 		int id;
         string component;
-        
 		Vec2 position;
 		ALIGNMENT alignment;
 		OBJECT_TYPE type;
@@ -82,9 +81,9 @@ namespace WIZARD {
         
 		Vec2 dimensionStart, dimensionEnd;
 		Vec2 dimensionInnerStart, dimensionInnerEnd;
-		Size margin;
-        Size innerMargin;
-		Size gridSize;
+		Vec2 margin;
+        Vec2 innerMargin;
+		Vec2 gridSize;
 		string img;
 		COLOR_RGB color, color_second, colorTile;
         Vec2 tileNum;
@@ -141,6 +140,12 @@ public:
 	static ui_wizard_share * inst() {
 		if (hInstance == NULL) {
 			hInstance = new ui_wizard_share;
+            hInstance->_DRAWLINE_COLOR [0] = Color4F::RED;
+            hInstance->_DRAWLINE_COLOR [1] = Color4F::MAGENTA;
+            hInstance->_DRAWLINE_COLOR [2] = Color4F::BLUE;
+            hInstance->_DRAWLINE_COLOR [3] = Color4F::ORANGE;
+            hInstance->_DRAWLINE_COLOR [4] = Color4F::BLACK;
+            hInstance->_DRAWLINE_COLOR [5] = Color4F::GREEN;
 		}
 		return hInstance;
 	};
@@ -196,6 +201,7 @@ public:
     bool loadPaletteFromJson(const string& pathPalette);
     bool loadComponentFromJson(const string& path);
     
+    Color4F _DRAWLINE_COLOR[6];
 private:
 	static ui_wizard_share * hInstance;
 	map<string, WIZARD::VEC_NODES> mSharedNodes;
@@ -203,6 +209,7 @@ private:
     map<string, WIZARD::_Node> mSharedComponent;
     ui_color mPalette;
     set<string> mPalettePaths;
+    
 };
 
 /* ===============================================
