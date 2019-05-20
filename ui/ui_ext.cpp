@@ -58,5 +58,14 @@ DrawNode * guiExt::drawRectForPhysics(Node * p, Vec2 pos, Size size, COLOR_RGB& 
     return draw;
 }
 
-
+/*
+ drawRectRoundShadow
+ */
+DrawNode * guiExt::drawRectRoundShadow (Node * p, Vec2 pos, Size size, COLOR_RGB& color){
+    Color4F colorShadow = color.getColorLight().getColor4F();
+    Color4F colorMain = color.getColor4F();
+    
+    gui::inst()->drawRectRound(p, Vec2(pos.x, pos.y), size, colorShadow);
+    return gui::inst()->drawRectRound(p, pos, Size(size.width - 2.f, size.height - 2.f), colorMain);
+}
 

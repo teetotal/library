@@ -41,6 +41,9 @@ namespace WIZARD {
         OBJECT_TYPE_RECT_LINE,
         OBJECT_TYPE_RECT_ROUND,
         OBJECT_TYPE_RECT_ROUND_SHADOW,
+        OBJECT_TYPE_LINE,
+        
+        OBJECT_TYPE_COMPONENT,
 	};
     
     struct _base {
@@ -50,6 +53,8 @@ namespace WIZARD {
 
     struct _Object : _base {
 		int id;
+        string component;
+        
 		Vec2 position;
 		ALIGNMENT alignment;
 		OBJECT_TYPE type;
@@ -70,8 +75,11 @@ namespace WIZARD {
 		bool load(rapidjson::Value &p);
 		int getObjectType(const string type);
 	};
+    
     struct _Node : _base {
 		int id;
+        string component;
+        
 		Vec2 dimensionStart, dimensionEnd;
 		Vec2 dimensionInnerStart, dimensionInnerEnd;
 		Size margin;
@@ -84,7 +92,7 @@ namespace WIZARD {
         bool isScrollView;
 		vector<_Object> mObjects;
 
-		bool load(rapidjson::Value &p);
+        bool load(rapidjson::Value &p);
 	};
 
     struct _Background : _base {
@@ -146,6 +154,10 @@ public:
 	void setBackground(const string& id, WIZARD::_Background& bg) {
 		mSharedBackgounds[id] = bg;
 	};
+    void setComponent(const string& id, WIZARD::_Node& component) {
+        if(mSharedComponent.find(id) == mSharedComponent.end())
+            mSharedComponent[id] = component;
+    };
 	
 	WIZARD::VEC_NODES getNodes(const string& id) {
 		return mSharedNodes[id];
@@ -154,6 +166,10 @@ public:
 	WIZARD::_Background getBackgound(const string& id) {
 		return mSharedBackgounds[id];
 	};
+    
+    WIZARD::_Node getComponent(const string& id) {
+        return mSharedComponent[id];
+    }
 
 	bool hasNode(const string& id) {
 		if (mSharedNodes.find(id) == mSharedNodes.end()) {
@@ -177,10 +193,14 @@ public:
         return  mPalettePaths.find(path) != mPalettePaths.end();
     }
     
+    bool loadPaletteFromJson(const string& pathPalette);
+    bool loadComponentFromJson(const string& path);
+    
 private:
 	static ui_wizard_share * hInstance;
 	map<string, WIZARD::VEC_NODES> mSharedNodes;
 	map<string, WIZARD::_Background> mSharedBackgounds;
+    map<string, WIZARD::_Node> mSharedComponent;
     ui_color mPalette;
     set<string> mPalettePaths;
 };
@@ -190,8 +210,8 @@ private:
 ================================================== */
 class ui_wizard : public PhysicsScene {	
 protected:
-    // palette 정보 share에 있는지 확인하고 node, obj, backgroud에 적용
-	bool loadFromJson(const string& sceneName, const string& path, const string& pathPalette = "");
+	bool loadFromJson(const string& sceneName, const string& path);
+    
 	Node * getNodeById(int id);
 	void pushScene(Scene * pScene) {
 		Director::getInstance()->pushScene(pScene);
@@ -213,10 +233,11 @@ private:
 	map<int, Node*> mNodeMap;
 
 	void drawBackground(WIZARD::_Background &bg);
-	void drawNode(WIZARD::_Node &node, int seq);
+	void drawNode(WIZARD::_Node &node);
+    Node * createNode(const Size& Dimension, const Vec2& Origin, const Vec2& Grid, WIZARD::_Node &node, int seq);
     
     bool mIsDrawGrid;
-    Size mGrid;
+    Vec2 mGrid;
 };
 
 #endif //_UI_WIZARD_H

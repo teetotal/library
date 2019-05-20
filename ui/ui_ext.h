@@ -16,5 +16,6 @@ class guiExt {
 public:
     static DrawNode * drawCircleForPhysics (Node * p, Vec2 center, float radius, COLOR_RGB& color);
     static DrawNode * drawRectForPhysics(Node * p, Vec2 pos, Size size, COLOR_RGB& color, bool isSolid = true, float thick = .1f);
+    static DrawNode * drawRectRoundShadow  (Node * p, Vec2 pos, Size size, COLOR_RGB& color);
 };
 #endif //_UI_EXT_H

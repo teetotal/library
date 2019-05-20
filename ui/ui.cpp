@@ -579,11 +579,15 @@ DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color, bool isSo
 
 DrawNode * gui::drawRectRound (Node * p, Vec2 pos, Size size, Color4F color){
     auto draw = DrawNode::create();
-    float ratio = 0.04f / 2.f;
+   
     Vec2 origin = Vec2(pos.x - size.width / 2.f, pos.y - size.height / 2.f);
     Vec2 dest = Vec2(pos.x + size.width / 2.f, pos.y + size.height / 2.f);
-    Vec2 marignBound = Vec2(size.width * ratio, size.height * ratio);
-    float margin = (marignBound.x > marignBound.y) ? marignBound.x : marignBound.y;
+    
+//    float ratio = 0.04f / 2.f;
+//    Vec2 marignBound = Vec2(size.width * ratio, size.height * ratio);
+//    float margin = (marignBound.x > marignBound.y) ? marignBound.x : marignBound.y;
+    
+    float margin = 1.f;
     
     Vec2 poli[9] = {
         Vec2(origin.x + margin    , origin.y)
@@ -601,17 +605,6 @@ DrawNode * gui::drawRectRound (Node * p, Vec2 pos, Size size, Color4F color){
     p->addChild(draw);
     
     return draw;
-}
-
-DrawNode * gui::drawRectRoundShadow (Node * p, Vec2 pos, Size size, Color4F color){
-    Color4F colorShadow = Color4F(color);
-    float f = 0.3f;
-    colorShadow.r = std::fmax(0, colorShadow.r - f);
-    colorShadow.g = std::fmax(0, colorShadow.g - f);
-    colorShadow.b = std::fmax(0, colorShadow.b - f);
-    
-    drawRectRound(p, Vec2(pos.x + 1, pos.y -1), size, colorShadow);
-    return drawRectRound(p, pos, size, color);
 }
 
 DrawNode * gui::drawDiamond(Node * p, Vec2 pos, Size size, Color4F color){
@@ -683,7 +676,7 @@ Layout * gui::createLayout(Size size, const string bgImg, bool hasBGColor, Color
         //l->setBackGroundImage(bgImg);
         //l->setBackGroundImageScale9Enabled(true);
         auto img = Sprite::create(bgImg);
-        float min = (l->getContentSize().width > l->getContentSize().height) ? l->getContentSize().height : l->getContentSize().width;
+//        float min = (l->getContentSize().width > l->getContentSize().height) ? l->getContentSize().height : l->getContentSize().width;
         img->setScaleX(size.width / img->getContentSize().width);
         img->setScaleY(size.height / img->getContentSize().height);
         img->setPosition(Vec2(size.width / 2.f, size.height / 2.f));
@@ -717,7 +710,7 @@ ScrollView * gui::addScrollView(Size size, Size innerSize, Vec2 position, Node *
     sv->setScrollBarPositionFromCorner(Vec2::ZERO);
     
     if (parent != NULL)
-    parent->addChild(sv);
+        parent->addChild(sv);
     
     return sv;
 }

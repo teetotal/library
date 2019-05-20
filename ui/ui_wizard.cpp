@@ -4,6 +4,7 @@
 
 #include "ui_wizard.h"
 #include "ui_progressbar.h"
+#include "ui_ext.h"
 
 ui_wizard_share * ui_wizard_share::hInstance = NULL;
 
@@ -45,6 +46,11 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
         this->id = p["id"].GetInt();
     
     CCLOG("WIZARD::_Object::load id=%d", id);
+    
+    if(p.HasMember("component") && !p["component"].IsNull()) {
+        this->component = p["component"].GetString();
+        CCLOG("WIZARD::_Object::load component = %s", this->component.c_str());
+    }
     
     CCLOG("WIZARD::_Object::load position");
 	this->position.x = p["position"][rapidjson::SizeType(0)].GetFloat();
@@ -179,6 +185,10 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_RECT_ROUND;
     else if (type.compare("rectangle_round_shadow") == 0)
         return OBJECT_TYPE_RECT_ROUND_SHADOW;
+    else if (type.compare("line") == 0)
+        return OBJECT_TYPE_LINE;
+    else if (type.compare("component") == 0)
+        return OBJECT_TYPE_COMPONENT;
     
 	return OBJECT_TYPE_LABEL;
 }
@@ -195,8 +205,13 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
 	
     CCLOG("WIZARD::_Node::load id=%d", id);
     
-    CCLOG("WIZARD::_Node::load include");
     rapidjson::Value & p = (pValue.HasMember("include")) ? getJsonValue(pValue["include"]["path"].GetString())[pValue["include"]["key"].GetString()] : pValue;
+    
+    if(p.HasMember("component") && !p["component"].IsNull()) {
+        this->component = p["component"].GetString();
+        CCLOG("WIZARD::_Node::load component = %s", this->component.c_str());
+        return true;
+    }
     
     CCLOG("WIZARD::_Node::load dimension");
     this->dimensionStart.x = p["dimension"][rapidjson::SizeType(0)].GetFloat();
@@ -331,7 +346,7 @@ rapidjson::Document WIZARD::getJsonValue(const string& path) {
 }
 
 // ui_wizard -------------------------------------------------------------------------------------------
-bool ui_wizard::loadFromJson(const string& sceneName, const string& path, const string& pathPalette)
+bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 {
     //////////////////////////////
     // 1. super init first
@@ -341,10 +356,10 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path, const 
     }
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
-    mGrid = Size(GRID_X, GRID_Y);
+    mGrid = Vec2(GRID_X, GRID_Y);
     if(visibleSize.width < visibleSize.height)
-        mGrid = Size(GRID_Y, GRID_X);
-    
+        mGrid = Vec2(GRID_Y, GRID_X);
+    //Draw from memory --------------------------------------------------------------------------------------
 	if (ui_wizard_share::inst()->hasNode(sceneName)) {
         WIZARD::_Background bg = ui_wizard_share::inst()->getBackgound(sceneName);
 		this->drawBackground(bg);
@@ -352,10 +367,39 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path, const 
 		WIZARD::VEC_NODES nodes = ui_wizard_share::inst()->getNodes(sceneName);
 		for (size_t n = 0; n < nodes.size(); n++) {
 			WIZARD::_Node p = nodes[n];
-			drawNode(p, (int)n);
+			drawNode(p);
 		}
 		return true;
 	}
+    
+    //Parse & Draw --------------------------------------------------------------------------------------
+    rapidjson::Document d = WIZARD::getJsonValue(path);
+    
+    //component
+
+    //background
+	WIZARD::_Background bg;
+	bg.load(d["background"]);
+	ui_wizard_share::inst()->setBackground(sceneName, bg);
+	this->drawBackground(bg);
+
+    //_Node
+	const rapidjson::Value& nodes = d["nodes"];
+	for (rapidjson::SizeType i = 0; i < nodes.Size(); i++)
+	{	
+		WIZARD::_Node p;
+		if (!p.load(d["nodes"][rapidjson::SizeType(i)]))
+			return false;
+		
+		ui_wizard_share::inst()->addNode(sceneName, p);
+		drawNode(p);
+	}
+
+	return true;
+}
+
+//Palette --------------------------------------------------------------------------------------
+bool ui_wizard_share::loadPaletteFromJson(const string& pathPalette) {
     
     if(pathPalette.compare("") != 0 && ui_wizard_share::inst()->insertPalettePath(pathPalette)) {
         rapidjson::Document dPalette = WIZARD::getJsonValue(pathPalette);
@@ -398,31 +442,24 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path, const 
                   , it->second.A
                   );
         }
-            
-        
-        
+        return true;
     }
-    
-    rapidjson::Document d = WIZARD::getJsonValue(path);
-    
-    
-	WIZARD::_Background bg;
-	bg.load(d["background"]);
-	ui_wizard_share::inst()->setBackground(sceneName, bg);
-	this->drawBackground(bg);
+    return false;
+}
 
-	const rapidjson::Value& nodes = d["nodes"];
-	for (rapidjson::SizeType i = 0; i < nodes.Size(); i++)
-	{	
-		WIZARD::_Node p;
-		if (!p.load(d["nodes"][rapidjson::SizeType(i)]))
-			return false;
-		
-		ui_wizard_share::inst()->addNode(sceneName, p);
-		drawNode(p, (int)i);
-	}
-
-	return true;
+bool ui_wizard_share::loadComponentFromJson(const string& path) {
+    if(path.compare("") != 0) {
+        rapidjson::Document d = WIZARD::getJsonValue(path);
+        for (auto& m : d.GetObject())
+        {
+            string name = m.name.GetString();
+            WIZARD::_Node componet;
+            componet.load(m.value);
+            setComponent(name, componet);
+        }
+        return true;
+    }
+    return false;
 }
 
 Node * ui_wizard::getNodeById(int id)
@@ -476,19 +513,19 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
                               );
 }
 
-void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
+Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Vec2& Grid, WIZARD::_Node &node, int seq)
 {
     Vec2 start= gui::inst()->getPointVec2(node.dimensionStart.x, node.dimensionStart.y, ALIGNMENT_NONE
-		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, mGrid
-		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size::ZERO
+		, Dimension
+		, Grid
+		, Origin
+		, Vec2::ZERO
 	);
     Vec2 end = gui::inst()->getPointVec2(node.dimensionEnd.x, node.dimensionEnd.y, ALIGNMENT_NONE
-		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, mGrid
-		, Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-		, Size::ZERO
+		, Dimension
+		, Grid
+		, Origin
+		, Vec2::ZERO
 	);
     
     Size size = Size(end.x - start.x, start.y - end.y);
@@ -496,16 +533,16 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
     //margin에 따른 사이즈 수정 필요
     if(node.isScrollView) {
         Vec2 startInner= gui::inst()->getPointVec2(node.dimensionInnerStart.x, node.dimensionInnerStart.y, ALIGNMENT_NONE
-                                                   , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                                                   , Dimension
                                                    , mGrid
-                                                   , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-                                                   , Size::ZERO
+                                                   , Origin
+                                                   , Vec2::ZERO
                                                    );
         Vec2 endInner = gui::inst()->getPointVec2(node.dimensionInnerEnd.x, node.dimensionInnerEnd.y, ALIGNMENT_NONE
-                                                  , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
+                                                  , Dimension
                                                   , mGrid
-                                                  , Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-                                                  , Size::ZERO
+                                                  , Origin
+                                                  , Vec2::ZERO
                                                   );
         scrollviewSize = Size(size.width - (node.margin.width * 2.f), size.height - (node.margin.height * 2.f));
         size = Size(endInner.x - startInner.x, startInner.y - endInner.y);
@@ -532,11 +569,18 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
         nodeMax = sizeColored.height;
         nodeMin = sizeColored.width;
     }
-    
+    //component
+    if(node.component.length() > 0) {
+        WIZARD::_Node component =  ui_wizard_share::inst()->getComponent(node.component);
+        return createNode(Dimension, Origin, Grid, component, 0);
+    }
 	//background colored layer
-    Node * layoutBG = gui::inst()->createLayout(sizeColored, node.img, true, node.color.getColor3B());
+    Node * layoutBG = gui::inst()->createLayout(sizeColored
+                                                , node.img
+                                                , (node.color.getA() == 0) ? false : true
+                                                , node.color.getColor3B());
     layoutBG->setOpacity(node.color.getA());
-    
+    layoutBG->setPosition(Vec2(start.x + node.margin.width, end.y + node.margin.height));
     ScrollView * sv;
     if (node.color_second.isValidColor) {
         
@@ -559,9 +603,7 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
     
     if(node.isScrollView) {
         layoutBG->setPosition(Vec2::ZERO);
-        sv = gui::inst()->addScrollView(scrollviewSize, sizeColored, Vec2(start.x + node.margin.width, end.y + node.margin.height), this);
-    } else {
-        layoutBG->setPosition(Vec2(start.x + node.margin.width, end.y + node.margin.height));
+        sv = gui::inst()->addScrollView(scrollviewSize, sizeColored, Vec2(start.x + node.margin.width, end.y + node.margin.height), NULL);
     }
     
     if(node.id >= 0)
@@ -722,7 +764,8 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                 break;
             case WIZARD::OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW:
             {
-                gui::inst()->drawRectRoundShadow(layoutBG, center, sizePerGrid, Color4F(obj.color_second, obj.opacity_second / 255.f));
+                COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
+                guiExt::drawRectRoundShadow(layoutBG, center, sizePerGrid, color);
                 float fontSize = gui::inst()->getFontSize(sizePerGrid);
                 int fontLength = (int)(sizePerGrid.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
                 string szM = "";
@@ -909,22 +952,59 @@ void ui_wizard::drawNode(WIZARD::_Node &node, int seq)
                 pObj = gui::inst()->drawRectRound(layoutBG, center, sizePerGrid, Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_RECT_ROUND_SHADOW:
-                pObj = gui::inst()->drawRectRoundShadow(layoutBG, center, sizePerGrid, Color4F(obj.color));
+            {
+                COLOR_RGB color = COLOR_RGB(obj.color.r, obj.color.g, obj.color.b, obj.opacity);
+                pObj = guiExt::drawRectRoundShadow(layoutBG, center, sizePerGrid, color);
                 break;
+            }
+            case WIZARD::OBJECT_TYPE_LINE:
+                pObj = gui::inst()->drawLine(layoutBG
+                                             , position
+                                             , Vec2(position.x + sizePerGrid.width + (node.innerMargin.width * 2.f), position.y)
+                                             , Color4F(obj.color));
+                break;
+            case WIZARD::OBJECT_TYPE_COMPONENT:
+            {
+                WIZARD::_Node component = ui_wizard_share::inst()->getComponent(obj.component);
+                int pSeq = 0;
+                if(obj.id >= 0)
+                    pSeq = obj.id;
+                pObj = createNode(sizePerGrid, Vec2::ZERO, Vec2(1.f, 1.f), component, pSeq);
+                Vec2 pos = gui::inst()->getPointVec2(obj.position.x
+                                                     , obj.position.y
+                                                     , ALIGNMENT_LEFT_BOTTOM
+                                                     , layoutBG->getContentSize()
+                                                     , node.gridSize
+                                                     , Vec2::ZERO
+                                                     , Vec2::ZERO
+                                                     , node.innerMargin );
+                pObj->setPosition(pos);
+                layoutBG->addChild(pObj);
+                break;
+            }
             default:
                 break;
         }
 		pObj->setOpacity(obj.opacity);
         pObj->setVisible(obj.visible);
-		if(obj.id > 0)
-			mNodeMap[obj.id] = pObj;
+		if(obj.id >= 0 && obj.type != WIZARD::OBJECT_TYPE_COMPONENT)
+			mNodeMap[obj.id + seq] = pObj;
 	}
     
     if(node.isScrollView) {
         sv->setVisible(node.visible);
         sv->addChild(layoutBG);
+        return sv;
     } else {
         layoutBG->setVisible(node.visible);
-        this->addChild(layoutBG);
+        return layoutBG;
     }
+    return NULL;
 }
+
+void ui_wizard::drawNode(WIZARD::_Node &node) {
+    Node * p = createNode(Size(INVALID_VALUE, INVALID_VALUE), Vec2(INVALID_VALUE, INVALID_VALUE), mGrid, node, 0);
+    if(p)
+        this->addChild(p);
+}
+
