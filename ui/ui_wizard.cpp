@@ -630,7 +630,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
         
         string sz = obj.text;
         if(obj.id > 0)
-            sz = getText(obj.text, obj.id);
+            sz = getText(obj.text, obj.id + seq);
         
 		Vec2 center = gui::inst()->getPointVec2(obj.position.x
 			, obj.position.y
@@ -652,6 +652,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                   , obj.span);
         
         Size gridSizeWithSpan = gui::inst()->getGridSize(layoutBG->getContentSize(), node.gridSize, Vec2::ZERO, Vec2::ZERO, obj.span);
+        Size gridSizeWithSpanWithMargin = Size(gridSizeWithSpan.width - (node.innerMargin.x * 2.f), gridSizeWithSpan.height - (node.innerMargin.y * 2.f));
         
         //bg color
         if(obj.bgColor.isValidColor) {
@@ -845,10 +846,10 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                            , node.innerMargin
                                                            , obj.span
                                                            );
-                if (gridSizeWithSpan.width > gridSizeWithSpan.height)
-                    gui::inst()->setScaleByHeight(pObj, gridSizeWithSpan.height);
+                if (gridSizeWithSpanWithMargin.width > gridSizeWithSpanWithMargin.height)
+                    gui::inst()->setScaleByHeight(pObj, gridSizeWithSpanWithMargin.height);
                 else
-                    gui::inst()->setScale(pObj, gridSizeWithSpan.width);
+                    gui::inst()->setScale(pObj, gridSizeWithSpanWithMargin.width);
                 
                 break;
             case WIZARD::OBJECT_TYPE_SPRITE_BUTTON:
@@ -865,10 +866,10 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                     , Vec2::ZERO
                                                     , node.innerMargin);
                 
-                if (sizePerGrid.width > sizePerGrid.height)
-                    gui::inst()->setScaleByHeight(pObj, sizePerGrid.height);
+                if (gridSizeWithSpanWithMargin.width > gridSizeWithSpanWithMargin.height)
+                    gui::inst()->setScaleByHeight(pObj, gridSizeWithSpanWithMargin.height);
                 else
-                    gui::inst()->setScale(pObj, sizePerGrid.width);
+                    gui::inst()->setScale(pObj, gridSizeWithSpanWithMargin.width);
                 
                 break;
             case WIZARD::OBJECT_TYPE_SPRITE_BUTTON_CIRCLE:
@@ -996,7 +997,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             case WIZARD::OBJECT_TYPE_LINE:
                 pObj = gui::inst()->drawLine(layoutBG
                                              , position
-                                             , Vec2(position.x + gridSizeWithSpan.width + (node.innerMargin.x * 2.f), position.y)
+                                             , Vec2(position.x + gridSizeWithSpan.width /* + (node.innerMargin.x * 2.f)*/, position.y)
                                              , Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_COMPONENT:
@@ -1005,7 +1006,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 int pSeq = 0;
                 if(obj.id >= 0)
                     pSeq = obj.id;
-                pObj = createNode(gridSizeWithSpan, Vec2::ZERO, Vec2(1.f, 1.f), component, pSeq);
+                pObj = createNode(gridSizeWithSpanWithMargin, Vec2::ZERO, Vec2(1.f, 1.f), component, pSeq);
                 Vec2 pos = gui::inst()->getPointVec2(obj.position.x
                                                      , obj.position.y
                                                      , ALIGNMENT_LEFT_BOTTOM
