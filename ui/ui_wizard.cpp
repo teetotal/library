@@ -42,6 +42,7 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
     this->opacity_second = (GLubyte)0xFF;
     this->id = -1;
     this->link = -1;
+    this->span = Vec2::ZERO;
     
     if(p.HasMember("id") && !p["id"].IsNull())
         this->id = p["id"].GetInt();
@@ -56,6 +57,12 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
     CCLOG("WIZARD::_Object::load position");
 	this->position.x = p["position"][rapidjson::SizeType(0)].GetFloat();
 	this->position.y = p["position"][rapidjson::SizeType(1)].GetFloat();
+    
+    if(p.HasMember("span") && !p["span"].IsNull()) {
+        this->span.x = p["span"][rapidjson::SizeType(0)].GetFloat();
+        this->span.y = p["span"][rapidjson::SizeType(1)].GetFloat();
+        CCLOG("WIZARD::_Object::load span");
+    }
     
     CCLOG("WIZARD::_Object::load alignment");
 	const string szAlignment = p["alignment"].GetString();
@@ -635,39 +642,58 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
 		);
         
         Vec2 position = gui::inst()->getPointVec2(obj.position.x
-              , obj.position.y
-              , obj.alignment
-              , layoutBG->getContentSize()
-              , node.gridSize
-              , Size::ZERO
-              , Size::ZERO//node.innerMargin
-        );
-        Vec2 circleCenter = position;
+                                                  , obj.position.y
+                                                  , obj.alignment
+                                                  , layoutBG->getContentSize()
+                                                  , node.gridSize
+                                                  , Size::ZERO
+                                                  , Size::ZERO
+                                                  , Size::ZERO //node.innerMargin
+                                                  , obj.span);
+        
+        Size gridSizeWithSpan = gui::inst()->getGridSize(layoutBG->getContentSize(), node.gridSize, Vec2::ZERO, Vec2::ZERO, obj.span);
         
         //bg color
         if(obj.bgColor.isValidColor) {
             Node * bg;
             if(obj.bgColor_second.isValidColor) {
                 bg = LayerGradient::create(obj.bgColor.getColor4B(), obj.bgColor_second.getColor4B());
-                bg->setContentSize(sizePerGridNoMargin);
-                bg->setPosition(gui::inst()->getPointVec2(obj.position.x, obj.position.y, ALIGNMENT_LEFT_BOTTOM, layoutBG->getContentSize(), node.gridSize, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO));
+                bg->setContentSize(gridSizeWithSpan);
+                bg->setPosition(gui::inst()->getPointVec2(obj.position.x
+                                                          , obj.position.y
+                                                          , ALIGNMENT_LEFT_BOTTOM
+                                                          , layoutBG->getContentSize()
+                                                          , node.gridSize
+                                                          , Vec2::ZERO
+                                                          , Vec2::ZERO
+                                                          , Vec2::ZERO
+                                                          , obj.span));
             } else {
-                bg = gui::inst()->createLayout(sizePerGridNoMargin, "", true, obj.bgColor.getColor3B());
+                bg = gui::inst()->createLayout(gridSizeWithSpan, "", true, obj.bgColor.getColor3B());
                 bg->setOpacity(obj.bgColor.getA());
                 gui::inst()->setAnchorPoint(bg, ALIGNMENT_CENTER);
-                bg->setPosition(gui::inst()->getPointVec2(obj.position.x, obj.position.y, ALIGNMENT_CENTER, layoutBG->getContentSize(), node.gridSize, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO));
+                bg->setPosition(gui::inst()->getPointVec2(obj.position.x
+                                                          , obj.position.y
+                                                          , ALIGNMENT_CENTER
+                                                          , layoutBG->getContentSize()
+                                                          , node.gridSize
+                                                          , Vec2::ZERO
+                                                          , Vec2::ZERO
+                                                          , Vec2::ZERO
+                                                          , obj.span));
             }
             
             layoutBG->addChild(bg);
         }
         
+        Vec2 circleCenter = position;
         switch(obj.alignment) {
             case ALIGNMENT_LEFT:
-                position.x += node.innerMargin.x;
+                circleCenter.x += node.innerMargin.x;
                 circleCenter.x = position.x + (min / 2.f);
             break;
             case ALIGNMENT_RIGHT:
-                position.x -= node.innerMargin.x;
+                circleCenter.x -= node.innerMargin.x;
                 circleCenter.x = position.x - (min / 2.f);
             break;
             default:
@@ -677,33 +703,35 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
         Node * pObj;
         switch(obj.type) {
             case WIZARD::OBJECT_TYPE_LABEL:
-                pObj = gui::inst()->addLabelAutoDimension(obj.position.x, obj.position.y
-                    , sz
-                    , layoutBG
-                    , obj.fontSize
-                    , obj.alignment
-                    , obj.color
-                    , node.gridSize
-                    , Vec2::ZERO
-                    , Vec2::ZERO
-                    , node.innerMargin
-                    , obj.img
-                );
+                pObj = gui::inst()->addLabelAutoDimension(obj.position.x
+                                                          , obj.position.y
+                                                          , sz
+                                                          , layoutBG
+                                                          , obj.fontSize
+                                                          , obj.alignment
+                                                          , obj.color
+                                                          , node.gridSize
+                                                          , Vec2::ZERO
+                                                          , Vec2::ZERO
+                                                          , node.innerMargin
+                                                          , obj.span
+                                                          , obj.img);
                 break;
             case WIZARD::OBJECT_TYPE_LABEL_SPRITE:
-                pObj = gui::inst()->addLabelAutoDimension(obj.position.x, obj.position.y
-                      , sz
-                      , layoutBG
-                      , obj.fontSize
-                      , obj.alignment
-                      , obj.color
-                      , node.gridSize
-                      , Vec2::ZERO
-                      , Vec2::ZERO
-                      , node.innerMargin
-                      , obj.img
-                      , false
-                  );
+                pObj = gui::inst()->addLabelAutoDimension(obj.position.x
+                                                          , obj.position.y
+                                                          , sz
+                                                          , layoutBG
+                                                          , obj.fontSize
+                                                          , obj.alignment
+                                                          , obj.color
+                                                          , node.gridSize
+                                                          , Vec2::ZERO
+                                                          , Vec2::ZERO
+                                                          , node.innerMargin
+                                                          , obj.span
+                                                          , obj.img
+                                                          , false);
                 break;
             case WIZARD::OBJECT_TYPE_BUTTON:
                 pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
@@ -815,11 +843,12 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                            , Vec2::ZERO
                                                            , Vec2::ZERO
                                                            , node.innerMargin
+                                                           , obj.span
                                                            );
-                if (sizePerGrid.width > sizePerGrid.height)
-                    gui::inst()->setScaleByHeight(pObj, sizePerGrid.height);
+                if (gridSizeWithSpan.width > gridSizeWithSpan.height)
+                    gui::inst()->setScaleByHeight(pObj, gridSizeWithSpan.height);
                 else
-                    gui::inst()->setScale(pObj, sizePerGrid.width);
+                    gui::inst()->setScale(pObj, gridSizeWithSpan.width);
                 
                 break;
             case WIZARD::OBJECT_TYPE_SPRITE_BUTTON:
@@ -899,8 +928,9 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , node.gridSize
                                                      , Vec2::ZERO
                                                      , Vec2::ZERO
-                                                     , node.innerMargin );
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_0, .65f, pos, sizePerGrid, color, color2, obj.alignment);
+                                                     , node.innerMargin
+                                                     , obj.span);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_0, .65f, pos, gridSizeWithSpan, color, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
@@ -916,8 +946,9 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , node.gridSize
                                                      , Vec2::ZERO
                                                      , Vec2::ZERO
-                                                     , node.innerMargin );
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_1, .65f, pos, sizePerGrid, color, color2, obj.alignment);
+                                                     , node.innerMargin
+                                                     , obj.span);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_1, .65f, pos, gridSizeWithSpan, color, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
@@ -933,8 +964,9 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , node.gridSize
                                                      , Vec2::ZERO
                                                      , Vec2::ZERO
-                                                     , node.innerMargin );
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, .65f, pos, sizePerGrid, color, color2, obj.alignment);
+                                                     , node.innerMargin
+                                                     , obj.span);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, .65f, pos, gridSizeWithSpan, color, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
@@ -947,24 +979,24 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             
                 break;
             case WIZARD::OBJECT_TYPE_RECT:
-                pObj = gui::inst()->drawRect(layoutBG, center, sizePerGrid, Color4F(obj.color));
+                pObj = gui::inst()->drawRect(layoutBG, center, gridSizeWithSpan, Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_RECT_LINE:
-                pObj = gui::inst()->drawRect(layoutBG, center, sizePerGrid, Color4F(obj.color), false);
+                pObj = gui::inst()->drawRect(layoutBG, center, gridSizeWithSpan, Color4F(obj.color), false);
                 break;
             case WIZARD::OBJECT_TYPE_RECT_ROUND:
-                pObj = gui::inst()->drawRectRound(layoutBG, center, sizePerGrid, Color4F(obj.color));
+                pObj = gui::inst()->drawRectRound(layoutBG, center, gridSizeWithSpan, Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_RECT_ROUND_SHADOW:
             {
                 COLOR_RGB color = COLOR_RGB(obj.color.r, obj.color.g, obj.color.b, obj.opacity);
-                pObj = guiExt::drawRectRoundShadow(layoutBG, center, sizePerGrid, color);
+                pObj = guiExt::drawRectRoundShadow(layoutBG, center, gridSizeWithSpan, color);
                 break;
             }
             case WIZARD::OBJECT_TYPE_LINE:
                 pObj = gui::inst()->drawLine(layoutBG
                                              , position
-                                             , Vec2(position.x + sizePerGrid.width + (node.innerMargin.x * 2.f), position.y)
+                                             , Vec2(position.x + gridSizeWithSpan.width + (node.innerMargin.x * 2.f), position.y)
                                              , Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_COMPONENT:
@@ -973,7 +1005,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 int pSeq = 0;
                 if(obj.id >= 0)
                     pSeq = obj.id;
-                pObj = createNode(sizePerGrid, Vec2::ZERO, Vec2(1.f, 1.f), component, pSeq);
+                pObj = createNode(gridSizeWithSpan, Vec2::ZERO, Vec2(1.f, 1.f), component, pSeq);
                 Vec2 pos = gui::inst()->getPointVec2(obj.position.x
                                                      , obj.position.y
                                                      , ALIGNMENT_LEFT_BOTTOM
@@ -981,7 +1013,8 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , node.gridSize
                                                      , Vec2::ZERO
                                                      , Vec2::ZERO
-                                                     , node.innerMargin );
+                                                     , node.innerMargin
+                                                     , obj.span);
                 pObj->setPosition(pos);
                 layoutBG->addChild(pObj);
                 break;

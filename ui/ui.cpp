@@ -137,6 +137,99 @@ bool gui::getPoint(int x, int y, float &pointX, float &pointY, ALIGNMENT align
     }
     return true;
 }
+
+Vec2 gui::getPointVec2(int x
+                       , int y
+                       , ALIGNMENT align
+                       , Size dimension
+                       , Vec2 grid
+                       , Vec2 origin
+                       , Vec2 margin
+                       , Vec2 innerMargin
+                       , Vec2 span)
+{
+    if(span.x == 0 && span.y ==0) {
+        Vec2 p;
+        getPoint(x, y, p, align, dimension, grid, origin, margin, innerMargin);
+        return p;
+    }
+    
+    Size gridSizeNoMargin = getGridSize(dimension, grid, margin, Vec2::ZERO);
+    Vec2 posNoMargin;
+    getPoint(x, y, posNoMargin, align, dimension, grid, origin, margin, Vec2::ZERO);
+
+    float moveX = 0.f, moveY = 0.f;
+    
+    if(span.x > 0) {
+        switch (align) {
+            case ALIGNMENT_CENTER:
+            case ALIGNMENT_CENTER_TOP:
+            case ALIGNMENT_CENTER_BOTTOM:
+                moveX = 0.5f;
+                break;
+            case ALIGNMENT_RIGHT:
+            case ALIGNMENT_RIGHT_TOP:
+            case ALIGNMENT_RIGHT_BOTTOM:
+                moveX = 1.f;
+                break;
+            default:
+                break;
+        }
+    }
+    
+    if(span.y > 0) {
+        switch (align) {
+            case ALIGNMENT_CENTER:
+            case ALIGNMENT_LEFT:
+            case ALIGNMENT_RIGHT:
+                moveY = 0.5f;
+                break;
+            case ALIGNMENT_CENTER_BOTTOM:
+            case ALIGNMENT_LEFT_BOTTOM:
+            case ALIGNMENT_RIGHT_BOTTOM:
+                moveY = 1.f;
+                break;
+            default:
+                break;
+        }
+    }
+    posNoMargin.x += gridSizeNoMargin.width * moveX;
+    posNoMargin.y -= gridSizeNoMargin.height * moveY;
+    
+    switch(align){
+        case ALIGNMENT_CENTER_TOP:
+            posNoMargin.y -= innerMargin.y;
+            break;
+        case ALIGNMENT_CENTER_BOTTOM:
+            posNoMargin.y += innerMargin.y;
+            break;
+        case ALIGNMENT_LEFT:
+            posNoMargin.x += innerMargin.x;
+            break;
+        case ALIGNMENT_LEFT_TOP:
+            posNoMargin.x += innerMargin.x;
+            posNoMargin.y -= innerMargin.y;
+            break;
+        case ALIGNMENT_LEFT_BOTTOM:
+            posNoMargin.x += innerMargin.x;
+            posNoMargin.y += innerMargin.y;
+            break;
+        case ALIGNMENT_RIGHT:
+            posNoMargin.x -= innerMargin.x;
+            break;
+        case ALIGNMENT_RIGHT_TOP:
+            posNoMargin.x -= innerMargin.x;
+            posNoMargin.y -= innerMargin.y;
+            break;
+        case ALIGNMENT_RIGHT_BOTTOM:
+            posNoMargin.x -= innerMargin.x;
+            posNoMargin.y += innerMargin.y;
+            break;
+        default:
+            break;
+    }
+    return posNoMargin;
+};
 // setAnchorPoint --------------------------------------------------------------------------------
 void gui::setAnchorPoint(Node * p, ALIGNMENT align) {
     switch(align) {
@@ -261,7 +354,7 @@ Label * gui::createLabel(int x
                          , Vec2 origin
                          , Vec2 margin
                          , Vec2 innerMargin
-                    ) {
+                         , Vec2 span) {
     switch((int)fontSize) {
         case 0:
             fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin));
@@ -281,7 +374,7 @@ Label * gui::createLabel(int x
     
     Label * label = Label::createWithTTF(text, mDefaultFont, fontSize);
     label->setColor(color);
-    label->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
+    label->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin, span));
     setAnchorPoint(label, align);
     
     return label;
@@ -299,15 +392,15 @@ Label * gui::addLabel(Node *p
                       , Vec2 origin
                       , Vec2 margin
                       , Vec2 innerMargin
+                      , Vec2 span
                       , const string img
                       , bool isBGImg)
 {
 
-    Label * label = createLabel(x, y, text, fontSize, align, color, dimension, grid, origin, margin, innerMargin);
+    Label * label = createLabel(x, y, text, fontSize, align, color, dimension, grid, origin, margin, innerMargin, span);
 
     if(img.compare("") != 0) {
-        Size sizePerGrid = Size((p->getContentSize().width / grid.x) - (margin.x * 2.f) - (innerMargin.x * 2.f)
-                                , (p->getContentSize().height / grid.y) - (margin.y * 2.f) - (innerMargin.y * 2.f));
+        Size sizePerGrid = getGridSize(p->getContentSize(), grid, margin, innerMargin, span);
         
         auto sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
         if(sizePerGrid.width > sizePerGrid.height)
@@ -316,7 +409,7 @@ Label * gui::addLabel(Node *p
             setScale(sprite, sizePerGrid.width);
         //bg
         if(isBGImg){
-            sprite->setPosition(getPointVec2(x, y, ALIGNMENT_CENTER, dimension, grid, origin, margin, innerMargin));
+            sprite->setPosition(getPointVec2(x, y, ALIGNMENT_CENTER, dimension, grid, origin, margin, innerMargin, span));
             setAnchorPoint(sprite, ALIGNMENT_CENTER);
             p->addChild(sprite);
             p->addChild(label);
@@ -333,7 +426,7 @@ Label * gui::addLabel(Node *p
             layer->addChild(sprite);
             layer->addChild(label);
             
-            layer->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
+            layer->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin, span));
             setAnchorPoint(layer, align);
             p->addChild(layer);
         }
@@ -479,6 +572,7 @@ Sprite * gui::addSprite(int x
                         , Vec2 origin
                         , Vec2 margin
                         , Vec2 innerMargin
+                        , Vec2 span
                         , const Size &spriteSize)
 {
     Sprite * sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
@@ -486,7 +580,7 @@ Sprite * gui::addSprite(int x
         sprite->setScale(spriteSize.width / sprite->getContentSize().width, spriteSize.height / sprite->getContentSize().height);
     }
     setAnchorPoint(sprite, align);
-    sprite->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
+    sprite->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin, span));
     p->addChild(sprite);
     return sprite;
 }
@@ -716,10 +810,16 @@ ScrollView * gui::addScrollView(Size size, Size innerSize, Vec2 position, Node *
 }
 
 // getGridSize  --------------------------------------------------------------------------------
-Size gui::getGridSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin) {
+Size gui::getGridSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin, Vec2 span) {
     Size size;
-    size.width  = ((dimension.width -(margin.x * 2)) / grid.x) - (innerMargin.x * 2);
-    size.height = ((dimension.height - (margin.y * 2)) / grid.y) - (innerMargin.y * 2);
+    size.width  = ((dimension.width -(margin.x * 2.f)) / grid.x);
+    size.height = ((dimension.height - (margin.y * 2.f)) / grid.y);
+    
+    size.width += size.width * span.x;
+    size.height += size.height * span.y;
+    
+    size.width  -= (innerMargin.x * 2.f);
+    size.height -= (innerMargin.y * 2.f);
     
     return size;
 }

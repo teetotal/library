@@ -55,6 +55,7 @@ namespace WIZARD {
 		int id;
         string component;
 		Vec2 position;
+        Vec2 span;
 		ALIGNMENT alignment;
 		OBJECT_TYPE type;
 		int link;

@@ -170,11 +170,8 @@ public:
                       , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
                       , Vec2 origin = Vec2(INVALID_VALUE,INVALID_VALUE)
                       , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
-                      , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)) {
-        Vec2 p;
-        getPoint(x, y, p, align, dimension, Size(grid), Size(origin), Size(margin), Size(innerMargin));
-        return p;
-    };
+                      , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                      , Vec2 span = Vec2::ZERO);
     // setAnchorPoint --------------------------------------------------------------------------------
     void setAnchorPoint(Node * p, ALIGNMENT align);
     // drawGrid --------------------------------------------------------------------------------
@@ -200,7 +197,7 @@ public:
                         , Vec2 origin = Vec2(INVALID_VALUE,INVALID_VALUE)
                         , Vec2 margin = Vec2(INVALID_VALUE,INVALID_VALUE)
                         , Vec2 innerMargin = Vec2(INVALID_VALUE,INVALID_VALUE)
-    );
+                        , Vec2 span = Vec2::ZERO);
 
     Label * addLabel(Node *p
                      , int x
@@ -214,24 +211,25 @@ public:
                      , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
                      , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
                      , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                     , Vec2 span = Vec2::ZERO
                      , const string img = ""
                      , bool isBGImg = true
                      );
     
     Label * addLabelAutoDimension(int x
-                                    , int y
-                                    , const string text
-                                    , Node *p
-                                    , float fontSize = 0.f
-                                    , ALIGNMENT align = ALIGNMENT_CENTER
-                                    , const Color3B color = Color3B::BLACK
-                                    , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
-                                    , Vec2 origin = Vec2(INVALID_VALUE,INVALID_VALUE)
-                                    , Vec2 margin = Vec2(INVALID_VALUE,INVALID_VALUE)
-                                    , Vec2 innerMargin = Vec2(INVALID_VALUE,INVALID_VALUE)
-                                    , const string img = ""
-                                    , bool isBGImg = true
-    ) {
+                                  , int y
+                                  , const string text
+                                  , Node *p
+                                  , float fontSize = 0.f
+                                  , ALIGNMENT align = ALIGNMENT_CENTER
+                                  , const Color3B color = Color3B::BLACK
+                                  , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                  , Vec2 origin = Vec2(INVALID_VALUE,INVALID_VALUE)
+                                  , Vec2 margin = Vec2(INVALID_VALUE,INVALID_VALUE)
+                                  , Vec2 innerMargin = Vec2(INVALID_VALUE,INVALID_VALUE)
+                                  , Vec2 span = Vec2::ZERO
+                                  , const string img = ""
+                                  , bool isBGImg = true) {
         return  addLabel(p
                          , x
                          , y
@@ -244,6 +242,7 @@ public:
                          , origin
                          , margin
                          , innerMargin
+                         , span
                          , img
                          , isBGImg
                          );
@@ -353,25 +352,9 @@ public:
                       , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
                       , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
                       , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                      , Vec2 span = Vec2::ZERO
                       , const Size &spriteSize = Size(INVALID_VALUE, INVALID_VALUE)
     );
-
-//    Sprite* addSpriteFixedSize(const Size &spriteSize
-//                               , int x
-//                               , int y
-//                               , const string img
-//                               , Node* p
-//                               , ALIGNMENT align = ALIGNMENT_CENTER
-//                               , Size dimension = Size(GRID_INVALID_VALUE, GRID_INVALID_VALUE)
-//                               , Vec2 grid = Vec2(INVALID_VALUE, INVALID_VALUE)
-//                               , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
-//                               , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
-//                               , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE))
-//    {
-//            Sprite * sprite = addSprite(x, y, img, p, align, dimension, grid, origin, margin, innerMargin);
-//            sprite->setContentSize(spriteSize);
-//            return sprite;
-//    };
 
     Sprite* addSpriteAutoDimension(int x
                                    , int y
@@ -382,9 +365,10 @@ public:
                                    , Vec2 origin = Vec2(INVALID_VALUE, INVALID_VALUE)
                                    , Vec2 margin = Vec2(INVALID_VALUE, INVALID_VALUE)
                                    , Vec2 innerMargin = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                   , Vec2 span = Vec2::ZERO
                                    , const Size &spriteSize = Size(INVALID_VALUE, INVALID_VALUE))
     {
-        return addSprite(x, y, img, p, align, p->getContentSize(), grid, origin, margin, innerMargin, spriteSize);
+        return addSprite(x, y, img, p, align, p->getContentSize(), grid, origin, margin, innerMargin, span, spriteSize);
     };
     
     // addProgressBar --------------------------------------------------------------------------------
@@ -442,7 +426,7 @@ public:
         return getFontSize(getGridSize(dimension, grid, margin, innerMargin), scale);
     }
     // getGridSize  --------------------------------------------------------------------------------
-    Size getGridSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin);
+    Size getGridSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin, Vec2 span = Vec2::ZERO);
     
     // getColor4F  --------------------------------------------------------------------------------
     static Color4F getColor4F(int r, int g, int b, int a = 255) {
