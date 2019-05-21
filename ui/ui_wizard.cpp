@@ -633,12 +633,14 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             sz = getText(obj.text, obj.id + seq);
         
 		Vec2 center = gui::inst()->getPointVec2(obj.position.x
-			, obj.position.y
-			, ALIGNMENT_CENTER
-			, layoutBG->getContentSize()
-			, node.gridSize
-			, Size::ZERO
-			, Size::ZERO
+                                                , obj.position.y
+                                                , ALIGNMENT_CENTER
+                                                , layoutBG->getContentSize()
+                                                , node.gridSize
+                                                , Size::ZERO
+                                                , Size::ZERO
+                                                , Size::ZERO
+                                                , obj.span
 		);
         
         Vec2 position = gui::inst()->getPointVec2(obj.position.x
@@ -747,6 +749,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                                , Vec2::ZERO
                                                                , Vec2::ZERO
                                                                , node.innerMargin
+                                                               , obj.span
                                                                , obj.img);
                 break;
             case WIZARD::OBJECT_TYPE_BUTTON_SPRITE:
@@ -761,6 +764,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                    , Vec2::ZERO
                    , Vec2::ZERO
                    , node.innerMargin
+                   , obj.span
                    , obj.img
                    , false
                 );
@@ -770,7 +774,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 auto p = gui::inst()->drawCircle(layoutBG, circleCenter, min / 2.f, Color4F(obj.color_second));
                 p->setOpacity(obj.opacity_second);
                 
-                float fontSize = gui::inst()->getFontSize(layoutBG->getContentSize(), node.gridSize, node.margin, node.innerMargin, 0.8f);
+                float fontSize = gui::inst()->getFontSize(layoutBG->getContentSize(), node.gridSize, node.margin, node.innerMargin, obj.span, 0.8f);
                 
                 Menu * pMenu;
                 pObj = gui::inst()->addTextButtonRaw(pMenu
@@ -787,6 +791,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , Vec2::ZERO
                                                      , node.innerMargin
+                                                     , obj.span
                                                      , obj.img
                                                      , false
                                                      , true
@@ -798,26 +803,28 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             case WIZARD::OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW:
             {
                 COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
-                guiExt::drawRectRoundShadow(layoutBG, center, sizePerGrid, color);
-                float fontSize = gui::inst()->getFontSize(sizePerGrid);
-                int fontLength = (int)(sizePerGrid.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
+                guiExt::drawRectRoundShadow(layoutBG, center, gridSizeWithSpanWithMargin, color);
+                float fontSize = gui::inst()->getFontSize(gridSizeWithSpanWithMargin);
+                int fontLength = (int)(gridSizeWithSpanWithMargin.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
                 string szM = "";
                 for(int n = 0; n < fontLength; n++) {
                     szM += "M";
                 }
                 
                 gui::inst()->addTextButtonAutoDimension(obj.position.x
-                                                               , obj.position.y
-                                                               , szM
-                                                               , layoutBG
-                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                                                               , fontSize
-                                                               , obj.alignment
-                                                               , Color3B::WHITE
-                                                               , node.gridSize
-                                                               , Vec2::ZERO
-                                                               , Vec2::ZERO
-                                                               , node.innerMargin)->setOpacity(0);
+                                                        , obj.position.y
+                                                        , szM
+                                                        , layoutBG
+                                                        , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                        , fontSize
+                                                        , obj.alignment
+                                                        , Color3B::WHITE
+                                                        , node.gridSize
+                                                        , Vec2::ZERO
+                                                        , Vec2::ZERO
+                                                        , node.innerMargin
+                                                        , obj.span
+                                                        )->setOpacity(0);
                 
                 pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
                                                                , obj.position.y
@@ -831,6 +838,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                                , Vec2::ZERO
                                                                , Vec2::ZERO
                                                                , node.innerMargin
+                                                               , obj.span
                                                                , obj.img);
             }
                 break;
@@ -931,7 +939,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_0, .65f, pos, gridSizeWithSpan, color, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_0, .65f, pos, gridSizeWithSpanWithMargin, color, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
@@ -949,7 +957,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_1, .65f, pos, gridSizeWithSpan, color, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_1, .65f, pos, gridSizeWithSpanWithMargin, color, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
@@ -967,7 +975,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, .65f, pos, gridSizeWithSpan, color, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, .65f, pos, gridSizeWithSpanWithMargin, color, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
@@ -980,18 +988,18 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             
                 break;
             case WIZARD::OBJECT_TYPE_RECT:
-                pObj = gui::inst()->drawRect(layoutBG, center, gridSizeWithSpan, Color4F(obj.color));
+                pObj = gui::inst()->drawRect(layoutBG, center, gridSizeWithSpanWithMargin, Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_RECT_LINE:
-                pObj = gui::inst()->drawRect(layoutBG, center, gridSizeWithSpan, Color4F(obj.color), false);
+                pObj = gui::inst()->drawRect(layoutBG, center, gridSizeWithSpanWithMargin, Color4F(obj.color), false);
                 break;
             case WIZARD::OBJECT_TYPE_RECT_ROUND:
-                pObj = gui::inst()->drawRectRound(layoutBG, center, gridSizeWithSpan, Color4F(obj.color));
+                pObj = gui::inst()->drawRectRound(layoutBG, center, gridSizeWithSpanWithMargin, Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_RECT_ROUND_SHADOW:
             {
                 COLOR_RGB color = COLOR_RGB(obj.color.r, obj.color.g, obj.color.b, obj.opacity);
-                pObj = guiExt::drawRectRoundShadow(layoutBG, center, gridSizeWithSpan, color);
+                pObj = guiExt::drawRectRoundShadow(layoutBG, center, gridSizeWithSpanWithMargin, color);
                 break;
             }
             case WIZARD::OBJECT_TYPE_LINE:

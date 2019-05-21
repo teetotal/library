@@ -193,8 +193,8 @@ Vec2 gui::getPointVec2(int x
                 break;
         }
     }
-    posNoMargin.x += gridSizeNoMargin.width * moveX;
-    posNoMargin.y -= gridSizeNoMargin.height * moveY;
+    posNoMargin.x += (gridSizeNoMargin.width * moveX * span.x);
+    posNoMargin.y -= (gridSizeNoMargin.height * moveY * span.y);
     
     switch(align){
         case ALIGNMENT_CENTER_TOP:
@@ -357,16 +357,16 @@ Label * gui::createLabel(int x
                          , Vec2 span) {
     switch((int)fontSize) {
         case 0:
-            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin));
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin, span));
             break;
         case -1:
-            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.75f);
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin, span), 0.75f);
             break;
         case -2:
-            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.5f);
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin, span), 0.5f);
             break;
         case -3:
-            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.25f);
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin, span), 0.25f);
             break;
         default:
             break;
@@ -451,6 +451,7 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
                                       , Vec2 origin
                                       , Vec2 margin
                                       , Vec2 innerMargin
+                                      , Vec2 span
                                       , const string img
                                       , bool isBGImg
                                       , bool isAttachParent
@@ -458,16 +459,16 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
 {
     switch((int)fontSize) {
         case 0:
-            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin));
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin, span));
             break;
         case -1:
-            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.75f);
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin, span), 0.75f);
             break;
         case -2:
-            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.5f);
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin, span), 0.5f);
             break;
         case -3:
-            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin), 0.25f);
+            fontSize = gui::getFontSize(getGridSize(dimension, grid, margin, innerMargin, span), 0.25f);
             break;
         default:
             break;
@@ -483,8 +484,7 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
 
     
     if(img.compare("") != 0) {
-        Size sizePerGrid = Size((p->getContentSize().width / grid.x) - (margin.x * 2.f) - (innerMargin.x * 2.f)
-                                , (p->getContentSize().height / grid.y) - (margin.y * 2.f) - (innerMargin.y * 2.f));
+        Size sizePerGrid = getGridSize(p->getContentSize(), grid, margin, innerMargin, span);
         
         auto sprite = (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
         if(sizePerGrid.width > sizePerGrid.height)
@@ -493,11 +493,11 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
             setScale(sprite, sizePerGrid.width);
         //bg
         if(isBGImg){
-            sprite->setPosition(getPointVec2(x, y, ALIGNMENT_CENTER, dimension, grid, origin, margin, innerMargin));
+            sprite->setPosition(getPointVec2(x, y, ALIGNMENT_CENTER, dimension, grid, origin, margin, innerMargin, span));
             setAnchorPoint(sprite, ALIGNMENT_CENTER);
             p->addChild(sprite);
             setAnchorPoint(pItem, align);
-            pMenu->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
+            pMenu->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin, span));
             
         } else{
             float spriteWidth = sprite->getContentSize().width * sprite->getScale();
@@ -511,7 +511,7 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
             layer->addChild(sprite);
             layer->addChild(pMenu);
             
-            layer->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
+            layer->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin, span));
             setAnchorPoint(layer, align);
             
             child = layer;
@@ -523,7 +523,7 @@ MenuItemLabel * gui::addTextButtonRaw(Menu* &pMenu
     if(specificPos.x != GRID_INVALID_VALUE && specificPos.y != GRID_INVALID_VALUE) {
         child->setPosition(specificPos);
     } else {
-        child->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
+        child->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin, span));
     }
     
     if(isAttachParent)

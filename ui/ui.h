@@ -263,6 +263,7 @@ public:
                                     , Vec2 origin       = Vec2(INVALID_VALUE, INVALID_VALUE)
                                     , Vec2 margin       = Vec2(INVALID_VALUE, INVALID_VALUE)
                                     , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    , Vec2 span         = Vec2::ZERO
                                     , const string img = ""
                                     , bool isBGImg = true
                                     , bool isAttachParent = true
@@ -282,11 +283,12 @@ public:
                                   , Vec2 origin       = Vec2(INVALID_VALUE, INVALID_VALUE)
                                   , Vec2 margin       = Vec2(INVALID_VALUE, INVALID_VALUE)
                                   , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                  , Vec2 span = Vec2::ZERO
                                   , const string img = ""
                                   , bool isBGImg = true)
     {
         Menu * pMenu = NULL;
-        return addTextButtonRaw(pMenu, x, y, text, p, callback, fontSize, align, color, dimension, grid, origin, margin, innerMargin, img, isBGImg);
+        return addTextButtonRaw(pMenu, x, y, text, p, callback, fontSize, align, color, dimension, grid, origin, margin, innerMargin, span, img, isBGImg);
     };
     
     MenuItemLabel* addTextButtonAutoDimension(int x
@@ -301,10 +303,11 @@ public:
                                               , Vec2 origin       = Vec2(INVALID_VALUE, INVALID_VALUE)
                                               , Vec2 margin       = Vec2(INVALID_VALUE, INVALID_VALUE)
                                               , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                              , Vec2 span = Vec2::ZERO
                                               , const string img = ""
                                               , bool isBGImg = true)
     {
-        return addTextButton(x, y, text, p, callback, fontSize, align, color, p->getContentSize(), grid, origin, margin, innerMargin, img, isBGImg);
+        return addTextButton(x, y, text, p, callback, fontSize, align, color, p->getContentSize(), grid, origin, margin, innerMargin, span, img, isBGImg);
     }
     
     // Sprite Button --------------------------------------------------------------------------------
@@ -422,8 +425,8 @@ public:
         return ( 10.f * size.height / mDefaultFontLabelSize.height ) * scale;
     }
     
-    float getFontSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin, float scale) {
-        return getFontSize(getGridSize(dimension, grid, margin, innerMargin), scale);
+    float getFontSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin, Vec2 span, float scale) {
+        return getFontSize(getGridSize(dimension, grid, margin, innerMargin, span), scale);
     }
     // getGridSize  --------------------------------------------------------------------------------
     Size getGridSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin, Vec2 span = Vec2::ZERO);
