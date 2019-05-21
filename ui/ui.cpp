@@ -545,6 +545,7 @@ MenuItemImage * gui::addSpriteButtonRaw(Menu* &pMenu
                                         , Vec2 origin
                                         , Vec2 margin
                                         , Vec2 innerMargin
+                                        , Vec2 span
                                         , Vec2 specificPos)
 {
     auto pItem = MenuItemImage::create(normalImg, selectImg, callback);
@@ -554,7 +555,7 @@ MenuItemImage * gui::addSpriteButtonRaw(Menu* &pMenu
     if(specificPos.x != INVALID_VALUE && specificPos.y != INVALID_VALUE) {
         pMenu->setPosition(specificPos);
     } else {
-        pMenu->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin));
+        pMenu->setPosition(getPointVec2(x, y, align, dimension, grid, origin, margin, innerMargin, span));
     }
     
     p->addChild(pMenu);

@@ -872,7 +872,8 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                     , node.gridSize
                                                     , Vec2::ZERO
                                                     , Vec2::ZERO
-                                                    , node.innerMargin);
+                                                    , node.innerMargin
+                                                    , obj.span);
                 
                 if (gridSizeWithSpanWithMargin.width > gridSizeWithSpanWithMargin.height)
                     gui::inst()->setScaleByHeight(pObj, gridSizeWithSpanWithMargin.height);
@@ -899,9 +900,10 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                        , Vec2::ZERO
                                                        , Vec2::ZERO
                                                        , node.innerMargin
+                                                       , obj.span
                                                        , circleCenter
                                                        );
-                Size imgSize = sizePerGrid;
+                Size imgSize = gridSizeWithSpanWithMargin;
                 imgSize.width -= node.innerMargin.x * 2.f;
                 imgSize.height -= node.innerMargin.y * 2.f;
                 
@@ -991,7 +993,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 pObj = gui::inst()->drawRect(layoutBG, center, gridSizeWithSpanWithMargin, Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_RECT_LINE:
-                pObj = gui::inst()->drawRect(layoutBG, center, gridSizeWithSpanWithMargin, Color4F(obj.color), false);
+                pObj = gui::inst()->drawRect(layoutBG, center, gridSizeWithSpan, Color4F(obj.color), false);
                 break;
             case WIZARD::OBJECT_TYPE_RECT_ROUND:
                 pObj = gui::inst()->drawRectRound(layoutBG, center, gridSizeWithSpanWithMargin, Color4F(obj.color));

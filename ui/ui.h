@@ -324,8 +324,8 @@ public:
                                        , Vec2 origin       = Vec2(INVALID_VALUE, INVALID_VALUE)
                                        , Vec2 margin       = Vec2(INVALID_VALUE, INVALID_VALUE)
                                        , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE)
-                                       , Vec2 specificPos  = Vec2(INVALID_VALUE, INVALID_VALUE)
-                                       );
+                                       , Vec2 span = Vec2::ZERO
+                                       , Vec2 specificPos  = Vec2(INVALID_VALUE, INVALID_VALUE));
     
 	MenuItemImage * addSpriteButton(int x
                                     , int y
@@ -338,10 +338,11 @@ public:
                                     , Vec2 grid         = Vec2(INVALID_VALUE, INVALID_VALUE)
                                     , Vec2 origin       = Vec2(INVALID_VALUE, INVALID_VALUE)
                                     , Vec2 margin       = Vec2(INVALID_VALUE, INVALID_VALUE)
-                                    , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE))
+                                    , Vec2 innerMargin  = Vec2(INVALID_VALUE, INVALID_VALUE)
+                                    , Vec2 span = Vec2::ZERO)
     {
 		Menu * pMenu = NULL;
-		return addSpriteButtonRaw(pMenu, x, y, normalImg, selectImg, p, callback, align, dimension, grid, origin, margin, innerMargin);
+		return addSpriteButtonRaw(pMenu, x, y, normalImg, selectImg, p, callback, align, dimension, grid, origin, margin, innerMargin, span);
 	};
     
     // Sprite --------------------------------------------------------------------------------
