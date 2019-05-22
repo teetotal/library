@@ -985,13 +985,11 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 break;
             }
             case WIZARD::OBJECT_TYPE_ROULETTE:{
-                COLOR_RGB arrow, bg, outCircle;
-                arrow.set(obj.color, obj.opacity);
+                COLOR_RGB color, bg;
+                color.set(obj.color, obj.opacity);
                 bg.set(obj.color_second, obj.opacity_second);
-                outCircle = bg.getColorDark();
-                pObj = ui_roulette::create(gridSizeWithSpanWithMargin, center, arrow, bg, outCircle);
+                pObj = ui_roulette::create(gridSizeWithSpanWithMargin, center, color, bg, obj.text);
                 ((ui_roulette*)pObj)->addParent(layoutBG);
-                ((ui_roulette*)pObj)->run(0);
                 break;
             }
             case WIZARD::OBJECT_TYPE_CIRCLE:
