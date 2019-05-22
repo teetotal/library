@@ -35,6 +35,8 @@ namespace WIZARD {
         OBJECT_TYPE_PROGRESSBAR_1,
         OBJECT_TYPE_PROGRESSBAR_2,
         
+        OBJECT_TYPE_ROULETTE,
+        
 		OBJECT_TYPE_CIRCLE,
         
         OBJECT_TYPE_RECT,

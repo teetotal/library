@@ -4,6 +4,7 @@
 
 #include "ui_wizard.h"
 #include "ui_progressbar.h"
+#include "ui_roulette.h"
 #include "ui_ext.h"
 #include "../library/util.h"
 
@@ -183,6 +184,8 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_PROGRESSBAR_1;
     else if (type.compare("progressbar_2") == 0)
         return OBJECT_TYPE_PROGRESSBAR_2;
+    else if (type.compare("roulette") == 0)
+        return OBJECT_TYPE_ROULETTE;
 	else if (type.compare("circle") == 0)
 		return OBJECT_TYPE_CIRCLE;
     else if (type.compare("rectangle") == 0)
@@ -979,6 +982,16 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , obj.span);
                 pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, .65f, pos, gridSizeWithSpanWithMargin, color, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
+                break;
+            }
+            case WIZARD::OBJECT_TYPE_ROULETTE:{
+                COLOR_RGB arrow, bg, outCircle;
+                arrow.set(obj.color, obj.opacity);
+                bg.set(obj.color_second, obj.opacity_second);
+                outCircle = bg.getColorDark();
+                pObj = ui_roulette::create(gridSizeWithSpanWithMargin, center, arrow, bg, outCircle);
+                ((ui_roulette*)pObj)->addParent(layoutBG);
+                ((ui_roulette*)pObj)->run(0);
                 break;
             }
             case WIZARD::OBJECT_TYPE_CIRCLE:
