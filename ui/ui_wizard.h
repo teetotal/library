@@ -223,6 +223,11 @@ protected:
 	bool loadFromJson(const string& sceneName, const string& path);
     
 	Node * getNodeById(int id);
+    Node ** getNodePointerById(int id) {
+        if (mNodeMap.find(id) == mNodeMap.end())
+            return NULL;
+        return &mNodeMap[id];
+    };
 	void pushScene(Scene * pScene) {
 		Director::getInstance()->pushScene(pScene);
 	};
@@ -236,7 +241,17 @@ protected:
 		Director::getInstance()->end();
 	};
 	virtual void callback(cocos2d::Ref* pSender, int from, int link) = 0;
-	virtual const string getText(const string& defaultString, int id) = 0;	
+	virtual const string getText(const string& defaultString, int id) = 0;
+    
+    virtual void cleanup() override {
+        
+        mNodeMap.clear();
+        Node::cleanup();
+        for(int n=0; n < mDeleteList.size(); n++) {
+            delete mDeleteList[n];
+        }
+    };
+    
 private:	
 #define NULL_INT_VALUE -1
 #define NULL_STRING_VALUE ""
@@ -248,6 +263,8 @@ private:
     
     bool mIsDrawGrid;
     Vec2 mGrid;
+    
+    vector<Node *> mDeleteList;
 };
 
 #endif //_UI_WIZARD_H

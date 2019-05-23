@@ -4,17 +4,15 @@
 #define STEP_DEGREE 0.45f
 #define STEP_DEGREE_TEXT 0.225f
 
-bool ui_roulette::mEnable = true;
-Node * ui_roulette::mLayerSquare = NULL;
-float ui_roulette::mValue = 0;
-
 void ui_roulette::init(Size size
                        , Vec2 center
                        , COLOR_RGB& color
                        , COLOR_RGB& colorBG
                        , const string szStart)
 {
-    
+    mThis = this;
+    mItemsIdx = 0;
+    mEnable = true;
     mColor = color;
     mStartString = szStart;
     
@@ -56,7 +54,7 @@ void ui_roulette::init(Size size
     gui::inst()->drawTriangle(mLayer, l, r, c, color.getColorDark().getColor4F());
 }
 
-bool ui_roulette::run(const std::function<void()>& callback) {
+bool ui_roulette::run(const ccMenuCallback& callback) {
     if(mEnable == false) {
         CCLOG("ui_roulette disabled");
         return false;
@@ -74,14 +72,13 @@ bool ui_roulette::run(const std::function<void()>& callback) {
 //                                , CallFunc::create(callback)
 //                                , NULL);
     auto seq = Sequence::create(ease
-                                , CallFunc::create(callback)
+                                , CallFunc::create([=](){ callback(this); })
                                 , NULL);
-//    mLayerSquare->runAction(RotateTo::create(3, 360 * 3 + f));
+
     mLayerSquare->runAction(seq);
     
     return true;
 }
-
 void ui_roulette::drawArc(float fromDegree, float toDegree, const Color4F color) {
     DrawNode * arc = DrawNode::create();
     vector<Vec2> vecs;
@@ -100,15 +97,15 @@ void ui_roulette::drawArc(float fromDegree, float toDegree, const Color4F color)
     mLayerSquare->addChild(arc);
 }
 
-bool ui_roulette::setValue(float val, const std::function<void()>& callback) {
-    if(mItems.size() != 8)
+bool ui_roulette::setValue(float val, const ccMenuCallback& callback) {
+    if(mItemsIdx != 8)
         return false;
     
     mValue = val;
     
     Vec2 pos;
     float degree;
-    for(int n=0; n<mItems.size(); n++) {
+    for(int n=0; n < mItemsIdx; n++) {
         degree = 22.5 + 45 * n;
         
         pos.x = mCenter.x + (std::cosf(CC_DEGREES_TO_RADIANS(degree)) * mRadius) * 0.75;
@@ -120,23 +117,28 @@ bool ui_roulette::setValue(float val, const std::function<void()>& callback) {
         mLayerSquare->addChild(mItems[n]);
     }
     
-    float fontSize = gui::inst()->getFontSize(Size(mRadius * 0.3, mRadius * 0.3), 0.75f);
-    gui::inst()->addTextButton(0
-                                              , 0
-                                              , mStartString
-                                              , mLayer
-                                              , [=](Ref* pSender) {
-                                                  this->run(callback);
-                                              }
-                                              , fontSize
-                                              , ALIGNMENT_CENTER
-                                              , mColor.getColor3B()
-                                              , mLayer->getContentSize()
-                                              , Vec2(1,1)
-                                              , Vec2::ZERO
-                                              , Vec2::ZERO
-                                              , Vec2::ZERO
-                                              , Vec2::ZERO );
+    float width = mRadius * 0.3 * 2;
+    
+    float fontSize = gui::inst()->getFontSize(Size(width, width), 0.75f);
+    auto button = gui::inst()->addTextButton(0
+                               , 0
+                               , mStartString
+                               , mLayer
+                               , [=](Ref* pRef) {
+                                   this->run(callback);
+                               }
+                               , fontSize
+                               , ALIGNMENT_CENTER
+                               , mColor.getColor3B()
+                               , mLayer->getContentSize()
+                               , Vec2(1,1)
+                               , Vec2::ZERO
+                               , Vec2::ZERO
+                               , Vec2::ZERO
+                               , Vec2::ZERO );
+    if(button->getContentSize().width > width * 0.75f) {
+        gui::inst()->setScale(button, width * 0.75f);
+    }
     
     return true;
 }

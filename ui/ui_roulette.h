@@ -13,11 +13,13 @@ class ui_roulette : public Node
 {
 public:
     static ui_roulette * create() {
-        auto ret = new (std::nothrow) ui_roulette;
+        ui_roulette * ret = new (std::nothrow) ui_roulette;
         
         if (ret)
         {
-            ret->autorelease();
+//            ret->autorelease();
+        } else {
+             CC_SAFE_DELETE(ret);
         }
         
         return ret;
@@ -39,14 +41,19 @@ public:
               , COLOR_RGB& colorBG
               , const string szStart);
     
+    void clear() {
+        mItemsIdx = 0;
+    };
+    
     void addParent(Node * p) {
         p->addChild(mLayer);
     };
-    bool setValue(float val, const std::function<void()>& callback);
-    static void setValue(float val) {
+    bool setValue(float val, const ccMenuCallback& callback);
+    void setValue(float val) {
         mValue = val;
     };
-    bool run(const std::function<void()>& callback);
+    
+    bool run(const ccMenuCallback& callback);
     
     virtual void setPosition(const Vec2 &position) override {
         mLayer->setPosition(position);
@@ -57,28 +64,34 @@ public:
     virtual void setOpacity(GLubyte opacity) override {  };
     
     bool insertItem(Node * p) {
-        if(mItems.size() >= 8)
+        if(mItemsIdx >= 8) {
             return false;
-        mItems.push_back(p);
+        }
+        mItems[mItemsIdx] = p;
+        mItemsIdx++;
         return true;
     };
     
-    static int getResultIdx() {
+    int getResultIdx() {
         float f = mLayerSquare->getRotation();
         return ((int)((90 + fmodf(f, 360.f)) / 45)) % 8;
     };
-    
-    static float mValue;
-    static bool mEnable;
-    static Node * mLayerSquare;
-    
+  
+    float mValue;
+    bool mEnable;
+    Node * mLayerSquare;
+    ui_roulette * mThis;
+   
 private:
     Node * mLayer;
     float mRadius;
-    Vec2 mCenter;
-    void drawArc(float fromDegree, float toDegree, const Color4F color);
-    vector<Node *> mItems;
     COLOR_RGB mColor;
+    Node * mItems[8];
+    int mItemsIdx;
     string mStartString;
+    Vec2 mCenter;
+    
+    void drawArc(float fromDegree, float toDegree, const Color4F color);
+    
 };
 #endif /* ui_roulette_h */

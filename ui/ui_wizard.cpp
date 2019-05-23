@@ -477,7 +477,8 @@ Node * ui_wizard::getNodeById(int id)
 {
 	if (mNodeMap.find(id) == mNodeMap.end())
 		return nullptr;
-	return mNodeMap[id];
+    Node * p = mNodeMap[id];
+	return p;
 }
 
 void ui_wizard::drawBackground(WIZARD::_Background & bg)
@@ -485,7 +486,7 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
     Size size = Director::getInstance()->getVisibleSize();
     mIsDrawGrid = bg.isDrawGrid;
 //    auto p = (bg.bgColor_second.isValidColor) ? LayerGradient::create(bg.bgColor.getColor4B(), bg.bgColor_second.getColor4B()) : LayerColor::create(bg.bgColor.getColor4B());
-    auto p = LayerColor::create(bg.bgColor.getColor4B());
+    Node * p = LayerColor::create(bg.bgColor.getColor4B());
 	p->setContentSize(size);
     p->setAnchorPoint(Vec2::ZERO);
 	p->setPosition(Director::getInstance()->getVisibleOrigin());
@@ -990,6 +991,9 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 bg.set(obj.color_second, obj.opacity_second);
                 pObj = ui_roulette::create(gridSizeWithSpanWithMargin, center, color, bg, obj.text);
                 ((ui_roulette*)pObj)->addParent(layoutBG);
+                
+                mDeleteList.push_back(pObj);
+                
                 break;
             }
             case WIZARD::OBJECT_TYPE_CIRCLE:

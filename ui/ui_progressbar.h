@@ -19,11 +19,12 @@ class ui_progressbar : public Node
 {
 public:
     static ui_progressbar * create() {
-        auto ret = new (std::nothrow) ui_progressbar;
-        
+        ui_progressbar * ret = new (std::nothrow) ui_progressbar;
         if (ret)
         {
             ret->autorelease();
+        } else {
+             CC_SAFE_DELETE(ret);
         }
         
         return ret;
