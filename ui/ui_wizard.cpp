@@ -661,7 +661,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
         Size gridSizeWithSpanWithMargin = Size(gridSizeWithSpan.width - (node.innerMargin.x * 2.f), gridSizeWithSpan.height - (node.innerMargin.y * 2.f));
         
         //bg color
-        if(obj.bgColor.isValidColor) {
+        if(obj.bgColor.isValidColor && obj.visible) {
             Node * bg;
             if(obj.bgColor_second.isValidColor) {
                 bg = LayerGradient::create(obj.bgColor.getColor4B(), obj.bgColor_second.getColor4B());

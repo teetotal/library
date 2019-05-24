@@ -72,6 +72,7 @@ bool ui_roulette::run(const ccMenuCallback& callback) {
 //                                , CallFunc::create(callback)
 //                                , NULL);
     auto seq = Sequence::create(ease
+                                , DelayTime::create(.5f)
                                 , CallFunc::create([=](){ callback(this); })
                                 , NULL);
 

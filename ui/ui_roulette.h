@@ -81,9 +81,9 @@ public:
     bool mEnable;
     Node * mLayerSquare;
     ui_roulette * mThis;
-   
-private:
     float mRadius;
+    
+private:
     COLOR_RGB mColor;
     Node * mItems[8];
     int mItemsIdx;
