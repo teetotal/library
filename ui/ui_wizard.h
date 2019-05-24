@@ -244,12 +244,15 @@ protected:
 	virtual const string getText(const string& defaultString, int id) = 0;
     
     virtual void cleanup() override {
+        Node * p;
+        for(map<int, Node*>::iterator it = mNodeMap.begin(); it != mNodeMap.end(); ++it) {
+            CCLOG("%d, %d", it->second->_ID, it->second->getReferenceCount());
+            if(it->second->_ID == 415)
+                p = it->second;
+        }
         
         mNodeMap.clear();
         Node::cleanup();
-        for(int n=0; n < mDeleteList.size(); n++) {
-            delete mDeleteList[n];
-        }
     };
     
 private:	
@@ -263,8 +266,6 @@ private:
     
     bool mIsDrawGrid;
     Vec2 mGrid;
-    
-    vector<Node *> mDeleteList;
 };
 
 #endif //_UI_WIZARD_H

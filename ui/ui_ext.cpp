@@ -61,7 +61,7 @@ DrawNode * guiExt::drawRectForPhysics(Node * p, Vec2 pos, Size size, COLOR_RGB& 
 /*
  drawRectRoundShadow
  */
-DrawNode * guiExt::drawRectRoundShadow (Node * p, Vec2 pos, Size size, COLOR_RGB& color){
+DrawNode * guiExt::drawRectRoundShadow (Node * p, Vec2 pos, Size size, COLOR_RGB& color) {
     Color4F colorShadow = color.getColorLight().getColor4F();
     Color4F colorMain = color.getColor4F();
     
@@ -69,3 +69,9 @@ DrawNode * guiExt::drawRectRoundShadow (Node * p, Vec2 pos, Size size, COLOR_RGB
     return gui::inst()->drawRectRound(p, pos, Size(size.width - 2.f, size.height - 2.f), colorMain);
 }
 
+ui_roulette * guiExt::addRoulette(Node * p, Size size, Vec2 center, COLOR_RGB& color, COLOR_RGB& bg, const string sz) {
+    auto roulette = ui_roulette::create(size, center, color, bg, sz);
+    if(p)
+        p->addChild(roulette);
+    return roulette;
+}

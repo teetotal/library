@@ -15,7 +15,7 @@ enum UI_PROGRESSBAR_TYPE {
     UI_PROGRESSBAR_TYPE_2,      // 입체, black 배경
 };
 
-class ui_progressbar : public Node
+class ui_progressbar : public Layout
 {
 public:
     static ui_progressbar * create() {
@@ -51,19 +51,12 @@ public:
               , ALIGNMENT align = ALIGNMENT_LEFT);
     
     void addParent(Node * p) {
-        p->addChild(mLayer);
+        p->addChild(this);
     };
     
     void setValue(float f);
-    virtual void setPosition(const Vec2 &position) override {
-        mLayer->setPosition(position);
-    };
-    const Vec2& getPosition() const override {
-        return mLayer->getPosition();
-    };
-    virtual void setOpacity(GLubyte opacity) override {  };
+    
 private:
-    Node * mLayer;
     DrawNode * mBar;
     float mMargin;
     COLOR_RGB mColor;

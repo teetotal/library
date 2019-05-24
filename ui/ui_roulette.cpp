@@ -16,16 +16,16 @@ void ui_roulette::init(Size size
     mColor = color;
     mStartString = szStart;
     
-    mLayer = gui::inst()->createLayout(size, "", false, Color3B::BLACK);
-    gui::inst()->setAnchorPoint(mLayer, ALIGNMENT_CENTER);
-    mLayer->setPosition(center);
+    this->setContentSize(size);
+    gui::inst()->setAnchorPoint(this, ALIGNMENT_CENTER);
+    this->setPosition(center);
     
     mRadius = (size.width > size.height) ? size.height: size.width;
     
     mLayerSquare = gui::inst()->createLayout(Size(mRadius, mRadius), "", false, Color3B::WHITE);
     gui::inst()->setAnchorPoint(mLayerSquare, ALIGNMENT_CENTER);
     mLayerSquare->setPosition(Vec2(size.width / 2.f, size.height / 2.f));
-    mLayer->addChild(mLayerSquare);
+    this->addChild(mLayerSquare);
     
     mRadius /= 2.f;
     float len = mRadius * 0.1f;
@@ -48,10 +48,10 @@ void ui_roulette::init(Size size
         drawArc(45*n, 45*(n+1), c);
     }
     
-    gui::inst()->drawCircle(mLayer, center, mRadius * 0.32, colorBG.getColor4F());
-    gui::inst()->drawCircle(mLayer, center, mRadius * 0.3, Color4F::WHITE);
+    gui::inst()->drawCircle(this, center, mRadius * 0.32, colorBG.getColor4F());
+    gui::inst()->drawCircle(this, center, mRadius * 0.3, Color4F::WHITE);
     
-    gui::inst()->drawTriangle(mLayer, l, r, c, color.getColorDark().getColor4F());
+    gui::inst()->drawTriangle(this, l, r, c, color.getColorDark().getColor4F());
 }
 
 bool ui_roulette::run(const ccMenuCallback& callback) {
@@ -100,7 +100,7 @@ void ui_roulette::drawArc(float fromDegree, float toDegree, const Color4F color)
 bool ui_roulette::setValue(float val, const ccMenuCallback& callback) {
     if(mItemsIdx != 8)
         return false;
-    
+//    this->retain();
     mValue = val;
     
     Vec2 pos;
@@ -123,14 +123,14 @@ bool ui_roulette::setValue(float val, const ccMenuCallback& callback) {
     auto button = gui::inst()->addTextButton(0
                                , 0
                                , mStartString
-                               , mLayer
+                               , this
                                , [=](Ref* pRef) {
                                    this->run(callback);
                                }
                                , fontSize
                                , ALIGNMENT_CENTER
                                , mColor.getColor3B()
-                               , mLayer->getContentSize()
+                               , this->getContentSize()
                                , Vec2(1,1)
                                , Vec2::ZERO
                                , Vec2::ZERO

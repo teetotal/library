@@ -985,15 +985,12 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
-            case WIZARD::OBJECT_TYPE_ROULETTE:{
+            case WIZARD::OBJECT_TYPE_ROULETTE:
+            {
                 COLOR_RGB color, bg;
                 color.set(obj.color, obj.opacity);
                 bg.set(obj.color_second, obj.opacity_second);
-                pObj = ui_roulette::create(gridSizeWithSpanWithMargin, center, color, bg, obj.text);
-                ((ui_roulette*)pObj)->addParent(layoutBG);
-                
-                mDeleteList.push_back(pObj);
-                
+                pObj = guiExt::addRoulette(layoutBG, gridSizeWithSpanWithMargin, center, color, bg, obj.text);
                 break;
             }
             case WIZARD::OBJECT_TYPE_CIRCLE:

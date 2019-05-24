@@ -9,7 +9,7 @@
 #include "ui.h"
 #include "ui_color.h"
 
-class ui_roulette : public Node
+class ui_roulette : public Layout
 {
 public:
     static ui_roulette * create() {
@@ -17,7 +17,7 @@ public:
         
         if (ret)
         {
-//            ret->autorelease();
+            ret->autorelease();
         } else {
              CC_SAFE_DELETE(ret);
         }
@@ -46,7 +46,7 @@ public:
     };
     
     void addParent(Node * p) {
-        p->addChild(mLayer);
+        p->addChild(this);
     };
     bool setValue(float val, const ccMenuCallback& callback);
     void setValue(float val) {
@@ -54,15 +54,15 @@ public:
     };
     
     bool run(const ccMenuCallback& callback);
-    
+    /*
     virtual void setPosition(const Vec2 &position) override {
-        mLayer->setPosition(position);
+        this->setPosition(position);
     };
     const Vec2& getPosition() const override {
-        return mLayer->getPosition();
+        return this->getPosition();
     };
     virtual void setOpacity(GLubyte opacity) override {  };
-    
+    */
     bool insertItem(Node * p) {
         if(mItemsIdx >= 8) {
             return false;
@@ -83,7 +83,6 @@ public:
     ui_roulette * mThis;
    
 private:
-    Node * mLayer;
     float mRadius;
     COLOR_RGB mColor;
     Node * mItems[8];

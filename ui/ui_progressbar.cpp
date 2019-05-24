@@ -11,11 +11,11 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
     mAlign = align;
     mColor.set(color);
     
-    mLayer = gui::inst()->createLayout(size);
-    mLayer->setPosition(zeroPosition);
+    this->setContentSize(size);
+    this->setPosition(zeroPosition);
     
     //outline
-    gui::inst()->drawRect(mLayer
+    gui::inst()->drawRect(this
                          , Vec2(size.width / 2.f, size.height / 2.f)
                          , size
                          , outline.getColor4F());
@@ -34,20 +34,20 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
     mMargin = size.height * 0.05f;
     Size s90 = Size(size.width - (mMargin * 2.f), size.height - (mMargin * 2.f));
     
-    gui::inst()->drawRect(mLayer
+    gui::inst()->drawRect(this
                         , Vec2(size.width / 2.f, size.height / 2.f)
                         , s90
                         , colorBG);
 }
 
 void ui_progressbar::setValue(float f) {
-    Size size = mLayer->getContentSize();
+    Size size = this->getContentSize();
     float margin2 = mMargin + (mMargin * .5f);
     Size value = Size(size.width * f - (margin2 * 2.f), size.height - (margin2 * 2.f));
     Size value2 = Size(value.width, value.height / 2.f);
     
     if(mBar) {
-        mLayer->removeChild(mBar);
+        this->removeChild(mBar);
     }
     mBar = DrawNode::create();
     if(mType == UI_PROGRESSBAR_TYPE_0) {
@@ -80,5 +80,5 @@ void ui_progressbar::setValue(float f) {
     }
     
     
-    mLayer->addChild(mBar);
+    this->addChild(mBar);
 }
