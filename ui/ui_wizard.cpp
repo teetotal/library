@@ -198,6 +198,8 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_RECT_ROUND_SHADOW;
     else if (type.compare("line") == 0)
         return OBJECT_TYPE_LINE;
+    else if (type.compare("icon_circle") == 0)
+        return OBJECT_TYPE_ICON_CIRCLE;
     else if (type.compare("component") == 0)
         return OBJECT_TYPE_COMPONENT;
     
@@ -564,14 +566,6 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
     Size sizeColored = Size(size.width - (node.margin.x * 2.f), size.height - (node.margin.y * 2.f));
     Size sizePerGridNoMargin = Size((sizeColored.width / node.gridSize.x), (sizeColored.height / node.gridSize.y));
     Size sizePerGrid = Size(sizePerGridNoMargin.width - (node.innerMargin.x * 2.f), sizePerGridNoMargin.height - (node.innerMargin.y * 2.f));
-    float min, max;
-    if(sizePerGrid.width > sizePerGrid.height) {
-        min = sizePerGrid.height;
-        max = sizePerGrid.width;
-    } else {
-        max = sizePerGrid.height;
-        min = sizePerGrid.width;
-    }
     
     float nodeMin, nodeMax;
     if(sizeColored.width > sizeColored.height) {
@@ -660,6 +654,15 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
         Size gridSizeWithSpan = gui::inst()->getGridSize(layoutBG->getContentSize(), node.gridSize, Vec2::ZERO, Vec2::ZERO, obj.span);
         Size gridSizeWithSpanWithMargin = Size(gridSizeWithSpan.width - (node.innerMargin.x * 2.f), gridSizeWithSpan.height - (node.innerMargin.y * 2.f));
         
+        float min, max;
+        if(gridSizeWithSpanWithMargin.width > gridSizeWithSpanWithMargin.height) {
+            min = gridSizeWithSpanWithMargin.height;
+            max = gridSizeWithSpanWithMargin.width;
+        } else {
+            max = gridSizeWithSpanWithMargin.height;
+            min = gridSizeWithSpanWithMargin.width;
+        }
+        
         //bg color
         if(obj.bgColor.isValidColor && obj.visible) {
             Node * bg;
@@ -706,6 +709,10 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             default:
             break;
         }
+        
+        COLOR_RGB color1, color2;
+        color1.set(obj.color, obj.opacity);
+        color2.set(obj.color_second, obj.opacity_second);
         
         Node * pObj;
         switch(obj.type) {
@@ -933,9 +940,6 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 break;
             case WIZARD::OBJECT_TYPE_PROGRESSBAR_0:
             {
-                COLOR_RGB color, color2;
-                color.set(obj.color, obj.opacity);
-                color2.set(obj.color_second, obj.opacity_second);
                 Vec2 pos = gui::inst()->getPointVec2(obj.position.x
                                                      , obj.position.y
                                                      , ALIGNMENT_LEFT_BOTTOM
@@ -945,15 +949,12 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_0, .65f, pos, gridSizeWithSpanWithMargin, color, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_0, .65f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
             case WIZARD::OBJECT_TYPE_PROGRESSBAR_1:
             {
-                COLOR_RGB color, color2;
-                color.set(obj.color, obj.opacity);
-                color2.set(obj.color_second, obj.opacity_second);
                 Vec2 pos = gui::inst()->getPointVec2(obj.position.x
                                                      , obj.position.y
                                                      , ALIGNMENT_LEFT_BOTTOM
@@ -963,15 +964,12 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_1, .65f, pos, gridSizeWithSpanWithMargin, color, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_1, .65f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
             case WIZARD::OBJECT_TYPE_PROGRESSBAR_2:
             {
-                COLOR_RGB color, color2;
-                color.set(obj.color, obj.opacity);
-                color2.set(obj.color_second, obj.opacity_second);
                 Vec2 pos = gui::inst()->getPointVec2(obj.position.x
                                                      , obj.position.y
                                                      , ALIGNMENT_LEFT_BOTTOM
@@ -981,16 +979,13 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, .65f, pos, gridSizeWithSpanWithMargin, color, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, .65f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
             case WIZARD::OBJECT_TYPE_ROULETTE:
             {
-                COLOR_RGB color, bg;
-                color.set(obj.color, obj.opacity);
-                bg.set(obj.color_second, obj.opacity_second);
-                pObj = guiExt::addRoulette(layoutBG, gridSizeWithSpanWithMargin, center, color, bg, obj.text);
+                pObj = guiExt::addRoulette(layoutBG, gridSizeWithSpanWithMargin, center, color1, color2, obj.text);
                 break;
             }
             case WIZARD::OBJECT_TYPE_CIRCLE:
@@ -1021,6 +1016,9 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                              , position
                                              , Vec2(position.x + gridSizeWithSpan.width /* + (node.innerMargin.x * 2.f)*/, position.y)
                                              , Color4F(obj.color));
+                break;
+            case WIZARD::OBJECT_TYPE_ICON_CIRCLE:
+                pObj = guiExt::addIconCircle(layoutBG, center, min / 2, obj.text, color1);
                 break;
             case WIZARD::OBJECT_TYPE_COMPONENT:
             {

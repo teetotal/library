@@ -45,6 +45,8 @@ namespace WIZARD {
         OBJECT_TYPE_RECT_ROUND_SHADOW,
         OBJECT_TYPE_LINE,
         
+        OBJECT_TYPE_ICON_CIRCLE,
+        
         OBJECT_TYPE_COMPONENT,
 	};
     
