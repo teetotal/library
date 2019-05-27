@@ -65,38 +65,40 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
         CCLOG("WIZARD::_Object::load span");
     }
     
-    CCLOG("WIZARD::_Object::load alignment");
-	const string szAlignment = p["alignment"].GetString();
-	if (szAlignment.compare("none") == 0) {
-		this->alignment = ALIGNMENT_NONE;
-	}
-	else if (szAlignment.compare("center") == 0){
-		this->alignment = ALIGNMENT_CENTER;
+    this->alignment = ALIGNMENT_CENTER;
+    if(p.HasMember("alignment") && !p["alignment"].IsNull()) {
+        const string szAlignment = p["alignment"].GetString();
+        if (szAlignment.compare("none") == 0) {
+            this->alignment = ALIGNMENT_NONE;
+        }
+        else if (szAlignment.compare("center_top") == 0){
+            this->alignment = ALIGNMENT_CENTER_TOP;
+        }
+        else if (szAlignment.compare("center_bottom") == 0){
+            this->alignment = ALIGNMENT_CENTER_BOTTOM;
+        }
+        else if (szAlignment.compare("left") == 0){
+            this->alignment = ALIGNMENT_LEFT;
+        }
+        else if (szAlignment.compare("left_top") == 0){
+            this->alignment = ALIGNMENT_LEFT_TOP;
+        }
+        else if (szAlignment.compare("left_bottom") == 0){
+            this->alignment = ALIGNMENT_LEFT_BOTTOM;
+        }
+        else if (szAlignment.compare("right") == 0){
+            this->alignment = ALIGNMENT_RIGHT;
+        }
+        else if (szAlignment.compare("right_top") == 0){
+            this->alignment = ALIGNMENT_RIGHT_TOP;
+        }
+        else if (szAlignment.compare("right_bottom") == 0){
+            this->alignment = ALIGNMENT_RIGHT_BOTTOM;
+        }
+        
+        CCLOG("WIZARD::_Object::load alignment %s", szAlignment.c_str());
     }
-    else if (szAlignment.compare("center_top") == 0){
-        this->alignment = ALIGNMENT_CENTER_TOP;
-    }
-    else if (szAlignment.compare("center_bottom") == 0){
-        this->alignment = ALIGNMENT_CENTER_BOTTOM;
-    }
-    else if (szAlignment.compare("left") == 0){
-        this->alignment = ALIGNMENT_LEFT;
-    }
-    else if (szAlignment.compare("left_top") == 0){
-        this->alignment = ALIGNMENT_LEFT_TOP;
-    }
-    else if (szAlignment.compare("left_bottom") == 0){
-        this->alignment = ALIGNMENT_LEFT_BOTTOM;
-    }
-    else if (szAlignment.compare("right") == 0){
-        this->alignment = ALIGNMENT_RIGHT;
-    }
-    else if (szAlignment.compare("right_top") == 0){
-        this->alignment = ALIGNMENT_RIGHT_TOP;
-    }
-    else if (szAlignment.compare("right_bottom") == 0){
-        this->alignment = ALIGNMENT_RIGHT_BOTTOM;
-    }
+    
     
     CCLOG("WIZARD::_Object::load type");
 	this->type = (OBJECT_TYPE)getObjectType(p["type"].GetString());
@@ -200,6 +202,8 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_LINE;
     else if (type.compare("icon_circle") == 0)
         return OBJECT_TYPE_ICON_CIRCLE;
+    else if (type.compare("icon_heart") == 0)
+        return OBJECT_TYPE_ICON_HEART;
     else if (type.compare("component") == 0)
         return OBJECT_TYPE_COMPONENT;
     
@@ -212,6 +216,7 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
     this->visible = true;
     this->isScrollView = false;
     this->id = -1;
+    this->img = NULL_STRING_VALUE;
     
     if(pValue.HasMember("id") && !pValue["id"].IsNull())
         this->id = pValue["id"].GetInt();
@@ -254,8 +259,11 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
 	this->gridSize.x = p["gridSize"][rapidjson::SizeType(0)].GetFloat();
 	this->gridSize.y = p["gridSize"][rapidjson::SizeType(1)].GetFloat();
     
-    CCLOG("WIZARD::_Node::load img");
-	this->img = p["img"].IsNull() ? NULL_STRING_VALUE : p["img"].GetString();
+    
+    if(p.HasMember("img") && !p["img"].IsNull()) {
+        this->img = p["img"].GetString();
+        CCLOG("WIZARD::_Node::load img %s", this->img.c_str());
+    }
     
     CCLOG("WIZARD::_Node::load color");
     if (p.HasMember("color") && !p["color"].IsNull()) {
@@ -651,6 +659,16 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                   , Size::ZERO //node.innerMargin
                                                   , obj.span);
         
+        Vec2 positionWithInnerMargin = gui::inst()->getPointVec2(obj.position.x
+                                                  , obj.position.y
+                                                  , obj.alignment
+                                                  , layoutBG->getContentSize()
+                                                  , node.gridSize
+                                                  , Size::ZERO
+                                                  , Size::ZERO
+                                                  , node.innerMargin
+                                                  , obj.span);
+        
         Size gridSizeWithSpan = gui::inst()->getGridSize(layoutBG->getContentSize(), node.gridSize, Vec2::ZERO, Vec2::ZERO, obj.span);
         Size gridSizeWithSpanWithMargin = Size(gridSizeWithSpan.width - (node.innerMargin.x * 2.f), gridSizeWithSpan.height - (node.innerMargin.y * 2.f));
         
@@ -700,11 +718,11 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
         switch(obj.alignment) {
             case ALIGNMENT_LEFT:
                 circleCenter.x += node.innerMargin.x;
-                circleCenter.x = position.x + (min / 2.f);
+                circleCenter.x += (min / 2.f);
             break;
             case ALIGNMENT_RIGHT:
                 circleCenter.x -= node.innerMargin.x;
-                circleCenter.x = position.x - (min / 2.f);
+                circleCenter.x -= (min / 2.f);
             break;
             default:
             break;
@@ -1018,8 +1036,14 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                              , Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_ICON_CIRCLE:
-                pObj = guiExt::addIconCircle(layoutBG, center, min / 2, obj.text, color1);
+                pObj = guiExt::addIconCircle(layoutBG, circleCenter, min / 2, obj.text, color1);
                 break;
+            case WIZARD::OBJECT_TYPE_ICON_HEART:
+            {
+                float fontSize = gui::inst()->getFontSize(gridSizeWithSpanWithMargin);
+                pObj = guiExt::addIconHeart(layoutBG, positionWithInnerMargin, obj.alignment, fontSize, color1);
+                break;
+            }
             case WIZARD::OBJECT_TYPE_COMPONENT:
             {
                 WIZARD::_Node component = ui_wizard_share::inst()->getComponent(obj.component);

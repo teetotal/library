@@ -120,3 +120,16 @@ Layout * guiExt::addIconCircle (Node * p, Vec2 center, float radius, const strin
     p->addChild(layer);
     return layer;
 }
+ /*
+  addIconHeart
+  */
+Label * guiExt::addIconHeart (Node * p, Vec2 pos, ALIGNMENT align, float fontSize, COLOR_RGB& color) {
+    auto label = Label::createWithSystemFont("♥", SYSTEM_FONT_NAME, fontSize);
+//    label->setColor(color.getColor3B());
+    gui::inst()->setAnchorPoint(label, align);
+    label->setPosition(pos);
+//    label->enableGlow(color.getColorDark().getColor4B());
+    
+    p->addChild(label);
+    return label;
+}

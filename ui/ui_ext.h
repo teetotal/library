@@ -20,5 +20,6 @@ public:
     static DrawNode * drawRectRoundShadow  (Node * p, Vec2 pos, Size size, COLOR_RGB& color);
     static ui_roulette * addRoulette(Node * p, Size size, Vec2 center, COLOR_RGB& color, COLOR_RGB& bg, const string sz);
     static Layout * addIconCircle (Node * p, Vec2 center, float radius, const string sz, COLOR_RGB& color);
+    static Label * addIconHeart (Node * p, Vec2 pos, ALIGNMENT align, float fontSize, COLOR_RGB& color);
 };
 #endif //_UI_EXT_H
