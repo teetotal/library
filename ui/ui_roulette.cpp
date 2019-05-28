@@ -29,11 +29,12 @@ void ui_roulette::init(Size size
     
     mRadius /= 2.f;
     float len = mRadius * 0.1f;
-    Vec2 l,r,c;
+    Vec2 l,r,c, t;
     Vec2 centerInner = Vec2(size.width / 2.f, size.height / 2.f);
     c = Vec2(centerInner.x, centerInner.y * 2.f - len * 2.f);
     l = Vec2(centerInner.x - len, centerInner.y * 2.f);
     r = Vec2(centerInner.x + len, centerInner.y * 2.f);
+    t = Vec2(centerInner.x, centerInner.y * 2.f);
     
     mCenter = Vec2(mRadius, mRadius);
     
@@ -52,7 +53,8 @@ void ui_roulette::init(Size size
     gui::inst()->drawCircle(this, centerInner, mRadius * 0.32, colorBG.getColor4F());
     gui::inst()->drawCircle(this, centerInner, mRadius * 0.3, Color4F::WHITE);
     
-    gui::inst()->drawTriangle(this, l, r, c, color.getColorDark().getColor4F());
+    gui::inst()->drawTriangle(this, l, t, c, color.getColorDark().getColor4F());
+    gui::inst()->drawTriangle(this, r, t, c, color.getColorDark().getColorDark().getColor4F());
 }
 
 bool ui_roulette::run(const ccMenuCallback& callback) {

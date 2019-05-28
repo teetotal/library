@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "pch.h"
 
 #define ACHIEVEMENT_TYPE_DAILY	0
@@ -69,7 +69,7 @@ public:
 	bool getDetail(detail &p, int type, int idx);
 
 	int getSize() {
-		return mMap.size();
+		return (int)mMap.size();
 	};
 	int getSize(int type) {
 		if(mMap.find(type) != mMap.end())
