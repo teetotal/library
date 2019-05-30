@@ -498,11 +498,11 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
     Size size = Director::getInstance()->getVisibleSize();
     mIsDrawGrid = bg.isDrawGrid;
 //    auto p = (bg.bgColor_second.isValidColor) ? LayerGradient::create(bg.bgColor.getColor4B(), bg.bgColor_second.getColor4B()) : LayerColor::create(bg.bgColor.getColor4B());
-    Node * p = LayerColor::create(bg.bgColor.getColor4B());
-	p->setContentSize(size);
-    p->setAnchorPoint(Vec2::ZERO);
-	p->setPosition(Director::getInstance()->getVisibleOrigin());
-	this->addChild(p);
+    mScreen = LayerColor::create(bg.bgColor.getColor4B());
+	mScreen->setContentSize(size);
+    mScreen->setAnchorPoint(Vec2::ZERO);
+	mScreen->setPosition(Director::getInstance()->getVisibleOrigin());
+	this->addChild(mScreen);
     
     if (bg.bgColor_second.isValidColor) {
         
@@ -513,18 +513,19 @@ void ui_wizard::drawBackground(WIZARD::_Background & bg)
                                                     , 0.0f);
         
         gradient->setContentSize(size);
-        p->addChild(gradient);
+        mScreen->addChild(gradient);
         
     }
 
 	if (bg.img.compare(NULL_STRING_VALUE) != 0) {
-		gui::inst()->addBG(bg.img, p, true);
+		gui::inst()->addBG(bg.img, mScreen, true);
 	}
     
-    mNodeMap[bg.id] = p;
+    if(bg.id >= 0)
+        mNodeMap[bg.id] = mScreen;
     
     if(bg.tileColor.isValidColor) {
-        gui::inst()->drawDiamondTile(p, bg.tileNum, bg.tileColor.getColor4F());
+        gui::inst()->drawDiamondTile(mScreen, bg.tileNum, bg.tileColor.getColor4F());
     }
     
     if(bg.isDrawGrid)
@@ -595,7 +596,9 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                 , node.img
                                                 , (node.color.getA() == 0) ? false : true
                                                 , node.color.getColor3B());
-    layoutBG->setOpacity(node.color.getA());
+    if(node.color.getA() > 0)
+        layoutBG->setOpacity(node.color.getA());
+    
     layoutBG->setPosition(Vec2(start.x + node.margin.x, end.y + node.margin.y));
     ScrollView * sv;
     if (node.color_second.isValidColor) {
@@ -725,6 +728,14 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             case ALIGNMENT_RIGHT:
                 circleCenter.x -= node.innerMargin.x;
                 circleCenter.x -= (min / 2.f);
+            break;
+            case ALIGNMENT_CENTER_TOP:
+                circleCenter.y -= node.innerMargin.x;
+                circleCenter.y -= (min / 2.f);
+            break;
+            case ALIGNMENT_CENTER_BOTTOM:
+                circleCenter.y += node.innerMargin.x;
+                circleCenter.y += (min / 2.f);
             break;
             default:
             break;

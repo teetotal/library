@@ -131,7 +131,10 @@ public:
     void initDefaultWithSpriteCache(const char* font = "fonts/arial.ttf") {
         init(font, GRID_DEFAULT_FONT_SIZE, Color4F::WHITE, true);
     };
-    
+    // get sprite  --------------------------------------------------------------------------------
+    Sprite * getSprite(const string img) {
+      return (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
+    };
     // about pixel --------------------------------------------------------------------------------
     float getRealPixel(float x);
     float getSizeFromRealPixel(float x);
@@ -539,7 +542,7 @@ public:
 	};
     
     Vec2 getCenter(Node * p) {
-        Vec2 center = getCenter();
+        Vec2 center;
         center.x = p->getContentSize().width / 2;
         center.y = p->getContentSize().height / 2;
         

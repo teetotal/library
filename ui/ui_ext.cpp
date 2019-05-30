@@ -133,3 +133,36 @@ Label * guiExt::addIconHeart (Node * p, Vec2 pos, ALIGNMENT align, float fontSiz
     p->addChild(label);
     return label;
 }
+
+Node * guiExt::addMovingEffect(Node * p, COLOR_RGB bgColor, const string img, bool toRight) {
+    auto layer = gui::inst()->createLayout(Size(p->getContentSize().width, p->getContentSize().height / 3), "", true, bgColor.getColor3B());
+    gui::inst()->setAnchorPoint(layer, ALIGNMENT_LEFT);
+    layer->setPosition(
+                       Vec2(p->getContentSize().width * ((toRight) ? -1.f : 1.f), p->getContentSize().height / 2.f)
+                       );
+    layer->setOpacity(bgColor.getA());
+    
+    auto center = MoveTo::create(.2f, Vec2(0, p->getContentSize().height / 2.f));
+    auto left = MoveTo::create(.2f, Vec2(p->getContentSize().width * -1.f, p->getContentSize().height / 2.f));
+    auto right = MoveTo::create(.2f, Vec2(p->getContentSize().width * 1.f, p->getContentSize().height / 2.f));
+    
+    layer->runAction(Sequence::create( center
+                                      , DelayTime::create(0.5f)
+                                      , toRight ? right : left
+                                      , RemoveSelf::create()
+                                      , NULL));
+    
+    if(img.length() > 0) {
+        auto sprite = gui::inst()->getSprite(img);
+        gui::inst()->setScaleByHeight(sprite, layer->getContentSize().height / 2.f);
+        sprite->setPosition(gui::inst()->getCenter(layer));
+        sprite->runAction(Sequence::create(ScaleBy::create(.7f, 1.5)
+                                           , ScaleBy::create(.7f, 1 / 1.5)
+                                           , NULL));
+        layer->addChild(sprite);
+    }
+    
+    p->addChild(layer);
+    
+    return layer;
+}

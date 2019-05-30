@@ -259,6 +259,8 @@ protected:
         Node::cleanup();
     };
     
+    Node * mScreen;
+    
 private:	
 #define NULL_INT_VALUE -1
 #define NULL_STRING_VALUE ""
