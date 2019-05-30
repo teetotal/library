@@ -13,6 +13,7 @@ enum UI_PROGRESSBAR_TYPE {
     UI_PROGRESSBAR_TYPE_0 = 0,  // 평면, dark 배경
     UI_PROGRESSBAR_TYPE_1,      // 입체, dark 배경
     UI_PROGRESSBAR_TYPE_2,      // 입체, black 배경
+    UI_PROGRESSBAR_TYPE_3,      // 입체, white 배경
 };
 
 class ui_progressbar : public Layout

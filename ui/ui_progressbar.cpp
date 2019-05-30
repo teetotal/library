@@ -26,6 +26,9 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
         case UI_PROGRESSBAR_TYPE_2:
             colorBG = Color4F::BLACK;
             break;
+        case UI_PROGRESSBAR_TYPE_3:
+            colorBG = Color4F::WHITE;
+            break;
         default:
             colorBG = color.getColor4F(COLOR_RGB_TYPE_DARK, mDarkBG);
             break;
@@ -50,35 +53,40 @@ void ui_progressbar::setValue(float f) {
         this->removeChild(mBar);
     }
     mBar = DrawNode::create();
-    if(mType == UI_PROGRESSBAR_TYPE_0) {
-        Vec2 origin, dest;
-        if(mAlign == ALIGNMENT_RIGHT) {
-            origin = Vec2(size.width - mMargin, margin2);
-            dest = Vec2(origin.x - value.width, origin.y + value.height);
-        } else {
-            origin = Vec2(mMargin, margin2);
-            dest = Vec2(origin.x + value.width, origin.y + value.height);
-        }
-        mBar->drawSolidRect(origin, dest, mColor.getColor4F());
-    } else {
-        Vec2 origin1, dest1, origin2, dest2;
-        if(mAlign == ALIGNMENT_RIGHT) {
-            origin2 = Vec2(size.width - mMargin, margin2);
-            dest2 = Vec2(origin2.x - value2.width, origin2.y + value2.height);
+    switch(mType) {
+        case UI_PROGRESSBAR_TYPE_0: {
+            Vec2 origin, dest;
+            if(mAlign == ALIGNMENT_RIGHT) {
+                origin = Vec2(size.width - mMargin, margin2);
+                dest = Vec2(origin.x - value.width, origin.y + value.height);
+            } else {
+                origin = Vec2(mMargin, margin2);
+                dest = Vec2(origin.x + value.width, origin.y + value.height);
+            }
+            mBar->drawSolidRect(origin, dest, mColor.getColor4F());
             
-            origin1 = Vec2(size.width - mMargin, dest2.y);
-            dest1 = Vec2(dest2.x, origin1.y + value2.height);
-        } else {
-            origin2 = Vec2(mMargin, margin2);
-            dest2 = Vec2(origin2.x + value2.width, origin2.y + value2.height);
-            
-            origin1 = Vec2(mMargin, dest2.y);
-            dest1 = Vec2(dest2.x, origin1.y + value2.height);
+            break;
         }
-        mBar->drawSolidRect(origin1, dest1, mColor.getColor4F());
-        mBar->drawSolidRect(origin2, dest2, mColor.getColor4F(COLOR_RGB_TYPE_DARK, mDarkValue));
+        default: {
+            Vec2 origin1, dest1, origin2, dest2;
+            if(mAlign == ALIGNMENT_RIGHT) {
+                origin2 = Vec2(size.width - mMargin, margin2);
+                dest2 = Vec2(origin2.x - value2.width, origin2.y + value2.height);
+                
+                origin1 = Vec2(size.width - mMargin, dest2.y);
+                dest1 = Vec2(dest2.x, origin1.y + value2.height);
+            } else {
+                origin2 = Vec2(mMargin, margin2);
+                dest2 = Vec2(origin2.x + value2.width, origin2.y + value2.height);
+                
+                origin1 = Vec2(mMargin, dest2.y);
+                dest1 = Vec2(dest2.x, origin1.y + value2.height);
+            }
+            mBar->drawSolidRect(origin1, dest1, mColor.getColor4F());
+            mBar->drawSolidRect(origin2, dest2, mColor.getColor4F(COLOR_RGB_TYPE_DARK, mDarkValue));
+            break;
+        }
     }
-    
-    
+   
     this->addChild(mBar);
 }
