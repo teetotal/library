@@ -72,7 +72,7 @@ PhysicsScene::bitmask PhysicsScene::getBitmask(PhysicsContact &contact) {
     st.collisionB = contact.getShapeB()->getBody()->getCollisionBitmask();
     
     st.contactA = contact.getShapeA()->getBody()->getContactTestBitmask();
-    st.contactB = contact.getShapeA()->getBody()->getContactTestBitmask();
+    st.contactB = contact.getShapeB()->getBody()->getContactTestBitmask();
     
     return st;
 }
