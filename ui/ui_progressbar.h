@@ -54,8 +54,20 @@ public:
     void addParent(Node * p) {
         p->addChild(this);
     };
-    
-    void setValue(float f);
+    const float getValue() {
+        return mValue;
+    };
+    const float setValue(float f);
+    const float setValueIncrese(float f) {
+        if(mValue >= 1.f)
+            return 1.f;
+        return setValue(mValue + f);
+    };
+    const float setValueDecrese(float f) {
+        if(mValue <= 0.f)
+            return 0.f;
+        return setValue(mValue - f);
+    };
     
 private:
     DrawNode * mBar;
@@ -66,5 +78,7 @@ private:
     
     const int mDarkValue = 20;
     const int mDarkBG = 50;
+    
+    float mValue;
 };
 #endif /* ui_progressbar_h */

@@ -980,7 +980,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_0, .65f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_0, 1.f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
@@ -995,7 +995,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_1, .65f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_1, 1.f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
@@ -1010,7 +1010,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, .65f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, 1.f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
@@ -1025,7 +1025,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_3, .65f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
+                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_3, 1.f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }

@@ -15,10 +15,10 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
     this->setPosition(zeroPosition);
     
     //outline
-    gui::inst()->drawRect(this
-                         , Vec2(size.width / 2.f, size.height / 2.f)
-                         , size
-                         , outline.getColor4F());
+//    gui::inst()->drawRect(this
+//                         , Vec2(size.width / 2.f, size.height / 2.f)
+//                         , size
+//                         , outline.getColor4F());
     
     //bg
     Color4F colorBG;
@@ -30,11 +30,12 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
             colorBG = Color4F::WHITE;
             break;
         default:
-            colorBG = color.getColor4F(COLOR_RGB_TYPE_DARK, mDarkBG);
+            //colorBG = color.getColor4F(COLOR_RGB_TYPE_DARK, mDarkBG);
+            colorBG = outline.getColor4F();
             break;
     }
     
-    mMargin = size.height * 0.05f;
+    mMargin = size.height * 0.1f;
     Size s90 = Size(size.width - (mMargin * 2.f), size.height - (mMargin * 2.f));
     
     gui::inst()->drawRect(this
@@ -43,10 +44,12 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
                         , colorBG);
 }
 
-void ui_progressbar::setValue(float f) {
+const float ui_progressbar::setValue(float f) {
+    mValue = std::fmin(1.f, f);
+    
     Size size = this->getContentSize();
     float margin2 = mMargin + (mMargin * .5f);
-    Size value = Size(size.width * f - (margin2 * 2.f), size.height - (margin2 * 2.f));
+    Size value = Size(size.width * mValue - (margin2 * 2.f), size.height - (margin2 * 2.f));
     Size value2 = Size(value.width, value.height / 2.f);
     
     if(mBar) {
@@ -89,4 +92,5 @@ void ui_progressbar::setValue(float f) {
     }
    
     this->addChild(mBar);
+    return mValue;
 }
