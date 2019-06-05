@@ -4,7 +4,7 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
                           , const Vec2 &zeroPosition
                           , const Size &size
                           , COLOR_RGB& color
-                          , COLOR_RGB& outline
+                          , COLOR_RGB& bgColor
                           , ALIGNMENT align) {
     mBar = NULL;
     mType = type;
@@ -20,20 +20,20 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
 //                         , size
 //                         , outline.getColor4F());
     
-    //bg
-    Color4F colorBG;
-    switch(mType) {
-        case UI_PROGRESSBAR_TYPE_2:
-            colorBG = Color4F::BLACK;
-            break;
-        case UI_PROGRESSBAR_TYPE_3:
-            colorBG = Color4F::WHITE;
-            break;
-        default:
-            //colorBG = color.getColor4F(COLOR_RGB_TYPE_DARK, mDarkBG);
-            colorBG = outline.getColor4F();
-            break;
-    }
+//    //bg
+//    Color4F colorBG;
+//    switch(mType) {
+//        case UI_PROGRESSBAR_TYPE_2:
+//            colorBG = Color4F::BLACK;
+//            break;
+//        case UI_PROGRESSBAR_TYPE_3:
+//            colorBG = Color4F::WHITE;
+//            break;
+//        default:
+//            //colorBG = color.getColor4F(COLOR_RGB_TYPE_DARK, mDarkBG);
+//            colorBG = bgColor.getColor4F();
+//            break;
+//    }
     
     mMargin = size.height * 0.1f;
     Size s90 = Size(size.width - (mMargin * 2.f), size.height - (mMargin * 2.f));
@@ -41,20 +41,25 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
     gui::inst()->drawRect(this
                         , Vec2(size.width / 2.f, size.height / 2.f)
                         , s90
-                        , colorBG);
+                        , bgColor.getColor4F());
 }
 
 const float ui_progressbar::setValue(float f) {
-    mValue = std::fmin(1.f, f);
-    
-    Size size = this->getContentSize();
-    float margin2 = mMargin + (mMargin * .5f);
-    Size value = Size(size.width * mValue - (margin2 * 2.f), size.height - (margin2 * 2.f));
-    Size value2 = Size(value.width, value.height / 2.f);
-    
     if(mBar) {
         this->removeChild(mBar);
     }
+    
+    mValue = std::fmin(1.f, f);
+    if(mValue <= 0.f) {
+        mValue = 0.f;
+        return mValue;
+    }
+    Size size = this->getContentSize();
+    float margin2 = mMargin;// + (mMargin * .5f);
+    
+    Size value = Size(size.width * mValue - (margin2 * 2.f), size.height - (margin2 * 2.f));
+    Size value2 = Size(value.width, value.height / 2.f);
+    
     mBar = DrawNode::create();
     switch(mType) {
         case UI_PROGRESSBAR_TYPE_0: {

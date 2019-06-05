@@ -133,7 +133,14 @@ public:
     };
     // get sprite  --------------------------------------------------------------------------------
     Sprite * getSprite(const string img) {
-      return (mUseSpriteCache == false) ? Sprite::create(img) : Sprite::createWithSpriteFrameName(img);
+        if(mUseSpriteCache) {
+            if (SpriteFrameCache::getInstance()->getSpriteFrameByName(img) == NULL)
+                SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(img)->getSpriteFrame(), img);
+            
+            return Sprite::createWithSpriteFrameName(img);
+        }
+        
+        return Sprite::create(img);
     };
     // about pixel --------------------------------------------------------------------------------
     float getRealPixel(float x);

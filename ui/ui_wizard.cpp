@@ -180,14 +180,10 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_SPRITE_BUTTON_CIRCLE;
 	else if (type.compare("loadingbar") == 0)
 		return OBJECT_TYPE_LOADINGBAR;
-    else if (type.compare("progressbar_0") == 0)
-        return OBJECT_TYPE_PROGRESSBAR_0;
-    else if (type.compare("progressbar_1") == 0)
-        return OBJECT_TYPE_PROGRESSBAR_1;
-    else if (type.compare("progressbar_2") == 0)
-        return OBJECT_TYPE_PROGRESSBAR_2;
-    else if (type.compare("progressbar_3") == 0)
-        return OBJECT_TYPE_PROGRESSBAR_3;
+    else if (type.compare("progressbar_FLAT") == 0)
+        return OBJECT_TYPE_PROGRESSBAR_FLAT;
+    else if (type.compare("progressbar") == 0)
+        return OBJECT_TYPE_PROGRESSBAR;
     else if (type.compare("roulette") == 0)
         return OBJECT_TYPE_ROULETTE;
 	else if (type.compare("circle") == 0)
@@ -969,8 +965,10 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                     , node.innerMargin
                                                 );
                 break;
-            case WIZARD::OBJECT_TYPE_PROGRESSBAR_0:
+            case WIZARD::OBJECT_TYPE_PROGRESSBAR_FLAT:
+            case WIZARD::OBJECT_TYPE_PROGRESSBAR:
             {
+                UI_PROGRESSBAR_TYPE t = (obj.type == WIZARD::OBJECT_TYPE_PROGRESSBAR_FLAT) ? UI_PROGRESSBAR_TYPE_0 : UI_PROGRESSBAR_TYPE_1;
                 Vec2 pos = gui::inst()->getPointVec2(obj.position.x
                                                      , obj.position.y
                                                      , ALIGNMENT_LEFT_BOTTOM
@@ -980,52 +978,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_0, 1.f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
-                ((ui_progressbar*)pObj)->addParent(layoutBG);
-                break;
-            }
-            case WIZARD::OBJECT_TYPE_PROGRESSBAR_1:
-            {
-                Vec2 pos = gui::inst()->getPointVec2(obj.position.x
-                                                     , obj.position.y
-                                                     , ALIGNMENT_LEFT_BOTTOM
-                                                     , layoutBG->getContentSize()
-                                                     , node.gridSize
-                                                     , Vec2::ZERO
-                                                     , Vec2::ZERO
-                                                     , node.innerMargin
-                                                     , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_1, 1.f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
-                ((ui_progressbar*)pObj)->addParent(layoutBG);
-                break;
-            }
-            case WIZARD::OBJECT_TYPE_PROGRESSBAR_2:
-            {
-                Vec2 pos = gui::inst()->getPointVec2(obj.position.x
-                                                     , obj.position.y
-                                                     , ALIGNMENT_LEFT_BOTTOM
-                                                     , layoutBG->getContentSize()
-                                                     , node.gridSize
-                                                     , Vec2::ZERO
-                                                     , Vec2::ZERO
-                                                     , node.innerMargin
-                                                     , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_2, 1.f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
-                ((ui_progressbar*)pObj)->addParent(layoutBG);
-                break;
-            }
-            case WIZARD::OBJECT_TYPE_PROGRESSBAR_3:
-            {
-                Vec2 pos = gui::inst()->getPointVec2(obj.position.x
-                                                     , obj.position.y
-                                                     , ALIGNMENT_LEFT_BOTTOM
-                                                     , layoutBG->getContentSize()
-                                                     , node.gridSize
-                                                     , Vec2::ZERO
-                                                     , Vec2::ZERO
-                                                     , node.innerMargin
-                                                     , obj.span);
-                pObj= ui_progressbar::create(UI_PROGRESSBAR_TYPE_3, 1.f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
+                pObj= ui_progressbar::create(t, 1.f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }

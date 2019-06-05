@@ -134,7 +134,7 @@ Label * guiExt::addIconHeart (Node * p, Vec2 pos, ALIGNMENT align, float fontSiz
     return label;
 }
 
-Node * guiExt::addMovingEffect(Node * p, COLOR_RGB bgColor, const string img, bool toRight) {
+Node * guiExt::addMovingEffect(Node * p, COLOR_RGB bgColor, const string img, const string text, COLOR_RGB fontColor, bool toRight) {
     auto layer = gui::inst()->createLayout(Size(p->getContentSize().width, p->getContentSize().height / 3), "", true, bgColor.getColor3B());
     gui::inst()->setAnchorPoint(layer, ALIGNMENT_LEFT);
     layer->setPosition(
@@ -160,6 +160,10 @@ Node * guiExt::addMovingEffect(Node * p, COLOR_RGB bgColor, const string img, bo
                                            , ScaleBy::create(.7f, 1 / 1.5)
                                            , NULL));
         layer->addChild(sprite);
+    }
+    
+    if(text.length() > 0) {
+        gui::inst()->addLabelAutoDimension(0, 1, text, layer, -2, ALIGNMENT_CENTER, fontColor.getColor3B(), Vec2(1,2), Vec2::ZERO, Vec2::ZERO, Vec2::ZERO)->setOpacity(fontColor.getA());
     }
     
     p->addChild(layer);

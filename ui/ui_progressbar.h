@@ -10,10 +10,8 @@
 #include "ui_color.h"
 
 enum UI_PROGRESSBAR_TYPE {
-    UI_PROGRESSBAR_TYPE_0 = 0,  // 평면, dark 배경
-    UI_PROGRESSBAR_TYPE_1,      // 입체, dark 배경
-    UI_PROGRESSBAR_TYPE_2,      // 입체, black 배경
-    UI_PROGRESSBAR_TYPE_3,      // 입체, white 배경
+    UI_PROGRESSBAR_TYPE_0 = 0,  // 평면
+    UI_PROGRESSBAR_TYPE_1,      // 입체
 };
 
 class ui_progressbar : public Layout
@@ -48,7 +46,7 @@ public:
               , const Vec2 &position
               , const Size &size
               , COLOR_RGB& color
-              , COLOR_RGB& outline
+              , COLOR_RGB& bgColor
               , ALIGNMENT align = ALIGNMENT_LEFT);
     
     void addParent(Node * p) {
