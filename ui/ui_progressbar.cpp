@@ -10,6 +10,7 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
     mType = type;
     mAlign = align;
     mColor.set(color);
+    mLockBlink = false;
     
     this->setContentSize(size);
     this->setPosition(zeroPosition);
@@ -98,4 +99,15 @@ const float ui_progressbar::setValue(float f) {
    
     this->addChild(mBar);
     return mValue;
+}
+
+void ui_progressbar::blink(float duration, int blinks) {
+    if(!mLockBlink) {
+        mLockBlink = true;
+        this->runAction(
+                        Sequence::create(Blink::create(duration, blinks)
+                                         , CallFunc::create([=]() {mLockBlink = false;})
+                                         , NULL)
+                        );
+    }
 }

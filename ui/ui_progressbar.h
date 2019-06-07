@@ -66,7 +66,7 @@ public:
             return 0.f;
         return setValue(mValue - f);
     };
-    
+    void blink(float duration = 0.5f, int blinks = 2);
 private:
     DrawNode * mBar;
     float mMargin;
@@ -78,5 +78,7 @@ private:
     const int mDarkBG = 50;
     
     float mValue;
+    
+    bool mLockBlink; //blink효과에 대한 lock
 };
 #endif /* ui_progressbar_h */
