@@ -7,7 +7,7 @@
 
 #include "PhysicsScene.h"
 
-void PhysicsScene::initPhysicsBody(Node* p, PhysicsMaterial material, bool isDebugDrawMask, float speed) {
+void PhysicsScene::initPhysicsBody(Node* p, PhysicsMaterial material, bool isDebugDrawMask, float speed, int subSteps) {
     auto edgeNode = Node::create();
     edgeNode->setPosition(gui::inst()->getCenter(p));
     PhysicsBody * physics = PhysicsBody::createEdgeBox(p->getContentSize(), material);
@@ -17,7 +17,7 @@ void PhysicsScene::initPhysicsBody(Node* p, PhysicsMaterial material, bool isDeb
     p->addChild(edgeNode);
     
     this->getPhysicsWorld()->setSpeed(speed);
-    this->getPhysicsWorld()->setSubsteps(1000);
+    this->getPhysicsWorld()->setSubsteps(subSteps);
     if(isDebugDrawMask)
         setDebugDrawMask();
 }

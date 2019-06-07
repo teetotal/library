@@ -67,7 +67,7 @@ bool ui_roulette::run(const ccMenuCallback& callback) {
     
     mEnable = false;
     // 2: 360 = d: mValue
-    auto ease = EaseIn::create(RotateBy::create(4, 360 * 3 + mValue), 0.6);
+    auto ease = EaseIn::create(RotateBy::create(5.5, 360 * 2 + mValue), 0.3f);
 //    auto seq = Sequence::create(RotateBy::create(1, 360)
 //                                , RotateBy::create(1.2, 360)
 //                                , RotateBy::create(1.5, 360)

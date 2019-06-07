@@ -15,8 +15,8 @@ using namespace std;
 
 class guiExt {
 public:
-    static DrawNode * drawCircleForPhysics (Node * p, Vec2 center, float radius, COLOR_RGB& color);
-    static DrawNode * drawRectForPhysics(Node * p, Vec2 pos, Size size, COLOR_RGB& color, bool isSolid = true, float thick = .1f);
+    static DrawNode * drawCircleForPhysics (Node * p, Vec2 center, float radius, COLOR_RGB color);
+    static DrawNode * drawRectForPhysics(Node * p, Vec2 pos, Size size, COLOR_RGB color, bool isSolid = true, float thick = .1f);
     static DrawNode * drawRectRoundShadow  (Node * p, Vec2 pos, Size size, COLOR_RGB& color);
     static ui_roulette * addRoulette(Node * p, Size size, Vec2 center, COLOR_RGB& color, COLOR_RGB& bg, const string sz);
     static Layout * addIconCircle (Node * p, Vec2 center, float radius, const string sz, COLOR_RGB& color);

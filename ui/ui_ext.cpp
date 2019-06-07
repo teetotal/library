@@ -5,7 +5,7 @@
 /*
  drawCircleForPhysics
  */
-DrawNode * guiExt::drawCircleForPhysics(Node * p, Vec2 pos, float radius, COLOR_RGB& color){
+DrawNode * guiExt::drawCircleForPhysics(Node * p, Vec2 pos, float radius, COLOR_RGB color){
     auto draw = DrawNode::create();
     draw->drawDot(Vec2(radius, radius), radius, color.getColor4F());
     
@@ -31,14 +31,14 @@ DrawNode * guiExt::drawCircleForPhysics(Node * p, Vec2 pos, float radius, COLOR_
 /*
  drawRectForPhysics
  */
-DrawNode * guiExt::drawRectForPhysics(Node * p, Vec2 pos, Size size, COLOR_RGB& color, bool isSolid, float thick){
+DrawNode * guiExt::drawRectForPhysics(Node * p, Vec2 pos, Size size, COLOR_RGB color, bool isSolid, float thick){
     auto draw = DrawNode::create();
     if(isSolid) {
         draw->drawSolidRect(Vec2::ZERO, size, color.getColor4F());
         
         Color4F line = color.getColorDark().getColor4F();
         
-        for(float n=0; n < thick; n = n+ 0.1) {
+        for(float n=0; n < thick; n = n + 0.1f) {
             draw->drawLine(Vec2(size.width, size.height - n), Vec2(0, size.height - n), line);
             draw->drawLine(Vec2(n, size.height), Vec2(n, 0.f), line);
             
