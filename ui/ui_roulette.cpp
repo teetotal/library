@@ -66,15 +66,20 @@ bool ui_roulette::run(const ccMenuCallback& callback) {
     mLayerSquare->setRotation(0);
     
     mEnable = false;
-    // 2: 360 = d: mValue
-    auto ease = EaseIn::create(RotateBy::create(5, 360 * 2 + mValue), 0.4f);
+    // 3: 720 = d: mValue
+//    auto ease = EaseIn::create(RotateBy::create(3 * mValue / 720, mValue), 0.1f);
 //    auto seq = Sequence::create(RotateBy::create(1, 360)
 //                                , RotateBy::create(1.2, 360)
 //                                , RotateBy::create(1.5, 360)
 //                                , RotateBy::create(mValue * 2 / 360, mValue)
 //                                , CallFunc::create(callback)
 //                                , NULL);
-    auto seq = Sequence::create(ease
+    auto seq = Sequence::create(RotateBy::create(1.5, 360 + 180)
+                                , RotateBy::create(1.1, 180)
+                                , RotateBy::create(1.2, 180)
+                                , RotateBy::create(1.3, 180)
+                                , RotateBy::create(1.4, mValue / 2)
+                                , RotateBy::create(2, mValue / 2)
                                 , DelayTime::create(.5f)
                                 , CallFunc::create([=](){ callback(this); })
                                 , NULL);
