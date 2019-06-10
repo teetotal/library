@@ -134,7 +134,14 @@ Label * guiExt::addIconHeart (Node * p, Vec2 pos, ALIGNMENT align, float fontSiz
     return label;
 }
 
-Node * guiExt::addMovingEffect(Node * p, COLOR_RGB bgColor, const string img, const string text, COLOR_RGB fontColor, bool toRight) {
+Node * guiExt::addMovingEffect(Node * p
+                               , COLOR_RGB bgColor
+                               , const string img
+                               , const string text
+                               , COLOR_RGB fontColor
+                               , bool toRight
+                               , float speed
+                               , CallFunc * pCallFunc) {
     auto layer = gui::inst()->createLayout(Size(p->getContentSize().width, p->getContentSize().height / 3), "", true, bgColor.getColor3B());
     gui::inst()->setAnchorPoint(layer, ALIGNMENT_LEFT);
     layer->setPosition(
@@ -142,28 +149,44 @@ Node * guiExt::addMovingEffect(Node * p, COLOR_RGB bgColor, const string img, co
                        );
     layer->setOpacity(bgColor.getA());
     
-    auto center = MoveTo::create(.2f, Vec2(0, p->getContentSize().height / 2.f));
-    auto left = MoveTo::create(.2f, Vec2(p->getContentSize().width * -1.f, p->getContentSize().height / 2.f));
-    auto right = MoveTo::create(.2f, Vec2(p->getContentSize().width * 1.f, p->getContentSize().height / 2.f));
+    auto center = MoveTo::create(.2f * speed, Vec2(0, p->getContentSize().height / 2.f));
+    auto left = MoveTo::create(.2f * speed, Vec2(p->getContentSize().width * -1.f, p->getContentSize().height / 2.f));
+    auto right = MoveTo::create(.2f * speed, Vec2(p->getContentSize().width * 1.f, p->getContentSize().height / 2.f));
     
     layer->runAction(Sequence::create( center
-                                      , DelayTime::create(0.5f)
+                                      , DelayTime::create(0.5f * speed)
                                       , toRight ? right : left
                                       , RemoveSelf::create()
+                                      , pCallFunc
                                       , NULL));
+    Vec2 gridText = Vec2(1,1);
+    int posText = 0;
+    int fontSize = -3;
     
     if(img.length() > 0) {
         auto sprite = gui::inst()->getSprite(img);
         gui::inst()->setScaleByHeight(sprite, layer->getContentSize().height / 2.f);
         sprite->setPosition(gui::inst()->getCenter(layer));
-        sprite->runAction(Sequence::create(ScaleBy::create(.7f, 1.5)
-                                           , ScaleBy::create(.7f, 1 / 1.5)
+        sprite->runAction(Sequence::create(ScaleBy::create(.7f * speed, 1.5)
+                                           , ScaleBy::create(.7f * speed, 1 / 1.5)
                                            , NULL));
         layer->addChild(sprite);
+        gridText = Vec2(1,2);
+        posText = 1;
+        fontSize = -2;
     }
     
     if(text.length() > 0) {
-        gui::inst()->addLabelAutoDimension(0, 1, text, layer, -2, ALIGNMENT_CENTER, fontColor.getColor3B(), Vec2(1,2), Vec2::ZERO, Vec2::ZERO, Vec2::ZERO)->setOpacity(fontColor.getA());
+        auto txt = gui::inst()->addLabelAutoDimension(0, posText, text, layer, fontSize, ALIGNMENT_CENTER, fontColor.getColor3B(), gridText, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO);
+        txt->enableGlow(Color4B::BLACK);
+        if(img.length() == 0) {
+             
+             txt->runAction(Sequence::create(ScaleBy::create(.7f * speed, 1.5)
+                                                , ScaleBy::create(.7f * speed, 1 / 1.5)
+                                                , NULL));
+         } else {
+             txt->setOpacity(fontColor.getA());
+         }
     }
     
     p->addChild(layer);

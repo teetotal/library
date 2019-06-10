@@ -60,6 +60,7 @@ Node * PhysicsScene::setPhysicsBodyRect(Node * p, PhysicsMaterial material, bool
     body->setContactTestBitmask(bitmaskContact);
     body->setTag(tag);
     p->setPhysicsBody(body);
+    p->setTag(tag);
     return p;
 }
 
