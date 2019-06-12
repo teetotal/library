@@ -48,6 +48,8 @@ void gui::init(const char* font, int fontSize, Color4F bgColor, bool useSpriteCa
     Director::getInstance()->setClearColor(bgColor);
 
 	mUseSpriteCache = useSpriteCache;
+    
+    std::srand ((unsigned)time(nullptr));
 }
 // about pixel --------------------------------------------------------------------------------
 float gui::getRealPixel(float x){
