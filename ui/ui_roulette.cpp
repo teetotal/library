@@ -74,12 +74,17 @@ bool ui_roulette::run(const ccMenuCallback& callback) {
 //                                , RotateBy::create(mValue * 2 / 360, mValue)
 //                                , CallFunc::create(callback)
 //                                , NULL);
-    auto seq = Sequence::create(RotateBy::create(1.5, 360 + 180)
-                                , RotateBy::create(1.1, 180)
+    //    180: 1.4 = half : s
+    // 1.4 * half / 180
+    float half = mValue / 2.f;
+    float halfDuration1 = 1.8f * half / 180;
+    float halfDuration2 = 2.0f * half / 180;
+    
+    auto seq = Sequence::create(RotateBy::create(1, 360)
+                                , RotateBy::create(1, 180)
                                 , RotateBy::create(1.2, 180)
-                                , RotateBy::create(1.3, 180)
-                                , RotateBy::create(1.4, mValue / 2)
-                                , RotateBy::create(2, mValue / 2)
+                                , RotateBy::create(halfDuration1, half)
+                                , RotateBy::create(halfDuration2, half)
                                 , DelayTime::create(.5f)
                                 , CallFunc::create([=](){ callback(this); })
                                 , NULL);

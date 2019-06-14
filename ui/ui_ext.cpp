@@ -193,3 +193,14 @@ Node * guiExt::addMovingEffect(Node * p
     
     return layer;
 }
+
+void guiExt::addVibrateEffect(Node * p, CallFunc * pCallFunc, float duration, float width) {
+    Vec2 pos = p->getPosition();
+    p->runAction(Sequence::create( MoveTo::create(duration, Vec2(pos.x - width, pos.y - width))
+                                      , MoveTo::create(duration, Vec2(pos.x + width, pos.y + width))
+                                      , MoveTo::create(duration, Vec2(pos.x - width, pos.y))
+                                      , MoveTo::create(duration, Vec2(pos.x + width, pos.y))
+                                      , MoveTo::create(duration, pos)
+                                      , pCallFunc
+                                      , NULL));
+}

@@ -30,5 +30,6 @@ public:
                                   , float speed = 1.f                   //default speed를 얼마나 빠르고 느리게 하는가
                                   , CallFunc * pCallFunc = NULL         // 효과 이후 콜백을 받기 위해
                                   );
+    static void addVibrateEffect(Node * p, CallFunc * pCallFunc = NULL, float duration = 0.1f, float width = 5.f);
 };
 #endif //_UI_EXT_H
