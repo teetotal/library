@@ -39,7 +39,8 @@ public:
               , Vec2 center
               , COLOR_RGB& color
               , COLOR_RGB& colorBG
-              , const string szStart);
+              , const string szStart
+              , bool isDebug = false);
     
     void clear() {
         mItemsIdx = 0;

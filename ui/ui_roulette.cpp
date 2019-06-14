@@ -8,7 +8,8 @@ void ui_roulette::init(Size size
                        , Vec2 center
                        , COLOR_RGB& color
                        , COLOR_RGB& colorBG
-                       , const string szStart)
+                       , const string szStart
+                       , bool isDebug)
 {
     mThis = this;
     mItemsIdx = 0;
@@ -22,7 +23,12 @@ void ui_roulette::init(Size size
     
     mRadius = (size.width > size.height) ? size.height: size.width;
     
-    mLayerSquare = gui::inst()->createLayout(Size(mRadius, mRadius), "", false, Color3B::WHITE);
+    if(isDebug) {
+        this->setBackGroundColor(Color3B::MAGENTA);
+        this->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
+    }
+    
+    mLayerSquare = gui::inst()->createLayout(Size(mRadius, mRadius), "", isDebug, Color3B::WHITE);
     gui::inst()->setAnchorPoint(mLayerSquare, ALIGNMENT_CENTER);
     mLayerSquare->setPosition(Vec2(size.width / 2.f, size.height / 2.f));
     this->addChild(mLayerSquare);
@@ -31,10 +37,16 @@ void ui_roulette::init(Size size
     float len = mRadius * 0.1f;
     Vec2 l,r,c, t;
     Vec2 centerInner = Vec2(size.width / 2.f, size.height / 2.f);
-    c = Vec2(centerInner.x, centerInner.y * 2.f - len * 2.f);
-    l = Vec2(centerInner.x - len, centerInner.y * 2.f);
-    r = Vec2(centerInner.x + len, centerInner.y * 2.f);
-    t = Vec2(centerInner.x, centerInner.y * 2.f);
+    
+//    c = Vec2(centerInner.x, centerInner.y * 2.f - len * 2.f);
+//    l = Vec2(centerInner.x - len, centerInner.y * 2.f);
+//    r = Vec2(centerInner.x + len, centerInner.y * 2.f);
+//    t = Vec2(centerInner.x, centerInner.y * 2.f);
+    float heightSquare = (mLayerSquare->getContentSize().height / 2.f) + centerInner.y;
+    c = Vec2(centerInner.x, heightSquare - (len * 2.f));
+    l = Vec2(centerInner.x - len, heightSquare);
+    r = Vec2(centerInner.x + len, heightSquare);
+    t = Vec2(centerInner.x, heightSquare);
     
     mCenter = Vec2(mRadius, mRadius);
     
