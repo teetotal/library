@@ -48,6 +48,8 @@ namespace WIZARD {
         OBJECT_TYPE_ICON_HEART,
         
         OBJECT_TYPE_COMPONENT,
+        
+        OBJECT_TYPE_LAYER,
 	};
     
     struct _base {

@@ -204,6 +204,8 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_ICON_HEART;
     else if (type.compare("component") == 0)
         return OBJECT_TYPE_COMPONENT;
+    else if (type.compare("layer") == 0)
+        return OBJECT_TYPE_LAYER;
     
 	return OBJECT_TYPE_LABEL;
 }
@@ -1035,6 +1037,22 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 Vec2 pos = gui::inst()->getPointVec2(obj.position.x
                                                      , obj.position.y
                                                      , ALIGNMENT_LEFT_BOTTOM
+                                                     , layoutBG->getContentSize()
+                                                     , node.gridSize
+                                                     , Vec2::ZERO
+                                                     , Vec2::ZERO
+                                                     , node.innerMargin
+                                                     , obj.span);
+                pObj->setPosition(pos);
+                layoutBG->addChild(pObj);
+                break;
+            }
+            case WIZARD::OBJECT_TYPE_LAYER:
+            {
+                pObj = gui::inst()->createLayout(gridSizeWithSpanWithMargin, obj.img, true, obj.color);
+                gui::inst()->setAnchorPoint(pObj, ALIGNMENT_LEFT_TOP);
+                auto pos = gui::inst()->getPointVec2(obj.position.x, obj.position.y
+                                                     , ALIGNMENT_LEFT_TOP
                                                      , layoutBG->getContentSize()
                                                      , node.gridSize
                                                      , Vec2::ZERO
