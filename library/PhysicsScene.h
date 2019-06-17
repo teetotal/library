@@ -50,7 +50,7 @@ class PhysicsScene : public Scene {
 public:
     
 protected:
-    void initPhysicsBody(Node * p, PhysicsMaterial material, bool isDebugDrawMask = false, float speed = 2.f, int subSteps = 10);
+    void initPhysicsBody(Node * p, PhysicsMaterial material, bool isDebugDrawMask = false, float speed = 2.f, int subSteps = 100);
     void setDebugDrawMask();
     void setAutoStepToggle();
     void setStep(float step);
