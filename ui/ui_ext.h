@@ -31,5 +31,7 @@ public:
                                   , CallFunc * pCallFunc = NULL         // 효과 이후 콜백을 받기 위해
                                   );
     static void addVibrateEffect(Node * p, CallFunc * pCallFunc = NULL, float duration = 0.1f, float width = 5.f);
+    static void addScaleEffect(Node * p, const string img, const string text = "", COLOR_RGB fontColor = COLOR_RGB() , CallFunc * pCallFunc = NULL, float duration = 0.4f, float sizePerWidth = .4f);
+    static void runScaleEffect(Node * p, CallFunc * pCallFunc = NULL, float duration = 0.4f, bool isRemoveSelf = false);
 };
 #endif //_UI_EXT_H

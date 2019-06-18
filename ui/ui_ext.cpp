@@ -149,26 +149,27 @@ Node * guiExt::addMovingEffect(Node * p
                        );
     layer->setOpacity(bgColor.getA());
     
-    auto center = MoveTo::create(.2f * speed, Vec2(0, p->getContentSize().height / 2.f));
-    auto left = MoveTo::create(.2f * speed, Vec2(p->getContentSize().width * -1.f, p->getContentSize().height / 2.f));
-    auto right = MoveTo::create(.2f * speed, Vec2(p->getContentSize().width * 1.f, p->getContentSize().height / 2.f));
+    auto center = EaseBackIn::create(MoveTo::create(.4f * speed, Vec2(0, p->getContentSize().height / 2.f)));
+    auto left = EaseBackOut::create(MoveTo::create(.4f * speed, Vec2(p->getContentSize().width * -1.f, p->getContentSize().height / 2.f)));
+    auto right = EaseBackOut::create(MoveTo::create(.4f * speed, Vec2(p->getContentSize().width * 1.f, p->getContentSize().height / 2.f)));
     
     layer->runAction(Sequence::create( center
-                                      , DelayTime::create(0.5f * speed)
+                                      , DelayTime::create(.4f * speed)
                                       , toRight ? right : left
                                       , RemoveSelf::create()
                                       , pCallFunc
                                       , NULL));
     Vec2 gridText = Vec2(1,1);
     int posText = 0;
-    int fontSize = -3;
+    int fontSize = -2;
     
     if(img.length() > 0) {
         auto sprite = gui::inst()->getSprite(img);
         gui::inst()->setScaleByHeight(sprite, layer->getContentSize().height / 2.f);
         sprite->setPosition(gui::inst()->getCenter(layer));
-        sprite->runAction(Sequence::create(ScaleBy::create(.7f * speed, 1.5)
-                                           , ScaleBy::create(.7f * speed, 1 / 1.5)
+        sprite->runAction(Sequence::create(DelayTime::create(0.4f * speed)
+                                           , ScaleBy::create(.2f * speed, 1.5)
+                                           , ScaleBy::create(.2f * speed, 1 / 1.5)
                                            , NULL));
         layer->addChild(sprite);
         gridText = Vec2(1,2);
@@ -181,9 +182,10 @@ Node * guiExt::addMovingEffect(Node * p
         txt->enableGlow(Color4B::BLACK);
         if(img.length() == 0) {
              
-             txt->runAction(Sequence::create(ScaleBy::create(.7f * speed, 1.5)
-                                                , ScaleBy::create(.7f * speed, 1 / 1.5)
-                                                , NULL));
+            txt->runAction(Sequence::create(DelayTime::create(.4f * speed)
+                                            ,ScaleBy::create(.2f * speed, 1.5)
+                                            , ScaleBy::create(.2f * speed, 1 / 1.5)
+                                            , NULL));
          } else {
              txt->setOpacity(fontColor.getA());
          }
@@ -203,4 +205,63 @@ void guiExt::addVibrateEffect(Node * p, CallFunc * pCallFunc, float duration, fl
                                       , MoveTo::create(duration, pos)
                                       , pCallFunc
                                       , NULL));
+}
+
+void guiExt::addScaleEffect(Node * p, const string img, const string text, COLOR_RGB fontColor, CallFunc * pCallFunc, float duration, float sizeRatio) {
+    Size size = p->getContentSize();
+    size.width *= sizeRatio;
+    size.height *= sizeRatio;
+    
+    float min = fmin(size.width, size.height);
+    
+    auto layer = gui::inst()->createLayout(size);
+    gui::inst()->setAnchorPoint(layer, ALIGNMENT_CENTER);
+    Vec2 center = gui::inst()->getCenter(p);
+//    layer->setPosition(Vec2(center.x - layer->getContentSize().width / 2, center.y - layer->getContentSize().height / 2));
+    layer->setPosition(center);
+    
+    Vec2 grid = Vec2(1, 1);
+    Vec2 position = Vec2::ZERO;
+    float fontSize = -1;
+    
+    if(img.size() > 0) {
+        auto pImg = gui::inst()->getSprite(img);
+        gui::inst()->setScale(pImg, min);
+        pImg->setPosition(gui::inst()->getCenter(layer));
+        layer->addChild(pImg);
+        grid.y++;
+        position.y++;
+        fontSize--;
+    }
+    
+    if(text.size() > 0) {
+        auto label = gui::inst()->addLabelAutoDimension(position.x, position.y, text, layer, fontSize, ALIGNMENT_CENTER, fontColor.getColor3B(), grid, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO);
+        label->enableGlow(Color4B::BLACK);
+        label->setOpacity(fontColor.getA());
+    }
+    
+    runScaleEffect(layer, pCallFunc, duration, true);
+    
+    p->addChild(layer);
+}
+
+void guiExt::runScaleEffect(Node * p, CallFunc * pCallFunc, float duration, bool isRemoveSelf) {
+    Vector<FiniteTimeAction *> actions;
+    actions.pushBack(EaseBackIn::create(ScaleTo::create(duration, 1.5f)));
+    actions.pushBack(EaseBackOut::create(ScaleTo::create(duration, 1.f)));
+    if(isRemoveSelf)
+        actions.pushBack(RemoveSelf::create());
+    if(pCallFunc)
+        actions.pushBack(pCallFunc);
+    
+    Sequence * seq = Sequence::create(actions);
+    p->runAction(seq);
+    
+//    p->runAction(Sequence::create(
+//                                  EaseBackIn::create(ScaleTo::create(duration, 1.5f))
+//                                  , EaseBackOut::create(ScaleTo::create(duration, 1.f))
+//                                  , RemoveSelf::create()
+//                                  , pCallFunc
+//                                  , NULL));
+  
 }

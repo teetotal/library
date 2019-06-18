@@ -56,9 +56,9 @@ protected:
     void setStep(float step);
     void setGravity(const Vec2& gravity);
     
-    Node * setPhysicsBodyRect(Node * p, PhysicsMaterial material, bool dynamic = true, int tag = 0, int bitmaskCategory=0xFFFFFFFF, int bitmaskCollision=0xFFFFFFFF, int bitmaskContact=0);	
+    Node * setPhysicsBodyRect(Node * p, PhysicsMaterial material, bool dynamic = true, int tag = 0, int bitmaskCategory=0xFFFFFFFF, int bitmaskCollision=0xFFFFFFFF, int bitmaskContact=0xFFFFFFFF);	
     
-    Node * setPhysicsBodyCircle(Node * p, PhysicsMaterial material, bool dynamic = true, int tag = 0, int bitmaskCategory=0xFFFFFFFF, int bitmaskCollision=0xFFFFFFFF, int bitmaskContact=0);
+    Node * setPhysicsBodyCircle(Node * p, PhysicsMaterial material, bool dynamic = true, int tag = 0, int bitmaskCategory=0xFFFFFFFF, int bitmaskCollision=0xFFFFFFFF, int bitmaskContact=0xFFFFFFFF);
     
     struct bitmask {
         int categoryA;
