@@ -704,6 +704,35 @@ DrawNode * gui::drawRectRound (Node * p, Vec2 pos, Size size, Color4F color){
     return draw;
 }
 
+DrawNode * gui::drawRectCircle(Node * p, Vec2 pos, Size size, Color4F color, DrawNode * draw) {
+    if(draw == NULL)
+        draw = DrawNode::create();
+    
+    float radius = size.height / 2.f;
+    Vec2 start = Vec2(pos.x - size.width / 2, pos.y - size.height / 2);
+    
+    Vec2 left = Vec2(start.x + radius, start.y + radius);
+    Vec2 right = Vec2(start.x + size.width - radius, start.y + radius);
+    
+    draw->drawDot(left, radius, color);
+    draw->drawDot(right, radius, color);
+    draw->drawSolidRect(Vec2(left.x, start.y), Vec2(right.x, start.y + size.height), color);
+    
+    if(p)
+        p->addChild(draw);
+    return draw;
+}
+// 아래쪽 여백이 좀더 많게 보이는 문제
+DrawNode * gui::drawRectCircleButton (Node * p, Vec2 pos,    Size size,      Color4F color1,      Color4F color2,      Color4F color3) {
+    auto draw = drawRectCircle(p, pos, size, color1);
+    float innerMargin = size.height * 0.1f;
+    Size innerSize = Size(size.width - innerMargin, size.height - innerMargin -1);
+    draw = drawRectCircle(NULL, Vec2(pos.x, pos.y - 0), innerSize, color2, draw);
+    draw = drawRectCircle(NULL, Vec2(pos.x, pos.y + 1), Size(innerSize.width, innerSize.height -1), color3, draw);
+    
+    return draw;
+}
+
 DrawNode * gui::drawDiamond(Node * p, Vec2 pos, Size size, Color4F color){
     auto draw = DrawNode::create();
     

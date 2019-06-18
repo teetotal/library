@@ -414,6 +414,8 @@ public:
     DrawNode * drawRect             (Node * p, Vec2 pos,    Size size,      Color4F color,  bool isSolid = true);
     DrawNode * drawRect             (Node * p, Vec2 pos1,   Vec2 pos2,      Vec2 pos3,  Vec2 pos4, Color4F color);
     DrawNode * drawRectRound        (Node * p, Vec2 pos,    Size size,      Color4F color);
+    DrawNode * drawRectCircle       (Node * p, Vec2 pos,    Size size,      Color4F color, DrawNode * draw = NULL);
+    DrawNode * drawRectCircleButton (Node * p, Vec2 pos,    Size size,      Color4F color1,      Color4F color2,      Color4F color3);
     DrawNode * drawDiamond          (Node * p, Vec2 pos,    Size size,      Color4F color);
     float drawDiamond               (Node * p, Vec2 center, float h,        float degrees,  Color4F color);
     void drawDiamondTile            (Node * p, Vec2 counts, Color4F color);
