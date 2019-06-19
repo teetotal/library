@@ -67,6 +67,7 @@ public:
         return setValue(mValue - f);
     };
     void blink(float duration = 0.5f, int blinks = 2);
+    void setText(const string sz);
 private:
     DrawNode * mBar;
     float mMargin;
@@ -78,7 +79,15 @@ private:
     const int mDarkBG = 50;
     
     float mValue;
+    Label * mLabel;
     
     bool mLockBlink; //blink효과에 대한 lock
+    
+    enum ZORDER {
+        ZORDER_BG = 0,
+        ZORDER_VALUE = 1,
+        ZORDER_TEXT,
+        ZORDER_PERCENTAGE
+    };
 };
 #endif /* ui_progressbar_h */

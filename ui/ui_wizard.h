@@ -24,6 +24,8 @@ namespace WIZARD {
 		OBJECT_TYPE_BUTTON,
         OBJECT_TYPE_BUTTON_SPRITE,
         OBJECT_TYPE_BUTTON_CIRCLE,
+        OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_1, //no outline
+        OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_2, // white outline
         OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW,
         
 		OBJECT_TYPE_SPRITE,
@@ -46,6 +48,7 @@ namespace WIZARD {
         
         OBJECT_TYPE_ICON_CIRCLE,
         OBJECT_TYPE_ICON_HEART,
+        OBJECT_TYPE_ICON_POINT,
         
         OBJECT_TYPE_COMPONENT,
         
@@ -69,8 +72,9 @@ namespace WIZARD {
         string img_selected;
         
         Color3B color, color_second;
-		GLubyte opacity, opacity_second;
+        GLubyte opacity, opacity_second;
         
+        COLOR_RGB color1, color2;
         COLOR_RGB bgColor, bgColor_second;
         
 		string text;
@@ -246,6 +250,7 @@ protected:
 	};
 	virtual void callback(cocos2d::Ref* pSender, int from, int link) = 0;
 	virtual const string getText(const string& defaultString, int id) = 0;
+    virtual const float getProgressValue(int id) = 0;
     
     virtual void cleanup() override {
         mNodeMap.clear();

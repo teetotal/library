@@ -1,7 +1,6 @@
 #include "ui_ext.h"
 
 #define _OPACITY    0.05f
-#define SYSTEM_FONT_NAME "Helvetica"
 /*
  drawCircleForPhysics
  */
@@ -83,56 +82,102 @@ ui_roulette * guiExt::addRoulette(Node * p, Size size, Vec2 center, COLOR_RGB& c
 /*
  addIconCircle
  */
-Layout * guiExt::addIconCircle (Node * p, Vec2 center, float radius, const string sz, COLOR_RGB& color) {
-    auto layer = Layout::create();
-    layer->setContentSize(Size(radius * 2.f, radius * 2.f));
-    layer->setPosition(center);
-    gui::inst()->setAnchorPoint(layer, ALIGNMENT_CENTER);
-    
-    Color4F colorOut, colorInner, colorOutline;
-    Color3B colorText;
-    colorOut = color.getColorDark().getColor4F();
-    colorInner = color.getColor4F();
-    colorOutline = color.getColorDark().getColorDark().getColor4F();
-    colorText = color.getColorDark().getColorDark().getColor3B();
-    
-    auto draw = DrawNode::create();
-    Vec2 centerInner = Vec2(radius, radius);
-    
-    //outline
-//    draw->drawDot(centerInner, radius, colorOutline);
-    
-    //outcircle
-    draw->drawDot(centerInner, radius - .1, colorOut);
-    
-    //inner circle
-    draw->drawDot(centerInner, radius * 0.8f, colorInner);
-    
-    //text
-    float fontSize = gui::inst()->getFontSize(layer->getContentSize(), 0.75f);
-    auto label = Label::createWithSystemFont(sz, SYSTEM_FONT_NAME, fontSize);
-    label->setColor(colorText);
-    gui::inst()->setAnchorPoint(label, ALIGNMENT_CENTER);
-    label->setPosition(centerInner);
-    
-    layer->addChild(draw);
-    layer->addChild(label);
-    p->addChild(layer);
-    return layer;
-}
+//Layout * guiExt::addIconCircle (Node * p, Vec2 pos, ALIGNMENT align, float radius, const string sz, COLOR_RGB color, const string szText, COLOR_RGB colorText) {
+//
+//    Size sizeCircle = Size(radius * 2.f, radius * 2.f);
+//    Size size = sizeCircle;
+//
+//    Color4F colorOut, colorInner, colorOutline;
+//    Color3B colorSymbol;
+//    colorOut = color.getColorDark().getColor4F();
+//    colorInner = color.getColor4F();
+//    colorOutline = color.getColorDark().getColorDark().getColor4F();
+//    colorSymbol = color.getColorDark().getColorDark().getColor3B();
+//
+//    auto draw = DrawNode::create();
+//    Vec2 centerInner = Vec2(radius, radius);
+//
+//    //outline
+////    draw->drawDot(centerInner, radius, colorOutline);
+//
+//    //outcircle
+//    draw->drawDot(centerInner, radius - .1, colorOut);
+//
+//    //inner circle
+//    draw->drawDot(centerInner, radius * 0.8f, colorInner);
+//
+//    //circle text
+//    float fontSize = gui::inst()->getFontSizeDefine(sizeCircle, -1);
+//    auto label = Label::createWithSystemFont(sz, SYSTEM_FONT_NAME, fontSize);
+//    label->setColor(colorSymbol);
+//    gui::inst()->setAnchorPoint(label, ALIGNMENT_CENTER);
+//    label->setPosition(centerInner);
+//
+//    Label * labelText = NULL;
+//    //text
+//    if(szText.size() > 0) {
+//        float fontSizeText = gui::inst()->getFontSizeDefine(sizeCircle, 0);
+//        labelText = Label::createWithTTF(szText, gui::inst()->mDefaultFont, fontSizeText);
+//        labelText->setColor(colorText.getColor3B());
+//        gui::inst()->setAnchorPoint(labelText, ALIGNMENT_LEFT_BOTTOM);
+//        labelText->setPosition(Vec2(sizeCircle.width, 0));
+//
+//        size.width += labelText->getContentSize().width;
+//    }
+//
+//    auto layer = Layout::create();
+////    layer->setBackGroundColor(Color3B::MAGENTA);
+////    layer->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
+//    layer->setContentSize(size);
+//
+//    layer->addChild(draw);
+//    layer->addChild(label);
+//
+//    if(labelText)
+//        layer->addChild(labelText);
+//
+//    layer->setPosition(pos);
+//    gui::inst()->setAnchorPoint(layer, align);
+//
+//
+//    p->addChild(layer);
+//    return layer;
+//}
  /*
   addIconHeart
   */
-Label * guiExt::addIconHeart (Node * p, Vec2 pos, ALIGNMENT align, float fontSize, COLOR_RGB& color) {
-    auto label = Label::createWithSystemFont("♥", SYSTEM_FONT_NAME, fontSize);
-//    label->setColor(color.getColor3B());
-    gui::inst()->setAnchorPoint(label, align);
-    label->setPosition(pos);
-//    label->enableGlow(color.getColorDark().getColor4B());
-    
-    p->addChild(label);
-    return label;
-}
+//Layout * guiExt::addIconHeart (Node * p, Vec2 pos, ALIGNMENT align, float fontSize, COLOR_RGB color, const string sz) {
+//    auto layer = Layout::create();
+//    auto labelHeart = Label::createWithSystemFont("♥", SYSTEM_FONT_NAME, fontSize);
+//    gui::inst()->setAnchorPoint(labelHeart, ALIGNMENT_LEFT_BOTTOM);
+//    labelHeart->setPosition(Vec2::ZERO);
+//    Size size = labelHeart->getContentSize();
+//
+//    if(sz.size() > 0) {
+//        auto label = Label::createWithTTF(sz, gui::inst()->mDefaultFont, fontSize);
+//        label->setColor(color.getColor3B());
+//        gui::inst()->setAnchorPoint(label, ALIGNMENT_LEFT_BOTTOM);
+//        label->setPosition(Vec2(size.width, 0));
+//
+//        size.width += label->getContentSize().width;
+//        layer->setContentSize(size);
+//
+//
+//        layer->addChild(labelHeart);
+//        layer->addChild(label);
+//    } else {
+//        layer->setContentSize(size);
+//        layer->addChild(labelHeart);
+//    }
+//
+//    layer->setPosition(pos);
+//    gui::inst()->setAnchorPoint(layer, align);
+//
+////    label->enableGlow(color.getColorDark().getColor4B());
+//
+//    p->addChild(layer);
+//    return layer;
+//}
 
 Node * guiExt::addMovingEffect(Node * p
                                , COLOR_RGB bgColor
@@ -264,4 +309,32 @@ void guiExt::runScaleEffect(Node * p, CallFunc * pCallFunc, float duration, bool
 //                                  , pCallFunc
 //                                  , NULL));
   
+}
+
+void guiExt::runFlyEffect(Node * p, CallFunc * pCallFunc, float duration) {
+    Spawn * spawn = Spawn::create(MoveBy::create(duration, Vec2(5, 10))
+                                  , FadeOut::create(duration)
+                                  , NULL
+                                  );
+    Sequence * seq = Sequence::create(spawn, RemoveSelf::create(), pCallFunc, NULL);
+    p->runAction(seq);
+}
+
+DrawNode * guiExt::drawRectCircleButton(Node * p, Vec2 pos, Size size, COLOR_RGB colorFront, COLOR_RGB colorBack) {
+    DrawNode * draw;
+    Size innerSize;
+    if(colorBack.isValidColor) {
+        draw = gui::inst()->drawRectCircle(p, pos, size, colorBack.getColor4F());
+        float innerMargin = size.height * 0.1f;
+        innerSize = Size(size.width - innerMargin, size.height - innerMargin);
+        draw = gui::inst()->drawRectCircle(NULL, Vec2(pos.x, pos.y), innerSize, colorFront.getColorDark().getColor4F(), draw);
+    } else {
+        draw = gui::inst()->drawRectCircle(p, pos, size, colorFront.getColorDark().getColor4F());
+        innerSize = size;
+    }
+    
+    float shadowMargin = innerSize.height * 0.1f;
+    draw = gui::inst()->drawRectCircle(NULL, Vec2(pos.x, pos.y + (shadowMargin / 2.f)), Size(innerSize.width, innerSize.height - shadowMargin), colorFront.getColor4F(), draw);
+    
+    return draw;
 }

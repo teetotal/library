@@ -5,8 +5,12 @@
 #include "ui_wizard.h"
 #include "ui_progressbar.h"
 #include "ui_roulette.h"
+#include "ui_icon.h"
 #include "ui_ext.h"
 #include "../library/util.h"
+
+#define POINT_CHAR   "P"
+#define POINT_COLOR  "YELLOW"
 
 ui_wizard_share * ui_wizard_share::hInstance = NULL;
 
@@ -137,7 +141,7 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
     
     CCLOG("WIZARD::_Object::load color");
     if (p.HasMember("color") && !p["color"].IsNull()) {
-        COLOR_RGB color1, color2;
+        //COLOR_RGB color1, color2;
         getColorFromJson(p["color"], &color1, &color2);
         this->color = color1.getColor3B();
         this->opacity = color1.getA();
@@ -168,6 +172,10 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_BUTTON_SPRITE;
     else if (type.compare("button_circle") == 0)
         return OBJECT_TYPE_BUTTON_CIRCLE;
+    else if (type.compare("button_rectangle_circle_shadow_1") == 0)
+        return OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_1;
+    else if (type.compare("button_rectangle_circle_shadow_2") == 0)
+        return OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_2;
     else if (type.compare("button_rectangle_round_shadow") == 0)
         return OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW;
 	else if (type.compare("sprite") == 0)
@@ -202,6 +210,8 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_ICON_CIRCLE;
     else if (type.compare("icon_heart") == 0)
         return OBJECT_TYPE_ICON_HEART;
+    else if (type.compare("icon_point") == 0)
+        return OBJECT_TYPE_ICON_POINT;
     else if (type.compare("component") == 0)
         return OBJECT_TYPE_COMPONENT;
     else if (type.compare("layer") == 0)
@@ -739,9 +749,9 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             break;
         }
         
-        COLOR_RGB color1, color2;
-        color1.set(obj.color, obj.opacity);
-        color2.set(obj.color_second, obj.opacity_second);
+//        COLOR_RGB color1, color2;
+//        color1.set(obj.color, obj.opacity);
+//        color2.set(obj.color_second, obj.opacity_second);
         
         Node * pObj;
         switch(obj.type) {
@@ -759,6 +769,10 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                           , node.innerMargin
                                                           , obj.span
                                                           , obj.img);
+                
+                if(obj.color2.isValidColor)
+                    ((Label*)pObj)->enableGlow(obj.color2.getColor4B());
+                
                 break;
             case WIZARD::OBJECT_TYPE_LABEL_SPRITE:
                 pObj = gui::inst()->addLabelAutoDimension(obj.position.x
@@ -837,9 +851,95 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , true
                                                      , circleCenter
                                                     );
-                
-            }
+             
                 break;
+            }
+            case WIZARD::OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_1: {
+                
+                COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
+                guiExt::drawRectCircleButton(layoutBG, center, gridSizeWithSpanWithMargin, color);
+                
+                float fontSize = gui::inst()->getFontSize(gridSizeWithSpanWithMargin);
+                int fontLength = (int)(gridSizeWithSpanWithMargin.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
+                string szM = "";
+                for(int n = 0; n < fontLength; n++) {
+                    szM += "M";
+                }
+                
+                gui::inst()->addTextButtonAutoDimension(obj.position.x
+                                                        , obj.position.y
+                                                        , szM
+                                                        , layoutBG
+                                                        , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                        , fontSize
+                                                        , obj.alignment
+                                                        , Color3B::WHITE
+                                                        , node.gridSize
+                                                        , Vec2::ZERO
+                                                        , Vec2::ZERO
+                                                        , node.innerMargin
+                                                        , obj.span
+                                                        )->setOpacity(0);
+                
+                pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
+                                                               , obj.position.y
+                                                               , sz
+                                                               , layoutBG
+                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                               , -1
+                                                               , obj.alignment
+                                                               , obj.color
+                                                               , node.gridSize
+                                                               , Vec2::ZERO
+                                                               , Vec2::ZERO
+                                                               , node.innerMargin
+                                                               , obj.span
+                                                               , obj.img);
+                break;
+            }
+            case WIZARD::OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_2: {
+                
+                COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
+                guiExt::drawRectCircleButton(layoutBG, center, gridSizeWithSpanWithMargin, color, ui_wizard_share::inst()->getPalette()->getColor("WHITE"));
+                
+                float fontSize = gui::inst()->getFontSize(gridSizeWithSpanWithMargin);
+                int fontLength = (int)(gridSizeWithSpanWithMargin.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
+                string szM = "";
+                for(int n = 0; n < fontLength; n++) {
+                    szM += "M";
+                }
+                
+                gui::inst()->addTextButtonAutoDimension(obj.position.x
+                                                        , obj.position.y
+                                                        , szM
+                                                        , layoutBG
+                                                        , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                        , fontSize
+                                                        , obj.alignment
+                                                        , Color3B::WHITE
+                                                        , node.gridSize
+                                                        , Vec2::ZERO
+                                                        , Vec2::ZERO
+                                                        , node.innerMargin
+                                                        , obj.span
+                                                        )->setOpacity(0);
+                
+                pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
+                                                               , obj.position.y
+                                                               , sz
+                                                               , layoutBG
+                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                               , -1
+                                                               , obj.alignment
+                                                               , obj.color
+                                                               , node.gridSize
+                                                               , Vec2::ZERO
+                                                               , Vec2::ZERO
+                                                               , node.innerMargin
+                                                               , obj.span
+                                                               , obj.img);
+                break;
+            }
             case WIZARD::OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW:
             {
                 COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
@@ -880,8 +980,8 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                                , node.innerMargin
                                                                , obj.span
                                                                , obj.img);
-            }
                 break;
+            }
             case WIZARD::OBJECT_TYPE_SPRITE:
                 pObj = gui::inst()->addSpriteAutoDimension(obj.position.x
                                                            , obj.position.y
@@ -980,13 +1080,16 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(t, 1.f, pos, gridSizeWithSpanWithMargin, color1, color2, obj.alignment);
+                pObj= ui_progressbar::create(t, getProgressValue(obj.id), pos, gridSizeWithSpanWithMargin, obj.color1, obj.color2, obj.alignment);
+                if(sz.size() > 0)
+                    ((ui_progressbar*)pObj)->setText(sz);
+                
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
             case WIZARD::OBJECT_TYPE_ROULETTE:
             {
-                pObj = guiExt::addRoulette(layoutBG, gridSizeWithSpanWithMargin, center, color1, color2, obj.text);
+                pObj = guiExt::addRoulette(layoutBG, gridSizeWithSpanWithMargin, center, obj.color1, obj.color2, sz);
                 break;
             }
             case WIZARD::OBJECT_TYPE_CIRCLE:
@@ -1019,14 +1122,26 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                              , Color4F(obj.color));
                 break;
             case WIZARD::OBJECT_TYPE_ICON_CIRCLE:
-                pObj = guiExt::addIconCircle(layoutBG, circleCenter, min / 2, obj.text, color1);
+                pObj = ui_icon::create();
+                ((ui_icon*)pObj)->addCircle(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment
+                                            , obj.color1
+                                            , sz);
                 break;
             case WIZARD::OBJECT_TYPE_ICON_HEART:
             {
-                float fontSize = gui::inst()->getFontSize(gridSizeWithSpanWithMargin);
-                pObj = guiExt::addIconHeart(layoutBG, positionWithInnerMargin, obj.alignment, fontSize, color1);
+                pObj = ui_icon::create();
+                ((ui_icon*)pObj)->addHeart(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment, sz, obj.color1);
                 break;
             }
+            case WIZARD::OBJECT_TYPE_ICON_POINT:
+                pObj = ui_icon::create();
+                ((ui_icon*)pObj)->addCircle(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment
+                                            , ui_wizard_share::inst()->getPalette()->getColor(POINT_COLOR)
+                                            , POINT_CHAR
+                                            , sz
+                                            , obj.color1);
+                
+                break;
             case WIZARD::OBJECT_TYPE_COMPONENT:
             {
                 WIZARD::_Node component = ui_wizard_share::inst()->getComponent(obj.component);

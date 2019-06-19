@@ -7,6 +7,7 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
                           , COLOR_RGB& bgColor
                           , ALIGNMENT align) {
     mBar = NULL;
+    mLabel = NULL;
     mType = type;
     mAlign = align;
     mColor.set(color);
@@ -39,10 +40,11 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
     mMargin = size.height * 0.1f;
     Size s90 = Size(size.width - (mMargin * 2.f), size.height - (mMargin * 2.f));
     
-    gui::inst()->drawRect(this
+    auto bg = gui::inst()->drawRect(this
                         , Vec2(size.width / 2.f, size.height / 2.f)
                         , s90
                         , bgColor.getColor4F());
+    bg->setLocalZOrder(ZORDER_BG);
 }
 
 const float ui_progressbar::setValue(float f) {
@@ -97,7 +99,7 @@ const float ui_progressbar::setValue(float f) {
         }
     }
    
-    this->addChild(mBar);
+    this->addChild(mBar, ZORDER_VALUE);
     return mValue;
 }
 
@@ -110,4 +112,14 @@ void ui_progressbar::blink(float duration, int blinks) {
                                          , NULL)
                         );
     }
+}
+
+void ui_progressbar::setText(const string sz) {
+    if(mLabel == NULL) {
+        mLabel = gui::inst()->addLabelAutoDimension(0, 0, sz, this, -2, ALIGNMENT_CENTER, mColor.getColorLight().getColor3B(), Vec2(1, 1), Vec2::ZERO, Vec2::ZERO);
+        mLabel->setLocalZOrder(ZORDER_TEXT);
+    }
+    mLabel->setString(sz);
+    mLabel->enableGlow(Color4B::BLACK);
+    return;
 }
