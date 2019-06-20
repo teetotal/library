@@ -166,7 +166,7 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
 
 int WIZARD::_Object::getObjectType(const string type)
 {
-	if (type.compare("button") == 0)
+    if (type.compare("button") == 0)
 		return OBJECT_TYPE_BUTTON;
     else if (type.compare("button_sprite") == 0)
         return OBJECT_TYPE_BUTTON_SPRITE;

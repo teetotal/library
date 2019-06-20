@@ -252,7 +252,7 @@ void guiExt::addVibrateEffect(Node * p, CallFunc * pCallFunc, float duration, fl
                                       , NULL));
 }
 
-void guiExt::addScaleEffect(Node * p, const string img, const string text, COLOR_RGB fontColor, CallFunc * pCallFunc, float duration, float sizeRatio) {
+void guiExt::addScaleEffect(Node * p, const string img, const string text, COLOR_RGB fontColor, CallFunc * pCallFunc, float duration, float sizeRatio, Vec2 specificPosition) {
     Size size = p->getContentSize();
     size.width *= sizeRatio;
     size.height *= sizeRatio;
@@ -261,9 +261,14 @@ void guiExt::addScaleEffect(Node * p, const string img, const string text, COLOR
     
     auto layer = gui::inst()->createLayout(size);
     gui::inst()->setAnchorPoint(layer, ALIGNMENT_CENTER);
-    Vec2 center = gui::inst()->getCenter(p);
-//    layer->setPosition(Vec2(center.x - layer->getContentSize().width / 2, center.y - layer->getContentSize().height / 2));
-    layer->setPosition(center);
+    
+    Vec2 pos;
+    if(specificPosition.x == -1 && specificPosition.y == -1)
+        pos = gui::inst()->getCenter(p);
+    else
+        pos = specificPosition;
+    
+    layer->setPosition(pos);
     
     Vec2 grid = Vec2(1, 1);
     Vec2 position = Vec2::ZERO;

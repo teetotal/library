@@ -17,10 +17,10 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
     this->setPosition(zeroPosition);
     
     //outline
-//    gui::inst()->drawRect(this
-//                         , Vec2(size.width / 2.f, size.height / 2.f)
-//                         , size
-//                         , outline.getColor4F());
+    gui::inst()->drawRect(this
+                         , Vec2(size.width / 2.f, size.height / 2.f)
+                         , size
+                         , Color4F::WHITE);
     
 //    //bg
 //    Color4F colorBG;
@@ -37,7 +37,7 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
 //            break;
 //    }
     
-    mMargin = size.height * 0.1f;
+    mMargin = size.height * 0.05f;
     Size s90 = Size(size.width - (mMargin * 2.f), size.height - (mMargin * 2.f));
     
     auto bg = gui::inst()->drawRect(this
@@ -120,6 +120,6 @@ void ui_progressbar::setText(const string sz) {
         mLabel->setLocalZOrder(ZORDER_TEXT);
     }
     mLabel->setString(sz);
-    mLabel->enableGlow(Color4B::BLACK);
+//    mLabel->enableGlow(Color4B::BLACK); 오히려 가독성이 떨어짐
     return;
 }
