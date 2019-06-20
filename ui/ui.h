@@ -45,12 +45,20 @@ struct IMG_LEVEL {
 typedef std::vector<IMG_LEVEL> IMG_LEVEL_VECTOR;
 
 #define TOUCH_INIT(__TYPE__) \
-auto listener = EventListenerTouchOneByOne::create();\
-listener->setSwallowTouches(true);\
-listener->onTouchBegan = CC_CALLBACK_2(__TYPE__::onTouchBegan, this);\
-listener->onTouchEnded = CC_CALLBACK_2(__TYPE__::onTouchEnded, this);\
-listener->onTouchMoved = CC_CALLBACK_2(__TYPE__::onTouchMoved, this);\
-_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+    auto listener = EventListenerTouchOneByOne::create();\
+    listener->setSwallowTouches(true);\
+    listener->onTouchBegan = CC_CALLBACK_2(__TYPE__::onTouchBegan, this);\
+    listener->onTouchEnded = CC_CALLBACK_2(__TYPE__::onTouchEnded, this);\
+    listener->onTouchMoved = CC_CALLBACK_2(__TYPE__::onTouchMoved, this);\
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
+#define MULTITOUCH_INIT(__TYPE__) \
+    auto listener = EventListenerTouchAllAtOnce::create();\
+    listener->onTouchesBegan = CC_CALLBACK_2(__TYPE__::onTouchesBegan, this);\
+    listener->onTouchesEnded = CC_CALLBACK_2(__TYPE__::onTouchesEnded, this);\
+    listener->onTouchesMoved = CC_CALLBACK_2(__TYPE__::onTouchesMoved, this);\
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
 
 #define POPUP_LIST(_PARENT_NODE, _GRID_SIZE, _NEWLINE, _START_VEC2, _END_VEC2, _MARGIN, _NODE_MARGIN, _NODE_SIZE, _FOR, _CONTINUE, _IMG, _CALLBACK, _SZ0, _SZ1, _SZ2, _SZ3, _SZ4, _IMG_POINTER) \
     Color3B fontColor0 = Color3B::BLACK; \

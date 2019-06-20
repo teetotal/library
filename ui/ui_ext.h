@@ -35,8 +35,8 @@ public:
                                   , CallFunc * pCallFunc = NULL         // 효과 이후 콜백을 받기 위해
                                   );
     static void addVibrateEffect(Node * p, CallFunc * pCallFunc = NULL, float duration = 0.1f, float width = 5.f);
-    static void addScaleEffect(Node * p, const string img, const string text = "", COLOR_RGB fontColor = COLOR_RGB(), CallFunc * pCallFunc = NULL, float duration = 0.4f, float sizePerWidth = .4f, Vec2 specificPosition = Vec2(-1, -1));
+    static void addScaleEffect(Node * p, const string img, const string text = "", COLOR_RGB fontColor = COLOR_RGB(), CallFunc * pCallFunc = NULL, float duration = 0.4f, float sizePerWidth = .4f, Vec2 specificPosition = Vec2(-1, -1), GLubyte opacity = 255);
     static void runScaleEffect(Node * p, CallFunc * pCallFunc = NULL, float duration = 0.4f, bool isRemoveSelf = false);
-    static void runFlyEffect(Node * p, CallFunc * pCallFunc = NULL, float duration = 1.f);
+    static void runFlyEffect(Node * p, CallFunc * pCallFunc = NULL, float duration = 1.f, bool isDown = false);
 };
 #endif //_UI_EXT_H

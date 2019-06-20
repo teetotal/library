@@ -252,7 +252,16 @@ void guiExt::addVibrateEffect(Node * p, CallFunc * pCallFunc, float duration, fl
                                       , NULL));
 }
 
-void guiExt::addScaleEffect(Node * p, const string img, const string text, COLOR_RGB fontColor, CallFunc * pCallFunc, float duration, float sizeRatio, Vec2 specificPosition) {
+void guiExt::addScaleEffect(Node * p
+                            , const string img
+                            , const string text
+                            , COLOR_RGB fontColor
+                            , CallFunc * pCallFunc
+                            , float duration
+                            , float sizeRatio
+                            , Vec2 specificPosition
+                            , GLubyte opacity
+                            ) {
     Size size = p->getContentSize();
     size.width *= sizeRatio;
     size.height *= sizeRatio;
@@ -278,6 +287,8 @@ void guiExt::addScaleEffect(Node * p, const string img, const string text, COLOR
         auto pImg = gui::inst()->getSprite(img);
         gui::inst()->setScale(pImg, min);
         pImg->setPosition(gui::inst()->getCenter(layer));
+        pImg->setOpacity(opacity);
+        
         layer->addChild(pImg);
         grid.y++;
         position.y++;
@@ -316,8 +327,12 @@ void guiExt::runScaleEffect(Node * p, CallFunc * pCallFunc, float duration, bool
   
 }
 
-void guiExt::runFlyEffect(Node * p, CallFunc * pCallFunc, float duration) {
-    Spawn * spawn = Spawn::create(MoveBy::create(duration, Vec2(5, 10))
+void guiExt::runFlyEffect(Node * p, CallFunc * pCallFunc, float duration, bool isDown) {
+    Vec2 direction = Vec2(p->getContentSize().width, p->getContentSize().height * 1.5f);
+    if(isDown)
+        direction.y *= -1.f;
+    
+    Spawn * spawn = Spawn::create(MoveBy::create(duration, direction)
                                   , FadeOut::create(duration)
                                   , NULL
                                   );
