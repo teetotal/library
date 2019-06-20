@@ -5,7 +5,8 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
                           , const Size &size
                           , COLOR_RGB& color
                           , COLOR_RGB& bgColor
-                          , ALIGNMENT align) {
+                          , ALIGNMENT align
+                          , Color4F outlineColor) {
     mBar = NULL;
     mLabel = NULL;
     mType = type;
@@ -20,7 +21,7 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
     gui::inst()->drawRect(this
                          , Vec2(size.width / 2.f, size.height / 2.f)
                          , size
-                         , Color4F::WHITE);
+                         , outlineColor);
     
 //    //bg
 //    Color4F colorBG;

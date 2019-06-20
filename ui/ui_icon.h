@@ -24,27 +24,59 @@ public:
         
         return ret;
     };
+    ui_icon() : mEnable(true) {};
     
-    void addHeart(Node * p, Size sizePerGrid, Vec2 pos, ALIGNMENT align, const string sz = "", COLOR_RGB color = COLOR_RGB());
-    void addCircle(Node * p, Size sizePerGrid, Vec2 pos, ALIGNMENT align, COLOR_RGB color, const string sz, const string szText = "", COLOR_RGB colorText = COLOR_RGB());
+    void addHeart(Node * p
+                  , Size sizePerGrid
+                  , Vec2 pos
+                  , ALIGNMENT align
+                  , const string sz = ""
+                  , COLOR_RGB color = COLOR_RGB());
+    
+    void addCircle(Node * p
+                   , Size sizePerGrid
+                   , Vec2 pos
+                   , ALIGNMENT align
+                   , COLOR_RGB color
+                   , const string sz
+                   , const string img = ""
+                   , const string szText = ""
+                   , COLOR_RGB colorText = COLOR_RGB());
     
     inline void setText(const string sz) {
-        if(mLabel) {
-            mLabel->setString(sz);
+        if(mNodes.label) {
+            mNodes.label->setString(sz);
         }
     };
     inline void setTextColor(const Color3B& color) {
-        if(mLabel) {
-            mLabel->setColor(color);
+        if(mNodes.label) {
+            mNodes.label->setColor(color);
         }
     };
     inline void enableGlow(const Color4B& color) {
-        if(mLabel) {
-            mLabel->enableGlow(color);
+        if(mNodes.label) {
+            mNodes.label->enableGlow(color);
         }
     };
     
+    inline bool isEnabled() const {
+        return mEnable;
+    };
+    //터치 이벤트 효과
+    void runScaleAndDisable();
+    
+    void setEnabled(bool enable);
+    
 private:
-    Label * mLabel;
+    struct Nodes {
+        Label * label;
+        DrawNode * drawNode;
+        Label * ch;
+        Sprite * sprite;
+        
+        Nodes() : label(NULL), drawNode(NULL), ch(NULL), sprite(NULL) {};
+    } mNodes;
+    
+    bool mEnable;
 };
 #endif /* ui_icon_h */

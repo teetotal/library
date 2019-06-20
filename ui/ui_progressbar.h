@@ -35,9 +35,10 @@ public:
                                    , const Size &size
                                    , COLOR_RGB& color
                                    , COLOR_RGB& outline
-                                   , ALIGNMENT align = ALIGNMENT_LEFT) {
+                                   , ALIGNMENT align = ALIGNMENT_LEFT
+                                   , Color4F outlineColor = Color4F::WHITE) {
         auto p = ui_progressbar::create();
-        p->init(type, position, size, color, outline, align);
+        p->init(type, position, size, color, outline, align, outlineColor);
         p->setValue(value);
         return p;
     };
@@ -47,7 +48,8 @@ public:
               , const Size &size
               , COLOR_RGB& color
               , COLOR_RGB& bgColor
-              , ALIGNMENT align = ALIGNMENT_LEFT);
+              , ALIGNMENT align = ALIGNMENT_LEFT
+              , Color4F outlineColor = Color4F::WHITE);
     
     void addParent(Node * p) {
         p->addChild(this);

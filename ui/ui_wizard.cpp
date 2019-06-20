@@ -859,7 +859,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
                 guiExt::drawRectCircleButton(layoutBG, center, gridSizeWithSpanWithMargin, color);
                 
-                float fontSize = gui::inst()->getFontSize(gridSizeWithSpanWithMargin);
+                float fontSize = gui::inst()->getFontSizeDefine(gridSizeWithSpanWithMargin, 0);
                 int fontLength = (int)(gridSizeWithSpanWithMargin.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
                 string szM = "";
                 for(int n = 0; n < fontLength; n++) {
@@ -902,7 +902,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
                 guiExt::drawRectCircleButton(layoutBG, center, gridSizeWithSpanWithMargin, color, ui_wizard_share::inst()->getPalette()->getColor("WHITE"));
                 
-                float fontSize = gui::inst()->getFontSize(gridSizeWithSpanWithMargin);
+                float fontSize = gui::inst()->getFontSizeDefine(gridSizeWithSpanWithMargin, 0);
                 int fontLength = (int)(gridSizeWithSpanWithMargin.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
                 string szM = "";
                 for(int n = 0; n < fontLength; n++) {
@@ -1125,7 +1125,9 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 pObj = ui_icon::create();
                 ((ui_icon*)pObj)->addCircle(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment
                                             , obj.color1
-                                            , sz);
+                                            , sz
+                                            , obj.img
+                                            );
                 break;
             case WIZARD::OBJECT_TYPE_ICON_HEART:
             {
@@ -1138,6 +1140,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 ((ui_icon*)pObj)->addCircle(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment
                                             , ui_wizard_share::inst()->getPalette()->getColor(POINT_COLOR)
                                             , POINT_CHAR
+                                            , ""
                                             , sz
                                             , obj.color1);
                 
