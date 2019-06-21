@@ -36,6 +36,37 @@ public:
         return ret;
     };
     
+    static ui_button * create(int target
+                              , const string text
+                              , Node * p
+                              , Vec2 pos
+                              , ALIGNMENT align
+                              , Size size
+                              , TYPE type
+                              , std::function<void(int)> callback
+                              , COLOR_RGB color
+                              , COLOR_RGB colorFont
+                              , COLOR_RGB colorBack = COLOR_RGB()
+                              , const string img = ""
+                              , TOUCH_TYPE touchType = TOUCH_TYPE_NORMAL)
+    {
+        ui_button * ret = ui_button::create();
+        ret->init(target
+                  , text
+                  , p
+                  , pos
+                  , align
+                  , size
+                  , type
+                  , callback
+                  , color
+                  , colorFont
+                  , colorBack
+                  , img
+                  , touchType);
+        return ret;
+    }
+    
     ui_button() : mEnable(true) {};
     
     void init(int target

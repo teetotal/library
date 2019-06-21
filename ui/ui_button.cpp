@@ -92,8 +92,8 @@ void ui_button::setEnabled(bool enable) {
     
     GLubyte opacity = (enable) ? 255 : 128;
     
-    if(mNodes.drawNode)
-        mNodes.drawNode->setOpacity(opacity);
+//    if(mNodes.drawNode)
+//        mNodes.drawNode->setOpacity(opacity); 그린 여러 폴리곤이 개별적으로 먹어서 이상한 느낌이 됨.
     if(mNodes.label)
         mNodes.label->setOpacity(opacity);
     if(mNodes.sprite)
