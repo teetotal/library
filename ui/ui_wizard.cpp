@@ -7,6 +7,7 @@
 #include "ui_roulette.h"
 #include "ui_icon.h"
 #include "ui_ext.h"
+#include "ui_button.h"
 #include "../library/util.h"
 
 #define POINT_CHAR   "P"
@@ -825,6 +826,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 break;
             case WIZARD::OBJECT_TYPE_BUTTON_CIRCLE:
             {
+                
                 auto p = gui::inst()->drawCircle(layoutBG, circleCenter, min / 2.f, Color4F(obj.color_second));
                 p->setOpacity(obj.opacity_second);
                 
@@ -856,130 +858,97 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             }
             case WIZARD::OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_1: {
                 
-                COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
-                guiExt::drawRectCircleButton(layoutBG, center, gridSizeWithSpanWithMargin, color);
-                
-                float fontSize = gui::inst()->getFontSizeDefine(gridSizeWithSpanWithMargin, 0);
-                int fontLength = (int)(gridSizeWithSpanWithMargin.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
-                string szM = "";
-                for(int n = 0; n < fontLength; n++) {
-                    szM += "M";
-                }
-                
-                gui::inst()->addTextButtonAutoDimension(obj.position.x
-                                                        , obj.position.y
-                                                        , szM
-                                                        , layoutBG
-                                                        , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                                                        , fontSize
-                                                        , obj.alignment
-                                                        , Color3B::WHITE
-                                                        , node.gridSize
-                                                        , Vec2::ZERO
-                                                        , Vec2::ZERO
-                                                        , node.innerMargin
-                                                        , obj.span
-                                                        )->setOpacity(0);
-                
-                pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
-                                                               , obj.position.y
-                                                               , sz
-                                                               , layoutBG
-                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                                                               , -1
-                                                               , obj.alignment
-                                                               , obj.color
-                                                               , node.gridSize
-                                                               , Vec2::ZERO
-                                                               , Vec2::ZERO
-                                                               , node.innerMargin
-                                                               , obj.span
-                                                               , obj.img);
+                pObj = ui_button::create(obj.id
+                                         , obj.link
+                                         , sz
+                                         , layoutBG
+                                         , center
+                                         , obj.alignment
+                                         , gridSizeWithSpanWithMargin
+                                         , ui_button::TYPE_CIRCLE
+                                         , std::bind(&ui_wizard::callback2, this, std::placeholders::_1, std::placeholders::_2)
+                                         , obj.color2
+                                         , obj.color1
+                                         , COLOR_RGB()
+                                         , obj.img
+                                         );
+            
                 break;
             }
-            case WIZARD::OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_2: {
+            case WIZARD::OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_2:
+            {
+                pObj = ui_button::create(obj.id
+                                         , obj.link
+                                         , sz
+                                         , layoutBG
+                                         , center
+                                         , obj.alignment
+                                         , gridSizeWithSpanWithMargin
+                                         , ui_button::TYPE_CIRCLE
+                                         , std::bind(&ui_wizard::callback2, this, std::placeholders::_1, std::placeholders::_2)
+                                         , obj.color2
+                                         , obj.color1
+                                         , ui_wizard_share::inst()->getPalette()->getColor("WHITE")
+                                         , obj.img
+                                         );
                 
-                COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
-                guiExt::drawRectCircleButton(layoutBG, center, gridSizeWithSpanWithMargin, color, ui_wizard_share::inst()->getPalette()->getColor("WHITE"));
-                
-                float fontSize = gui::inst()->getFontSizeDefine(gridSizeWithSpanWithMargin, 0);
-                int fontLength = (int)(gridSizeWithSpanWithMargin.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
-                string szM = "";
-                for(int n = 0; n < fontLength; n++) {
-                    szM += "M";
-                }
-                
-                gui::inst()->addTextButtonAutoDimension(obj.position.x
-                                                        , obj.position.y
-                                                        , szM
-                                                        , layoutBG
-                                                        , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                                                        , fontSize
-                                                        , obj.alignment
-                                                        , Color3B::WHITE
-                                                        , node.gridSize
-                                                        , Vec2::ZERO
-                                                        , Vec2::ZERO
-                                                        , node.innerMargin
-                                                        , obj.span
-                                                        )->setOpacity(0);
-                
-                pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
-                                                               , obj.position.y
-                                                               , sz
-                                                               , layoutBG
-                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                                                               , -1
-                                                               , obj.alignment
-                                                               , obj.color
-                                                               , node.gridSize
-                                                               , Vec2::ZERO
-                                                               , Vec2::ZERO
-                                                               , node.innerMargin
-                                                               , obj.span
-                                                               , obj.img);
                 break;
             }
             case WIZARD::OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW:
             {
-                COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
-                guiExt::drawRectRoundShadow(layoutBG, center, gridSizeWithSpanWithMargin, color);
-                float fontSize = gui::inst()->getFontSize(gridSizeWithSpanWithMargin);
-                int fontLength = (int)(gridSizeWithSpanWithMargin.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
-                string szM = "";
-                for(int n = 0; n < fontLength; n++) {
-                    szM += "M";
-                }
+                pObj = ui_button::create(obj.id
+                                         , obj.link
+                                         , sz
+                                         , layoutBG
+                                         , center
+                                         , obj.alignment
+                                         , gridSizeWithSpanWithMargin
+                                         , ui_button::TYPE_ROUND
+                                         , std::bind(&ui_wizard::callback2, this, std::placeholders::_1, std::placeholders::_2)
+                                         , obj.color2
+                                         , obj.color1
+                                         , COLOR_RGB()
+                                         , obj.img
+                                         );
                 
-                gui::inst()->addTextButtonAutoDimension(obj.position.x
-                                                        , obj.position.y
-                                                        , szM
-                                                        , layoutBG
-                                                        , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                                                        , fontSize
-                                                        , obj.alignment
-                                                        , Color3B::WHITE
-                                                        , node.gridSize
-                                                        , Vec2::ZERO
-                                                        , Vec2::ZERO
-                                                        , node.innerMargin
-                                                        , obj.span
-                                                        )->setOpacity(0);
-                
-                pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
-                                                               , obj.position.y
-                                                               , sz
-                                                               , layoutBG
-                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
-                                                               , -1
-                                                               , obj.alignment
-                                                               , obj.color
-                                                               , node.gridSize
-                                                               , Vec2::ZERO
-                                                               , Vec2::ZERO
-                                                               , node.innerMargin
-                                                               , obj.span
-                                                               , obj.img);
+//                COLOR_RGB color = COLOR_RGB(obj.color_second.r, obj.color_second.g, obj.color_second.b, obj.opacity_second);
+//                guiExt::drawRectRoundShadow(layoutBG, center, gridSizeWithSpanWithMargin, color);
+//                float fontSize = gui::inst()->getFontSize(gridSizeWithSpanWithMargin);
+//                int fontLength = (int)(gridSizeWithSpanWithMargin.width / gui::inst()->createLabel(0, 0, "M", fontSize, ALIGNMENT_CENTER)->getContentSize().width);
+//                string szM = "";
+//                for(int n = 0; n < fontLength; n++) {
+//                    szM += "M";
+//                }
+//
+//                gui::inst()->addTextButtonAutoDimension(obj.position.x
+//                                                        , obj.position.y
+//                                                        , szM
+//                                                        , layoutBG
+//                                                        , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+//                                                        , fontSize
+//                                                        , obj.alignment
+//                                                        , Color3B::WHITE
+//                                                        , node.gridSize
+//                                                        , Vec2::ZERO
+//                                                        , Vec2::ZERO
+//                                                        , node.innerMargin
+//                                                        , obj.span
+//                                                        )->setOpacity(0);
+//
+//                pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x
+//                                                               , obj.position.y
+//                                                               , sz
+//                                                               , layoutBG
+//                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+//                                                               , -1
+//                                                               , obj.alignment
+//                                                               , obj.color
+//                                                               , node.gridSize
+//                                                               , Vec2::ZERO
+//                                                               , Vec2::ZERO
+//                                                               , node.innerMargin
+//                                                               , obj.span
+//                                                               , obj.img);
                 break;
             }
             case WIZARD::OBJECT_TYPE_SPRITE:

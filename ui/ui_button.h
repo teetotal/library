@@ -36,14 +36,15 @@ public:
         return ret;
     };
     
-    static ui_button * create(int target
+    static ui_button * create(int id
+                              , int target
                               , const string text
                               , Node * p
                               , Vec2 pos
                               , ALIGNMENT align
                               , Size size
                               , TYPE type
-                              , std::function<void(int)> callback
+                              , std::function<void(int, int)> callback
                               , COLOR_RGB color
                               , COLOR_RGB colorFont
                               , COLOR_RGB colorBack = COLOR_RGB()
@@ -51,7 +52,8 @@ public:
                               , TOUCH_TYPE touchType = TOUCH_TYPE_NORMAL)
     {
         ui_button * ret = ui_button::create();
-        ret->init(target
+        ret->init(id
+                  , target
                   , text
                   , p
                   , pos
@@ -69,19 +71,105 @@ public:
     
     ui_button() : mEnable(true) {};
     
-    void init(int target
+    void init(int id
+              , int target
               , const string text
               , Node * p
               , Vec2 pos
               , ALIGNMENT align
               , Size size
               , TYPE type
-              , std::function<void(int)> callback
+              , std::function<void(int, int)> callback
               , COLOR_RGB color
               , COLOR_RGB colorFont
               , COLOR_RGB colorBack = COLOR_RGB()
               , const string img = ""
               , TOUCH_TYPE touchType = TOUCH_TYPE_NORMAL);
+    
+    inline void setText(const string sz) {
+        if(mNodes.menuItem) {
+            mNodes.menuItem->setString(sz);
+        }
+    };
+    inline void setTextColor(const Color3B& color) {
+        if(mNodes.menuItem) {
+            mNodes.menuItem->setColor(color);
+        }
+    };
+    
+    inline bool isEnabled() const {
+        return mEnable;
+    };
+    
+    inline void setTouchType(TOUCH_TYPE t) {
+        mTouchType = t;
+    };
+    //터치 이벤트 효과
+    void runScaleAndDisable();
+    
+    void setEnabled(bool enable);
+    
+private:
+    struct Nodes {
+        
+        MenuItemLabel * menuItem;
+        MenuItemImage * menuItemImage;
+        DrawNode * drawNode;
+        Nodes() : drawNode(NULL), menuItem(NULL), menuItemImage(NULL) {};
+    } mNodes;
+    
+    bool mEnable;
+    void callbackFn(cocos2d::Ref* pSender);
+    void drawRectRoundShadow (COLOR_RGB color);
+    void drawRectCircleButton(COLOR_RGB colorFront, COLOR_RGB colorBack);
+    int mId, mTarget;
+    TOUCH_TYPE mTouchType;
+    std::function<void(int, int)> mCallback;
+};
+
+class ui_checkbox : public Layout
+{
+public:
+    static ui_checkbox * create() {
+        ui_checkbox * ret = new (std::nothrow) ui_checkbox;
+        if (ret)
+        {
+            ret->autorelease();
+        } else {
+            CC_SAFE_DELETE(ret);
+        }
+        
+        return ret;
+    };
+    
+    static ui_checkbox * create(Node * p
+                                , Vec2 pos
+                                , ALIGNMENT align
+                                , Size sizePerGrid
+                                , const string text
+                                , COLOR_RGB color
+                                , COLOR_RGB colorFont)
+    {
+        ui_checkbox * ret = ui_checkbox::create();
+        ret->init(p
+                  , pos
+                  , align
+                  , sizePerGrid
+                  , text
+                  , color
+                  , colorFont);
+        return ret;
+    }
+    
+    ui_checkbox() : mEnable(true), mIsChecked(false) {};
+    
+    void init(Node * p
+              , Vec2 pos
+              , ALIGNMENT align
+              , Size sizePerGrid
+              , const string text
+              , COLOR_RGB color
+              , COLOR_RGB colorFont);
     
     inline void setText(const string sz) {
         if(mNodes.label) {
@@ -93,6 +181,7 @@ public:
             mNodes.label->setColor(color);
         }
     };
+    
     inline void enableGlow(const Color4B& color) {
         if(mNodes.label) {
             mNodes.label->enableGlow(color);
@@ -102,27 +191,28 @@ public:
     inline bool isEnabled() const {
         return mEnable;
     };
-    //터치 이벤트 효과
-    void runScaleAndDisable();
     
     void setEnabled(bool enable);
     
+    inline bool isChecked() const {
+        return mIsChecked;
+    };
+    
+    void setChecked(bool isChecked);
+    inline void setToggle() {
+        setChecked(!mIsChecked);
+    };
 private:
     struct Nodes {
         Label * label;
+        Label * labelChecked;
         DrawNode * drawNode;
-        Sprite * sprite;
-        
-        Nodes() : label(NULL), drawNode(NULL), sprite(NULL) {};
+        Nodes() : drawNode(NULL), label(NULL), labelChecked(NULL) {};
     } mNodes;
     
-    bool mEnable;
+    bool mEnable, mIsChecked;
+    void drawUnchecked(COLOR_RGB color);
     
-    void setTouchEvent(std::function<void(int)> callback);
-    void drawRectRoundShadow (COLOR_RGB color);
-    void drawRectCircleButton(COLOR_RGB colorFront, COLOR_RGB colorBack);
-    int mId;
-    TOUCH_TYPE mTouchType;
+    Size mCheckboxSize;
 };
-
 #endif /* ui_button_h */

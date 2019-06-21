@@ -661,8 +661,14 @@ DrawNode * gui::drawRect(Node * p, Vec2 pos1, Vec2 pos2, Vec2 pos3, Vec2 pos4, C
     return draw;
 }
 
-DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color, bool isSolid){
-    auto draw = DrawNode::create();
+DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color, bool isSolid, DrawNode * pDraw)
+{
+    DrawNode * draw;
+    
+    if(pDraw)
+        draw = pDraw;
+    else
+        draw = DrawNode::create();
     
     Vec2 origin = Vec2(pos.x - size.width / 2, pos.y - size.height / 2);
     Vec2 dest = Vec2(pos.x + size.width / 2, pos.y + size.height / 2);
@@ -671,7 +677,8 @@ DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color, bool isSo
     else
         draw->drawRect(origin, dest, color);
     
-    p->addChild(draw);
+    if(p)
+        p->addChild(draw);
     return draw;
 }
 

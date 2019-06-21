@@ -249,6 +249,9 @@ protected:
 		Director::getInstance()->end();
 	};
 	virtual void callback(cocos2d::Ref* pSender, int from, int link) = 0;
+    void callback2(int from, int link) {
+        return callback(this, from, link);
+    }
 	virtual const string getText(const string& defaultString, int id) = 0;
     virtual const float getProgressValue(int id) = 0;
     
