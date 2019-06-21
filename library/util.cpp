@@ -152,6 +152,9 @@ string sprint(const char * format, ...) {
 }
 
 string numberFormat(int n) {
+    if(n < 1000)
+        return to_string(n);
+    
     string sz = "";
     bool isInit = true;
     while(true){

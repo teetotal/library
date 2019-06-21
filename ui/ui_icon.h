@@ -45,11 +45,8 @@ public:
                    , COLOR_RGB colorText = COLOR_RGB()
                    , const float fontSize = 0);
     
-    inline void setText(const string sz) {
-        if(mNodes.label) {
-            mNodes.label->setString(sz);
-        }
-    };
+    void setText(const string sz);
+    
     inline void setTextColor(const Color3B& color) {
         if(mNodes.label) {
             mNodes.label->setColor(color);

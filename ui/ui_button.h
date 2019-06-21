@@ -146,6 +146,7 @@ public:
                                 , Vec2 pos
                                 , ALIGNMENT align
                                 , Size sizePerGrid
+                                , int sizeDefine
                                 , const string text
                                 , COLOR_RGB color
                                 , COLOR_RGB colorFont)
@@ -155,27 +156,26 @@ public:
                   , pos
                   , align
                   , sizePerGrid
+                  , sizeDefine
                   , text
                   , color
                   , colorFont);
         return ret;
     }
     
-    ui_checkbox() : mEnable(true), mIsChecked(false) {};
+    ui_checkbox() : mEnable(true), mIsChecked(true) {};
     
     void init(Node * p
               , Vec2 pos
               , ALIGNMENT align
               , Size sizePerGrid
+              , int sizeDefine
               , const string text
               , COLOR_RGB color
               , COLOR_RGB colorFont);
     
-    inline void setText(const string sz) {
-        if(mNodes.label) {
-            mNodes.label->setString(sz);
-        }
-    };
+    void setText(const string sz);
+    
     inline void setTextColor(const Color3B& color) {
         if(mNodes.label) {
             mNodes.label->setColor(color);

@@ -193,6 +193,8 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_PROGRESSBAR_FLAT;
     else if (type.compare("progressbar") == 0)
         return OBJECT_TYPE_PROGRESSBAR;
+    else if (type.compare("checkbox") == 0)
+        return OBJECT_TYPE_CHECKBOX;
     else if (type.compare("roulette") == 0)
         return OBJECT_TYPE_ROULETTE;
 	else if (type.compare("circle") == 0)
@@ -1056,6 +1058,16 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 ((ui_progressbar*)pObj)->addParent(layoutBG);
                 break;
             }
+            case WIZARD::OBJECT_TYPE_CHECKBOX:
+                pObj = ui_checkbox::create(layoutBG
+                                           , positionWithInnerMargin
+                                           , obj.alignment
+                                           , gridSizeWithSpanWithMargin
+                                           , (int)obj.fontSize
+                                           , sz
+                                           , obj.color1
+                                           , obj.color2);
+                break;
             case WIZARD::OBJECT_TYPE_ROULETTE:
             {
                 pObj = guiExt::addRoulette(layoutBG, gridSizeWithSpanWithMargin, center, obj.color1, obj.color2, sz);

@@ -154,3 +154,14 @@ void ui_icon::runScaleAndDisable() {
     mEnable = false;
     guiExt::runScaleEffect(this, CallFunc::create([=](){ this->setEnabled(false); }));
 }
+
+void ui_icon::setText(const string sz) {
+    if(mNodes.label) {
+        float w1 = mNodes.label->getContentSize().width;
+        mNodes.label->setString(sz);
+        float w2 = mNodes.label->getContentSize().width;
+        float f = w2 - w1;
+        Size size = this->getContentSize();
+        this->setContentSize(Size(size.width + f, size.height));
+    }
+};

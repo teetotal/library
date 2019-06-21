@@ -121,7 +121,7 @@ void ui_button::setEnabled(bool enable) {
 //    if(mNodes.drawNode)
 //        mNodes.drawNode->setOpacity(opacity); 그린 여러 폴리곤이 개별적으로 먹어서 이상한 느낌이 됨.
     if(mNodes.menuItem)
-        mNodes.menuItem->setEnabled(false);
+        mNodes.menuItem->setEnabled(enable);
     if(mNodes.menuItemImage)
         mNodes.menuItemImage->setOpacity(opacity);
 }
@@ -153,11 +153,13 @@ void ui_checkbox::init(Node * p
                        , Vec2 pos
                        , ALIGNMENT align
                        , Size sizePerGrid
+                       , int sizeDefine
                        , const string text
                        , COLOR_RGB color
                        , COLOR_RGB colorFont)
 {
-    Size size = Size(sizePerGrid.height, sizePerGrid.height);
+    float scale = gui::inst()->getScaleDefine(sizeDefine);
+    Size size = Size(sizePerGrid.height * scale, sizePerGrid.height * scale);
     mCheckboxSize = size;
     
     //checkbox
@@ -221,4 +223,15 @@ void ui_checkbox::setEnabled(bool enable) {
     //        mNodes.drawNode->setOpacity(opacity); 그린 여러 폴리곤이 개별적으로 먹어서 이상한 느낌이 됨.
     if(mNodes.label)
         mNodes.label->setOpacity(opacity);
+}
+
+void ui_checkbox::setText(const string sz) {
+    if(mNodes.label) {
+        float w1 = mNodes.label->getContentSize().width;
+        mNodes.label->setString(sz);
+        float w2 = mNodes.label->getContentSize().width;
+        float f = w2 - w1;
+        Size size = this->getContentSize();
+        this->setContentSize(Size(size.width + f, size.height));
+    }
 }

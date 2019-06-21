@@ -308,7 +308,7 @@ void guiExt::addScaleEffect(Node * p
 
 void guiExt::runScaleEffect(Node * p, CallFunc * pCallFunc, float duration, bool isRemoveSelf) {
     Vector<FiniteTimeAction *> actions;
-    actions.pushBack(EaseBackIn::create(ScaleTo::create(duration, 1.5f)));
+    actions.pushBack(EaseBackIn::create(ScaleTo::create(duration, 1.2f)));
     actions.pushBack(EaseBackOut::create(ScaleTo::create(duration, 1.f)));
     if(isRemoveSelf)
         actions.pushBack(RemoveSelf::create());
