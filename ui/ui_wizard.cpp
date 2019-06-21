@@ -1132,7 +1132,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             case WIZARD::OBJECT_TYPE_ICON_HEART:
             {
                 pObj = ui_icon::create();
-                ((ui_icon*)pObj)->addHeart(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment, sz, obj.color1);
+                ((ui_icon*)pObj)->addHeart(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment, sz, obj.color1, obj.fontSize);
                 break;
             }
             case WIZARD::OBJECT_TYPE_ICON_POINT:
@@ -1142,7 +1142,8 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                             , POINT_CHAR
                                             , ""
                                             , sz
-                                            , obj.color1);
+                                            , obj.color1
+                                            , obj.fontSize);
                 
                 break;
             case WIZARD::OBJECT_TYPE_COMPONENT:

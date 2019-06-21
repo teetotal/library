@@ -421,7 +421,7 @@ public:
     DrawNode * drawTriangle         (Node * p, Vec2 a,      Vec2 b,         Vec2 c,     Color4F color);
     DrawNode * drawRect             (Node * p, Vec2 pos,    Size size,      Color4F color,  bool isSolid = true);
     DrawNode * drawRect             (Node * p, Vec2 pos1,   Vec2 pos2,      Vec2 pos3,  Vec2 pos4, Color4F color);
-    DrawNode * drawRectRound        (Node * p, Vec2 pos,    Size size,      Color4F color);
+    DrawNode * drawRectRound        (Node * p, Vec2 pos,    Size size,      Color4F color, DrawNode * pDraw = NULL);
     DrawNode * drawRectCircle       (Node * p, Vec2 pos,    Size size,      Color4F color, DrawNode * draw = NULL);
     DrawNode * drawDiamond          (Node * p, Vec2 pos,    Size size,      Color4F color);
     float drawDiamond               (Node * p, Vec2 center, float h,        float degrees,  Color4F color);
@@ -445,26 +445,29 @@ public:
         return ( 10.f * size.height / mDefaultFontLabelSize.height ) * scale;
     }
     
-    float getFontSizeDefine(Size size, float sizeCode) {
-        float scale;
-        switch((int)sizeCode) {
+    inline const float getScaleDefine(int code) {
+        switch(code) {
             case 0:
-                scale = 1.f;
-                break;
+                return 1.f;
             case -1:
-                scale = 0.75f;
-                break;
+                return 0.75f;
             case -2:
-                scale = 0.5f;
-                break;
+                return 0.5f;
             case -3:
-                scale = 0.25f;
-                break;
+                return 0.25f;
             default:
-                return sizeCode;
+                return 0;
         }
-        return ( 10.f * size.height / mDefaultFontLabelSize.height ) * scale;
-    }
+    };
+    
+    inline float getFontSizeDefine(Size size, float sizeCode) {
+        float scale = getScaleDefine(sizeCode);
+        if(scale > 0) {
+            return ( 10.f * size.height / mDefaultFontLabelSize.height ) * scale;
+        } else {
+            return sizeCode;
+        }
+    };
     
     float getFontSize(Size dimension, Vec2 grid, Vec2 margin, Vec2 innerMargin, Vec2 span, float scale) {
         return getFontSize(getGridSize(dimension, grid, margin, innerMargin, span), scale);

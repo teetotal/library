@@ -9,14 +9,15 @@
 
 #define SYSTEM_FONT_NAME "Helvetica"
 
-void ui_icon::addHeart(Node * p, Size sizePerGrid, Vec2 pos, ALIGNMENT align, const string sz, COLOR_RGB color)
+void ui_icon::addHeart(Node * p, Size sizePerGrid, Vec2 pos, ALIGNMENT align, const string sz, COLOR_RGB color, const float fontSize)
 {
     Size size;
 //    this->setBackGroundColor(Color3B::MAGENTA);
 //    this->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
     
-    float fontSize = gui::inst()->getFontSizeDefine(sizePerGrid, 0);
-    mNodes.ch = Label::createWithSystemFont("♥", SYSTEM_FONT_NAME, fontSize);
+    mNodes.ch = Label::createWithSystemFont("♥", SYSTEM_FONT_NAME
+                                            , gui::inst()->getFontSizeDefine(sizePerGrid, fontSize));
+    
     gui::inst()->setAnchorPoint(mNodes.ch, ALIGNMENT_LEFT_BOTTOM);
     mNodes.ch->setPosition(Vec2::ZERO);
     mNodes.ch->enableGlow(Color4B::BLACK);
@@ -25,7 +26,8 @@ void ui_icon::addHeart(Node * p, Size sizePerGrid, Vec2 pos, ALIGNMENT align, co
     size = mNodes.ch->getContentSize();
     
     if(sz.size() > 0) {
-        mNodes.label = Label::createWithTTF(sz, gui::inst()->mDefaultFont, fontSize);
+        mNodes.label = Label::createWithTTF(sz, gui::inst()->mDefaultFont
+                                            , gui::inst()->getFontSizeDefine(sizePerGrid, fontSize));
         mNodes.label->setColor(color.getColor3B());
         gui::inst()->setAnchorPoint(mNodes.label, ALIGNMENT_LEFT_BOTTOM);
         
@@ -54,7 +56,8 @@ void ui_icon::addCircle(Node * p
                         , const string sz
                         , const string img
                         , const string szText
-                        , COLOR_RGB colorText)
+                        , COLOR_RGB colorText
+                        , const float fontSize)
 {
     Size size;
 //    this->setBackGroundColor(Color3B::MAGENTA);
@@ -62,6 +65,10 @@ void ui_icon::addCircle(Node * p
     gui::inst()->setAnchorPoint(this, align);
     
     float min = fmin(sizePerGrid.width, sizePerGrid.height);
+    float scale = gui::inst()->getScaleDefine(fontSize);
+    if(scale == 0)
+        scale = 1;
+    min = min * scale;
     
     Size sizeCircle = Size(min, min);
     size = sizeCircle;
@@ -109,8 +116,9 @@ void ui_icon::addCircle(Node * p
     
     //text
     if(szText.size() > 0) {
-        float fontSizeText = gui::inst()->getFontSizeDefine(sizeCircle, 0);
-        mNodes.label = Label::createWithTTF(szText, gui::inst()->mDefaultFont, fontSizeText);
+        mNodes.label = Label::createWithTTF(szText, gui::inst()->mDefaultFont
+                                            , gui::inst()->getFontSizeDefine(sizeCircle, 0));
+        
         mNodes.label->setColor(colorText.getColor3B());
         gui::inst()->setAnchorPoint(mNodes.label, ALIGNMENT_LEFT_BOTTOM);
         enableGlow(Color4B::BLACK);

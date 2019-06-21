@@ -675,8 +675,14 @@ DrawNode * gui::drawRect(Node * p, Vec2 pos, Size size, Color4F color, bool isSo
     return draw;
 }
 
-DrawNode * gui::drawRectRound (Node * p, Vec2 pos, Size size, Color4F color){
-    auto draw = DrawNode::create();
+DrawNode * gui::drawRectRound (Node * p, Vec2 pos, Size size, Color4F color, DrawNode * pDraw)
+{
+    DrawNode * draw;
+    
+    if(pDraw == NULL)
+        draw = DrawNode::create();
+    else
+        draw = pDraw;
    
     Vec2 origin = Vec2(pos.x - size.width / 2.f, pos.y - size.height / 2.f);
     Vec2 dest = Vec2(pos.x + size.width / 2.f, pos.y + size.height / 2.f);
@@ -700,7 +706,9 @@ DrawNode * gui::drawRectRound (Node * p, Vec2 pos, Size size, Color4F color){
     };
     
     draw->drawSolidPoly(poli, 9, color);
-    p->addChild(draw);
+    
+    if(p)
+        p->addChild(draw);
     
     return draw;
 }

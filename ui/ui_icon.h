@@ -31,7 +31,8 @@ public:
                   , Vec2 pos
                   , ALIGNMENT align
                   , const string sz = ""
-                  , COLOR_RGB color = COLOR_RGB());
+                  , COLOR_RGB color = COLOR_RGB()
+                  , const float fontSize = 0);
     
     void addCircle(Node * p
                    , Size sizePerGrid
@@ -41,7 +42,8 @@ public:
                    , const string sz
                    , const string img = ""
                    , const string szText = ""
-                   , COLOR_RGB colorText = COLOR_RGB());
+                   , COLOR_RGB colorText = COLOR_RGB()
+                   , const float fontSize = 0);
     
     inline void setText(const string sz) {
         if(mNodes.label) {

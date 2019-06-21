@@ -329,8 +329,10 @@ void guiExt::runScaleEffect(Node * p, CallFunc * pCallFunc, float duration, bool
 
 void guiExt::runFlyEffect(Node * p, CallFunc * pCallFunc, float duration, bool isDown) {
     Vec2 direction = Vec2(p->getContentSize().width, p->getContentSize().height * 1.5f);
-    if(isDown)
+    if(isDown) {
+        direction.x = 0;
         direction.y *= -1.f;
+    }
     
     Spawn * spawn = Spawn::create(MoveBy::create(duration, direction)
                                   , FadeOut::create(duration)
