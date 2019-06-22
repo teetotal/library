@@ -151,9 +151,16 @@ string sprint(const char * format, ...) {
 	return sz;
 }
 
-string numberFormat(int n) {
-    if(n < 1000)
-        return to_string(n);
+string numberFormat(int number) {
+    if(number < 1000)
+        return to_string(number);
+    
+    bool isMinus = false;
+    int n = number;
+    if(number < 0) {
+        isMinus = true;
+        n = number * -1;
+    }
     
     string sz = "";
     bool isInit = true;
@@ -187,6 +194,10 @@ string numberFormat(int n) {
             isInit = false;
         }
     }
+    
+    if(isMinus)
+        return "-" + sz;
+    
     return sz;
 }
 

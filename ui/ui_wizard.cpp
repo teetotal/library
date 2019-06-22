@@ -334,6 +334,16 @@ bool WIZARD::_Background::load(rapidjson::Value & pValue)
 		if(SpriteFrameCache::getInstance()->getSpriteFrameByName(this->img) == NULL)
 			SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(this->img)->getSpriteFrame(), this->img);
 	}
+    
+    //grid
+    if(p.HasMember("grid") && !p["grid"].IsNull()) {
+        this->grid = Vec2(p["grid"][rapidjson::SizeType(0)].GetInt(), p["grid"][rapidjson::SizeType(1)].GetInt());
+    } else {
+        Size visibleSize = Director::getInstance()->getVisibleSize();
+        this->grid = Vec2(GRID_X, GRID_Y);
+        if(visibleSize.width < visibleSize.height)
+            this->grid = Vec2(GRID_Y, GRID_X);
+    }
 
     this->isDrawGrid = false;
     //bgColor
@@ -389,13 +399,14 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
         return false;
     }
     
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    mGrid = Vec2(GRID_X, GRID_Y);
-    if(visibleSize.width < visibleSize.height)
-        mGrid = Vec2(GRID_Y, GRID_X);
+//    Size visibleSize = Director::getInstance()->getVisibleSize();
+//    mGrid = Vec2(GRID_X, GRID_Y);
+//    if(visibleSize.width < visibleSize.height)
+//        mGrid = Vec2(GRID_Y, GRID_X);
     //Draw from memory --------------------------------------------------------------------------------------
 	if (ui_wizard_share::inst()->hasNode(sceneName)) {
         WIZARD::_Background bg = ui_wizard_share::inst()->getBackgound(sceneName);
+        mGrid = bg.grid;
 		this->drawBackground(bg);
 
 		WIZARD::VEC_NODES nodes = ui_wizard_share::inst()->getNodes(sceneName);
@@ -414,6 +425,7 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
     //background
 	WIZARD::_Background bg;
 	bg.load(d["background"]);
+    mGrid = bg.grid;
 	ui_wizard_share::inst()->setBackground(sceneName, bg);
 	this->drawBackground(bg);
 

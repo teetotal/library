@@ -113,6 +113,7 @@ namespace WIZARD {
 		COLOR_RGB bgColor, bgColor_second, tileColor;
         Vec2 tileNum;
         bool isDrawGrid;
+        Vec2 grid;
         
 		bool load(rapidjson::Value &p);
 	};
