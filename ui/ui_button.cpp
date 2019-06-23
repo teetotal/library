@@ -165,13 +165,14 @@ void ui_checkbox::init(Node * p
     //checkbox
     drawUnchecked(color);
     
-    //check v
+    //check v√٧
     Vec2 center = Vec2(mCheckboxSize.width/2.f, mCheckboxSize.height / 2.f);
     float fontSize = gui::inst()->getFontSizeDefine(mCheckboxSize, -2);
-    mNodes.labelChecked = Label::createWithSystemFont("V", SYSTEM_FONT_NAME, fontSize);
+    mNodes.labelChecked = Label::createWithSystemFont("√", SYSTEM_FONT_NAME, fontSize);
     mNodes.labelChecked->setColor(color.getColor3B());
     mNodes.labelChecked->setPosition(center);
-    mNodes.labelChecked->enableBold();
+//    mNodes.labelChecked->enableBold();
+    mNodes.labelChecked->enableGlow(Color4B::BLACK);
     this->addChild(mNodes.labelChecked);
     setChecked(mIsChecked);
     
