@@ -32,7 +32,7 @@ void ui_icon::addHeart(Node * p, Size sizePerGrid, Vec2 pos, ALIGNMENT align, co
         gui::inst()->setAnchorPoint(mNodes.label, ALIGNMENT_LEFT_BOTTOM);
         
         float margin = size.width * 0.1f;
-        mNodes.label->setPosition(Vec2(size.width + margin, 0));
+        mNodes.label->setPosition(Vec2(size.width + margin, -1));
         size.width += mNodes.label->getContentSize().width + margin;
         enableGlow(Color4B::BLACK);
     }
@@ -124,7 +124,7 @@ void ui_icon::addCircle(Node * p
         enableGlow(Color4B::BLACK);
         
         float margin = size.width * 0.1f;
-        mNodes.label->setPosition(Vec2(sizeCircle.width + margin, 0));
+        mNodes.label->setPosition(Vec2(sizeCircle.width + margin, -1)); // 1px아래로 해야 위에가 안짤림.
         size.width += mNodes.label->getContentSize().width + margin;
         this->addChild(mNodes.label);
     }

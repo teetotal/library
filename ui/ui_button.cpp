@@ -73,6 +73,7 @@ void ui_button::init(int id
     {
         mNodes.menuItem = gui::inst()->addTextButtonAutoDimension(0, 0, text, this, CC_CALLBACK_1(ui_button::callbackFn, this), -1, ALIGNMENT_CENTER, colorFont.getColor3B(), Vec2(1, 1), Vec2::ZERO, Vec2::ZERO, Vec2::ZERO);
         mNodes.menuItem->setOpacity(colorFont.getA());
+        mNodes.menuItem->setPosition(Vec2(mNodes.menuItem->getPosition().x, mNodes.menuItem->getPosition().y-1));
     }
 }
 
@@ -183,7 +184,7 @@ void ui_checkbox::init(Node * p
     gui::inst()->setAnchorPoint(mNodes.label, ALIGNMENT_LEFT_BOTTOM);
     
     float margin = size.width * 0.1f;
-    mNodes.label->setPosition(Vec2(size.width + margin, 0));
+    mNodes.label->setPosition(Vec2(size.width + margin, -1));
     size.width += mNodes.label->getContentSize().width + margin;
     this->addChild(mNodes.label);
     

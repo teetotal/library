@@ -91,7 +91,7 @@ namespace WIZARD {
     struct _Node : _base {
 		int id;
         string component;
-        
+        int link;
 		Vec2 dimensionStart, dimensionEnd;
 		Vec2 dimensionInnerStart, dimensionInnerEnd;
 		Vec2 margin;

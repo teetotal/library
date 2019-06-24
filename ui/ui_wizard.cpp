@@ -57,17 +57,17 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
     
     if(p.HasMember("component") && !p["component"].IsNull()) {
         this->component = p["component"].GetString();
-        CCLOG("WIZARD::_Object::load component = %s", this->component.c_str());
+//        CCLOG("WIZARD::_Object::load component = %s", this->component.c_str());
     }
     
-    CCLOG("WIZARD::_Object::load position");
+//    CCLOG("WIZARD::_Object::load position");
 	this->position.x = p["position"][rapidjson::SizeType(0)].GetFloat();
 	this->position.y = p["position"][rapidjson::SizeType(1)].GetFloat();
     
     if(p.HasMember("span") && !p["span"].IsNull()) {
         this->span.x = p["span"][rapidjson::SizeType(0)].GetFloat();
         this->span.y = p["span"][rapidjson::SizeType(1)].GetFloat();
-        CCLOG("WIZARD::_Object::load span");
+//        CCLOG("WIZARD::_Object::load span");
     }
     
     this->alignment = ALIGNMENT_CENTER;
@@ -101,23 +101,23 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
             this->alignment = ALIGNMENT_RIGHT_BOTTOM;
         }
         
-        CCLOG("WIZARD::_Object::load alignment %s", szAlignment.c_str());
+//        CCLOG("WIZARD::_Object::load alignment %s", szAlignment.c_str());
     }
     
     
-    CCLOG("WIZARD::_Object::load type");
+//    CCLOG("WIZARD::_Object::load type");
 	this->type = (OBJECT_TYPE)getObjectType(p["type"].GetString());
-    CCLOG("Start WIZARD::_Object::load link");
+//    CCLOG("Start WIZARD::_Object::load link");
 	this->link = ( !p.HasMember("link") || p["link"].IsNull()) ? NULL_INT_VALUE : p["link"].GetInt();
     
-    CCLOG("WIZARD::_Object::load text");
+//    CCLOG("WIZARD::_Object::load text");
     this->text = (!p.HasMember("text") || p["text"].IsNull()) ? NULL_STRING_VALUE : p["text"].GetString();
-    CCLOG("WIZARD::_Object::load fontSize");
+//    CCLOG("WIZARD::_Object::load fontSize");
     this->fontSize = (!p.HasMember("fontSize") || p["fontSize"].IsNull()) ? 0 : p["fontSize"].GetFloat();
-    CCLOG("WIZARD::_Object::load visible");
+//    CCLOG("WIZARD::_Object::load visible");
     this->visible = (!p.HasMember("visible") || p["visible"].IsNull()) ? true : p["visible"].GetBool();
 	
-    CCLOG("WIZARD::_Object::load img");
+//    CCLOG("WIZARD::_Object::load img");
     if (!p.HasMember("img") || p["img"].IsNull()) {
 		this->img = NULL_STRING_VALUE;
         this->img_selected = NULL_STRING_VALUE;
@@ -140,7 +140,7 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
 		//SpriteFrameCache::getInstance()->removeSpriteFrameByName("btn_bg");	
 	}
     
-    CCLOG("WIZARD::_Object::load color");
+//    CCLOG("WIZARD::_Object::load color");
     if (p.HasMember("color") && !p["color"].IsNull()) {
         //COLOR_RGB color1, color2;
         getColorFromJson(p["color"], &color1, &color2);
@@ -152,7 +152,7 @@ bool WIZARD::_Object::load(rapidjson::Value & p)
         }
     }
     
-    CCLOG("WIZARD::_Object::load bgColor");
+//    CCLOG("WIZARD::_Object::load bgColor");
     if (p.HasMember("bgColor") && !p["bgColor"].IsNull()) {
         COLOR_RGB color1, color2;
         getColorFromJson(p["bgColor"], &color1, &color2);
@@ -229,6 +229,7 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
     this->visible = true;
     this->isScrollView = false;
     this->id = -1;
+    this->link = -1;
     this->img = NULL_STRING_VALUE;
     
     if(pValue.HasMember("id") && !pValue["id"].IsNull())
@@ -240,18 +241,23 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
     
     if(p.HasMember("component") && !p["component"].IsNull()) {
         this->component = p["component"].GetString();
-        CCLOG("WIZARD::_Node::load component = %s", this->component.c_str());
+//        CCLOG("WIZARD::_Node::load component = %s", this->component.c_str());
         return true;
     }
     
-    CCLOG("WIZARD::_Node::load dimension");
+    if(p.HasMember("link") && !p["link"].IsNull()) {
+        this->link = p["link"].GetInt();
+//        CCLOG("WIZARD::_Node::load link = %d", this->link);
+    }
+    
+//    CCLOG("WIZARD::_Node::load dimension");
     this->dimensionStart.x = p["dimension"][rapidjson::SizeType(0)].GetFloat();
 	this->dimensionStart.y = p["dimension"][rapidjson::SizeType(1)].GetFloat();
 	this->dimensionEnd.x = p["dimension"][rapidjson::SizeType(2)].GetFloat();
 	this->dimensionEnd.y = p["dimension"][rapidjson::SizeType(3)].GetFloat();
     
     if(p.HasMember("dimensionInner") && !p["dimensionInner"].IsNull()) {
-        CCLOG("Start WIZARD::_Node::load dimensionInner");
+//        CCLOG("Start WIZARD::_Node::load dimensionInner");
         this->dimensionInnerStart.x = p["dimensionInner"][rapidjson::SizeType(0)].GetFloat();
         this->dimensionInnerStart.y = p["dimensionInner"][rapidjson::SizeType(1)].GetFloat();
         this->dimensionInnerEnd.x = p["dimensionInner"][rapidjson::SizeType(2)].GetFloat();
@@ -260,25 +266,25 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
         this->isScrollView = true;
     }
     
-    CCLOG("WIZARD::_Node::load margin");
+//    CCLOG("WIZARD::_Node::load margin");
 	this->margin.x = p["margin"][rapidjson::SizeType(0)].GetFloat();
 	this->margin.y = p["margin"][rapidjson::SizeType(1)].GetFloat();
     
-    CCLOG("WIZARD::_Node::load innerMargin");
+//    CCLOG("WIZARD::_Node::load innerMargin");
     this->innerMargin.x = p["innerMargin"][rapidjson::SizeType(0)].GetFloat();
     this->innerMargin.y = p["innerMargin"][rapidjson::SizeType(1)].GetFloat();
     
-    CCLOG("WIZARD::_Node::load gridSize");
+//    CCLOG("WIZARD::_Node::load gridSize");
 	this->gridSize.x = p["gridSize"][rapidjson::SizeType(0)].GetFloat();
 	this->gridSize.y = p["gridSize"][rapidjson::SizeType(1)].GetFloat();
     
     
     if(p.HasMember("img") && !p["img"].IsNull()) {
         this->img = p["img"].GetString();
-        CCLOG("WIZARD::_Node::load img %s", this->img.c_str());
+//        CCLOG("WIZARD::_Node::load img %s", this->img.c_str());
     }
     
-    CCLOG("WIZARD::_Node::load color");
+//    CCLOG("WIZARD::_Node::load color");
     if (p.HasMember("color") && !p["color"].IsNull()) {
         COLOR_RGB color1, color2;
         getColorFromJson(p["color"], &color1, &color2);
@@ -289,7 +295,7 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
     }
     //tile
     if (p.HasMember("tile") && !p["tile"].IsNull()) {
-        CCLOG("WIZARD::_Node::load tile");
+//        CCLOG("WIZARD::_Node::load tile");
         COLOR_RGB color1;
         getColorFromJson(p["tile"]["color"], &color1);
         this->colorTile.set(color1);
@@ -297,7 +303,7 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
                              , p["tile"]["num"][rapidjson::SizeType(1)].GetInt());
     }
 
-    CCLOG("WIZARD::_Node::load objects");
+//    CCLOG("WIZARD::_Node::load objects");
 	if (p.HasMember("objects")) {
 		const rapidjson::Value& objects = p["objects"];
 		for (rapidjson::SizeType i = 0; i < objects.Size(); i++)
@@ -310,7 +316,7 @@ bool WIZARD::_Node::load(rapidjson::Value & pValue)
 		}
 	}
     
-    CCLOG("WIZARD::_Node::load visible");
+//    CCLOG("WIZARD::_Node::load visible");
     if(p.HasMember("visible")) {
         this->visible = p["visible"].GetBool();
     }
@@ -347,7 +353,7 @@ bool WIZARD::_Background::load(rapidjson::Value & pValue)
 
     this->isDrawGrid = false;
     //bgColor
-    CCLOG("WIZARD::_Background::load bgColor");
+//    CCLOG("WIZARD::_Background::load bgColor");
 	if (!p["bgColor"].IsNull()) {
         COLOR_RGB color1, color2;
         getColorFromJson(p["bgColor"], &color1, &color2);
@@ -357,7 +363,7 @@ bool WIZARD::_Background::load(rapidjson::Value & pValue)
         }
 	}
     //tile
-    CCLOG("WIZARD::_Background::load tile");
+//    CCLOG("WIZARD::_Background::load tile");
     if (p.HasMember("tile") && !p["tile"].IsNull()) {
         COLOR_RGB color1;
         getColorFromJson(p["tile"]["color"], &color1);
@@ -369,7 +375,7 @@ bool WIZARD::_Background::load(rapidjson::Value & pValue)
     }
     
     //isDrawGrid
-    CCLOG("WIZARD::_Background::load isDrawGrid");
+//    CCLOG("WIZARD::_Background::load isDrawGrid");
     if(!p["isDrawGrid"].IsNull())
         this->isDrawGrid = p["isDrawGrid"].GetBool();
     
@@ -1183,6 +1189,23 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
 		if(obj.id >= 0 && obj.type != WIZARD::OBJECT_TYPE_COMPONENT)
 			mNodeMap[obj.id + seq] = pObj;
 	}
+    
+    //node link
+    if(node.link != -1) {
+        gui::inst()->addTextButtonAutoDimension(0
+                                                , 0
+                                                , "M"
+                                                , layoutBG
+                                                , CC_CALLBACK_1(ui_wizard::callback, this, node.id, node.link)
+                                                , 0
+                                                , ALIGNMENT_CENTER
+                                                , Color3B::BLACK
+                                                , Vec2(1, 1)
+                                                , Vec2::ZERO
+                                                , Vec2::ZERO
+                                                , Vec2::ZERO
+                                                , Vec2::ZERO)->setOpacity(0);
+    }
     
     if(node.isScrollView) {
         sv->setVisible(node.visible);
