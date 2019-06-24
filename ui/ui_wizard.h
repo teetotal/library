@@ -120,7 +120,7 @@ namespace WIZARD {
 
 	typedef vector<WIZARD::_Node> VEC_NODES;
     
-    rapidjson::Document getJsonValue(const string& path);
+//    rapidjson::Document getJsonValue(const string& path);
 };
 /* ===============================================
 	ui_wizard_share

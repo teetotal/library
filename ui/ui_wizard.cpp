@@ -8,7 +8,7 @@
 #include "ui_icon.h"
 #include "ui_ext.h"
 #include "ui_button.h"
-#include "../library/util.h"
+#include "library/pch.h"
 
 #define POINT_CHAR   "P"
 #define POINT_COLOR  "YELLOW"
@@ -381,19 +381,19 @@ bool WIZARD::_Background::load(rapidjson::Value & pValue)
     
 	return true;
 }
-
-rapidjson::Document WIZARD::getJsonValue(const string& path) {
-    string fullpath = FileUtils::getInstance()->fullPathForFilename(path);
-    string sz = FileUtils::getInstance()->getStringFromFile(fullpath);
-    
-    rapidjson::Document d;
-    d.Parse(sz.c_str());
-    if (d.HasParseError()) {
-        CCLOG("loadFromJson Failure. ErrorCode: %d, ErrorOffset: %zu", d.GetParseError(), d.GetErrorOffset());
-        //return false;
-    }
-    return d;
-}
+//
+//rapidjson::Document WIZARD::getJsonValue(const string& path) {
+//    string fullpath = FileUtils::getInstance()->fullPathForFilename(path);
+//    string sz = FileUtils::getInstance()->getStringFromFile(fullpath);
+//    
+//    rapidjson::Document d;
+//    d.Parse(sz.c_str());
+//    if (d.HasParseError()) {
+//        CCLOG("loadFromJson Failure. ErrorCode: %d, ErrorOffset: %zu", d.GetParseError(), d.GetErrorOffset());
+//        //return false;
+//    }
+//    return d;
+//}
 
 // ui_wizard -------------------------------------------------------------------------------------------
 bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
@@ -424,7 +424,7 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 	}
     
     //Parse & Draw --------------------------------------------------------------------------------------
-    rapidjson::Document d = WIZARD::getJsonValue(path);
+    rapidjson::Document d = getJsonValue(path);
     
     //component
 
@@ -454,7 +454,7 @@ bool ui_wizard::loadFromJson(const string& sceneName, const string& path)
 bool ui_wizard_share::loadPaletteFromJson(const string& pathPalette) {
     
     if(pathPalette.compare("") != 0 && ui_wizard_share::inst()->insertPalettePath(pathPalette)) {
-        rapidjson::Document dPalette = WIZARD::getJsonValue(pathPalette);
+        rapidjson::Document dPalette = getJsonValue(pathPalette);
         int brightness = dPalette["brightness"].GetInt();
         int tone = dPalette["tone"].GetInt();
         
@@ -501,7 +501,7 @@ bool ui_wizard_share::loadPaletteFromJson(const string& pathPalette) {
 
 bool ui_wizard_share::loadComponentFromJson(const string& path) {
     if(path.compare("") != 0) {
-        rapidjson::Document d = WIZARD::getJsonValue(path);
+        rapidjson::Document d = getJsonValue(path);
         for (auto& m : d.GetObject())
         {
             string name = m.name.GetString();

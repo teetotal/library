@@ -13,6 +13,9 @@
 #include <cmath>
 #include <codecvt>
 #include <cwchar>
+#include "json/document.h"
+#include "json/stringbuffer.h"
+#include "json/writer.h"
 
 #include "util.h"
 
@@ -35,5 +38,5 @@ wstring sprint(const wstring format, int val);
 string sprint(const char * format, ...);
 string numberFormat(int n);
 string getRankString(int rank);
-
+rapidjson::Document getJsonValue(const string& path);
 

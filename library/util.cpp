@@ -216,6 +216,21 @@ string getRankString(int rank) {
     const string sz = to_string(rank) + postfix;
     return sz;
 }
+
+
+rapidjson::Document getJsonValue(const string& path) {
+    string fullpath = FileUtils::getInstance()->fullPathForFilename(path);
+    string sz = FileUtils::getInstance()->getStringFromFile(fullpath);
+    
+    rapidjson::Document d;
+    d.Parse(sz.c_str());
+    if (d.HasParseError()) {
+        CCLOG("loadFromJson Failure. ErrorCode: %d, ErrorOffset: %zu", d.GetParseError(), d.GetErrorOffset());
+        //return false;
+    }
+    return d;
+}
+
 /*
 char* intToChar(int n) {
 	char *buf = new char[10];
