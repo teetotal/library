@@ -33,6 +33,7 @@ public:
                                   , bool toRight = false
                                   , float speed = 1.f                   //default speed를 얼마나 빠르고 느리게 하는가
                                   , CallFunc * pCallFunc = NULL         // 효과 이후 콜백을 받기 위해
+                                  , CallFunc * pCallFuncInter = NULL    //중간 효과에서 콜백
                                   );
     static void addVibrateEffect(Node * p, CallFunc * pCallFunc = NULL, float duration = 0.1f, float width = 5.f);
     static void addScaleEffect(Node * p, const string img, const string text = "", COLOR_RGB fontColor = COLOR_RGB(), CallFunc * pCallFunc = NULL, float duration = 0.4f, float sizePerWidth = .4f, Vec2 specificPosition = Vec2(-1, -1), GLubyte opacity = 255);

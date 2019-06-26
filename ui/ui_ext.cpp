@@ -186,7 +186,8 @@ Node * guiExt::addMovingEffect(Node * p
                                , COLOR_RGB fontColor
                                , bool toRight
                                , float speed
-                               , CallFunc * pCallFunc) {
+                               , CallFunc * pCallFunc
+                               , CallFunc * pCallFuncInter) {
     auto layer = gui::inst()->createLayout(Size(p->getContentSize().width, p->getContentSize().height / 3), "", true, bgColor.getColor3B());
     gui::inst()->setAnchorPoint(layer, ALIGNMENT_LEFT);
     layer->setPosition(
@@ -198,12 +199,17 @@ Node * guiExt::addMovingEffect(Node * p
     auto left = EaseBackOut::create(MoveTo::create(.4f * speed, Vec2(p->getContentSize().width * -1.f, p->getContentSize().height / 2.f)));
     auto right = EaseBackOut::create(MoveTo::create(.4f * speed, Vec2(p->getContentSize().width * 1.f, p->getContentSize().height / 2.f)));
     
-    layer->runAction(Sequence::create( center
-                                      , DelayTime::create(.4f * speed)
-                                      , toRight ? right : left
-                                      , RemoveSelf::create()
-                                      , pCallFunc
-                                      , NULL));
+    Vector<FiniteTimeAction*> arr;
+    arr.pushBack(center);
+    arr.pushBack(DelayTime::create(.4f * speed));
+    if(pCallFuncInter)
+        arr.pushBack(pCallFuncInter);
+    arr.pushBack(toRight ? right : left);
+    arr.pushBack(RemoveSelf::create());
+    if(pCallFunc)
+        arr.pushBack(pCallFunc);
+    
+    layer->runAction(Sequence::create( arr ));
     Vec2 gridText = Vec2(1,1);
     int posText = 0;
     int fontSize = -2;
@@ -308,8 +314,9 @@ void guiExt::addScaleEffect(Node * p
 
 void guiExt::runScaleEffect(Node * p, CallFunc * pCallFunc, float duration, bool isRemoveSelf) {
     Vector<FiniteTimeAction *> actions;
-    actions.pushBack(EaseBackIn::create(ScaleTo::create(duration, 1.2f)));
-    actions.pushBack(EaseBackOut::create(ScaleTo::create(duration, 1.f)));
+    float origin = p->getScale();
+    actions.pushBack(EaseBackIn::create(ScaleBy::create(duration, 1.2f)));
+    actions.pushBack(EaseBackOut::create(ScaleTo::create(duration, origin)));
     if(isRemoveSelf)
         actions.pushBack(RemoveSelf::create());
     if(pCallFunc)
