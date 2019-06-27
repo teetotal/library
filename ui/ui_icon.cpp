@@ -45,7 +45,8 @@ void ui_icon::addHeart(Node * p, Size sizePerGrid, Vec2 pos, ALIGNMENT align, co
     gui::inst()->setAnchorPoint(this, align);
     this->setContentSize(size);
     
-    p->addChild(this);
+    if(p)
+        p->addChild(this);
 }
 
 void ui_icon::addCircle(Node * p
@@ -132,7 +133,8 @@ void ui_icon::addCircle(Node * p
     this->setContentSize(size);
     this->setPosition(pos);
     
-    p->addChild(this);
+    if(p)
+        p->addChild(this);
 }
 
 void ui_icon::setEnabled(bool enable) {
