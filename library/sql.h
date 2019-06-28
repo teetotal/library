@@ -13,14 +13,17 @@
 class Sql {
 public:
 	Sql() {
-		if (hInst == NULL)
-			hInst = this;
 	};
 	~Sql() {
-		if (hInst != NULL)
-			hInst = NULL;
+        if (hInst != NULL) {
+			delete(hInst);
+            hInst = NULL;
+        }
 	};
 	static Sql * inst() {
+        if (hInst == NULL) {
+            hInst = new Sql;
+        }
 		return hInst;
 	};
 
