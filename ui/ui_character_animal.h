@@ -24,12 +24,15 @@ public:
         
         return ret;
     };
-    
-    void init(Size size);
+    void addRectangle(Size size, Color3B colorBG, Color4F colorSkin, Color4F colorFeatures, Color4F colorPoint);
+    void addCircle(Size size, Color3B colorBG, Color4F colorSkin, Color4F colorFeatures, Color4F colorPoint);
 
 private:
     #define GRID Vec2(4,4)
     Vec2 getPositionOnGrid(int x, int y, ALIGNMENT align = ALIGNMENT_CENTER, Vec2 grid = GRID);
+    Vec2 getPositionOnGrid2(int x, int y, ALIGNMENT align = ALIGNMENT_CENTER, Vec2 grid = Vec2(8,8)){
+        return getPositionOnGrid(x, y, align, grid);
+    };
     
 };
 

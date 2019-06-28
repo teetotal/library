@@ -652,10 +652,21 @@ DrawNode * gui::drawTriangle(Node * p, Vec2 a, Vec2 b, Vec2 c, Color4F color){
     return draw;
 }
 
-DrawNode * gui::drawRect(Node * p, Vec2 pos1, Vec2 pos2, Vec2 pos3, Vec2 pos4, Color4F color){
+DrawNode * gui::drawRect(Node * p, Vec2 pos1, Vec2 pos2, Vec2 pos3, Vec2 pos4, Color4F color, bool isSolid){
     auto draw = DrawNode::create();
     
-    draw->drawRect(pos1, pos2, pos3, pos4, color);
+    if(isSolid) {
+        Vec2 origin, dest;
+        origin.x = fmin(fmin(fmin(pos1.x, pos2.x), pos3.x), pos4.x);
+        origin.y = fmax(fmax(fmax(pos1.y, pos2.y), pos3.y), pos4.y);
+        
+        dest.x = fmax(fmax(fmax(pos1.x, pos2.x), pos3.x), pos4.x);
+        dest.y = fmin(fmin(fmin(pos1.y, pos2.y), pos3.y), pos4.y);
+        
+        draw->drawSolidRect(origin, dest, color);
+    }
+    else
+        draw->drawRect(pos1, pos2, pos3, pos4, color);
     
     p->addChild(draw);
     return draw;

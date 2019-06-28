@@ -420,7 +420,7 @@ public:
     DrawNode * drawCircle           (Node * p, Vec2 pos,    float radius,   Color4F color);
     DrawNode * drawTriangle         (Node * p, Vec2 a,      Vec2 b,         Vec2 c,     Color4F color);
     DrawNode * drawRect             (Node * p, Vec2 pos,    Size size,      Color4F color,  bool isSolid = true, DrawNode * pDraw = NULL);
-    DrawNode * drawRect             (Node * p, Vec2 pos1,   Vec2 pos2,      Vec2 pos3,  Vec2 pos4, Color4F color);
+    DrawNode * drawRect             (Node * p, Vec2 pos1,   Vec2 pos2,      Vec2 pos3,  Vec2 pos4, Color4F color, bool isSolid = false);
     DrawNode * drawRectRound        (Node * p, Vec2 pos,    Size size,      Color4F color, DrawNode * pDraw = NULL);
     DrawNode * drawRectCircle       (Node * p, Vec2 pos,    Size size,      Color4F color, DrawNode * draw = NULL);
     DrawNode * drawDiamond          (Node * p, Vec2 pos,    Size size,      Color4F color);
