@@ -28,12 +28,37 @@ public:
     void addCircle(Size size, Color3B colorBG, Color4F colorSkin, Color4F colorFeatures, Color4F colorPoint);
 
 private:
-    #define GRID Vec2(4,4)
-    Vec2 getPositionOnGrid(int x, int y, ALIGNMENT align = ALIGNMENT_CENTER, Vec2 grid = GRID);
-    Vec2 getPositionOnGrid2(int x, int y, ALIGNMENT align = ALIGNMENT_CENTER, Vec2 grid = Vec2(8,8)){
-        return getPositionOnGrid(x, y, align, grid);
+    enum ID_LAYOUT {
+        ID_LAYOUT_EARS = 0,
+        ID_LAYOUT_FACE,
+        ID_LAYOUT_EYEBROW,
+        ID_LAYOUT_EYES,
+        ID_LAYOUT_MOUTH,
+        ID_LAYOUT_NOSE,
+        ID_LAYOUT_POINT,
+        ID_LAYOUT_MAX
     };
     
+    enum TYPE {
+        TYPE_RECTANGLE,
+    };
+    Layout * mLayout[ID_LAYOUT_MAX];
+    Color4F mColorSkin, mColorFeatures, mColorPoint;
+    TYPE mType;
+    
+    #define GRID Vec2(4,4)
+    #define GRID2 Vec2(8,8)
+    Vec2 getPositionOnGrid(int x, int y, ALIGNMENT align = ALIGNMENT_CENTER, Vec2 grid = GRID);
+    Vec2 getPositionOnGrid2(int x, int y, ALIGNMENT align = ALIGNMENT_CENTER, Vec2 grid = GRID2){
+        return getPositionOnGrid(x, y, align, grid);
+    };
+    void drawEars(int i);
+    void drawFace(int i);
+    void drawEyebrow(int i);
+    void drawEyes(int i);
+    void drawMouth(int i);
+    void drawNose(int i);
+    void drawPoint(int i);
 };
 
 #endif /* ui_character_animal_h */
