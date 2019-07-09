@@ -94,9 +94,9 @@ void ui_character_animal::drawFace(ID_FACE i) {
                                       , true);
                 
                 gui::inst()->drawTriangle(mLayout[ID_LAYOUT_FACE]
-                                          , getPositionOnGrid2(0, 7, ALIGNMENT_LEFT_TOP)
-                                          , getPositionOnGrid2(0, 7, ALIGNMENT_RIGHT_TOP)
-                                          , getPositionOnGrid2(0, 7, ALIGNMENT_RIGHT_BOTTOM)
+                                          , getPositionOnGrid2(1, 7, ALIGNMENT_LEFT_TOP)
+                                          , getPositionOnGrid2(1, 7, ALIGNMENT_RIGHT_TOP)
+                                          , getPositionOnGrid2(1, 7, ALIGNMENT_RIGHT_BOTTOM)
                                           , mColorSkin.getColor4F());
                 
                 gui::inst()->drawTriangle(mLayout[ID_LAYOUT_FACE]
