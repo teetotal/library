@@ -215,6 +215,12 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_ICON_HEART;
     else if (type.compare("icon_point") == 0)
         return OBJECT_TYPE_ICON_POINT;
+    else if (type.compare("icon_circle2") == 0)
+        return OBJECT_TYPE_ICON_CIRCLE2;
+    else if (type.compare("icon_heart2") == 0)
+        return OBJECT_TYPE_ICON_HEART2;
+    else if (type.compare("icon_point2") == 0)
+        return OBJECT_TYPE_ICON_POINT2;
     else if (type.compare("component") == 0)
         return OBJECT_TYPE_COMPONENT;
     else if (type.compare("layer") == 0)
@@ -1129,13 +1135,34 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                             );
                 break;
             case WIZARD::OBJECT_TYPE_ICON_HEART:
-            {
                 pObj = ui_icon::create();
                 ((ui_icon*)pObj)->addHeart(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment, sz, obj.color1, obj.fontSize);
                 break;
-            }
             case WIZARD::OBJECT_TYPE_ICON_POINT:
                 pObj = ui_icon::create();
+                ((ui_icon*)pObj)->addCircle(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment
+                                            , ui_wizard_share::inst()->getPalette()->getColor(POINT_COLOR)
+                                            , POINT_CHAR
+                                            , ""
+                                            , sz
+                                            , obj.color1
+                                            , obj.fontSize);
+                
+                break;
+            case WIZARD::OBJECT_TYPE_ICON_CIRCLE2:
+                pObj = ui_icon::create(false);
+                ((ui_icon*)pObj)->addCircle(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment
+                                            , obj.color1
+                                            , sz
+                                            , obj.img
+                                            );
+                break;
+            case WIZARD::OBJECT_TYPE_ICON_HEART2:
+                pObj = ui_icon::create(false);
+                ((ui_icon*)pObj)->addHeart(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment, sz, obj.color1, obj.fontSize);
+                break;
+            case WIZARD::OBJECT_TYPE_ICON_POINT2:
+                pObj = ui_icon::create(false);
                 ((ui_icon*)pObj)->addCircle(layoutBG, gridSizeWithSpanWithMargin, positionWithInnerMargin, obj.alignment
                                             , ui_wizard_share::inst()->getPalette()->getColor(POINT_COLOR)
                                             , POINT_CHAR

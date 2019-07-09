@@ -11,7 +11,34 @@
 mLayout[x]->setContentSize(this->getContentSize());\
 this->addChild(mLayout[x]);
 
-void ui_character_animal::drawEars(int i) {
+void ui_character_animal::init(Node * parent
+          , Size size
+          , Vec2 position
+          , ALIGNMENT align
+          , COLOR_RGB colorSkin
+          , COLOR_RGB colorFeatures
+          , COLOR_RGB colorPoint
+          , COLOR_RGB colorBG)
+{
+    
+    this->setContentSize(size);
+    if(colorBG.isValidColor) {
+        this->setBackGroundColor(colorBG.getColor3B());
+        this->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
+    }
+    mColorSkin = colorSkin;
+    mColorFeatures = colorFeatures;
+    mColorPoint = colorPoint;
+    
+    
+    this->setPosition(position);
+    gui::inst()->setAnchorPoint(this, align);
+    
+    if(parent)
+        parent->addChild(this);
+}
+
+void ui_character_animal::drawEars(ID_EARS i) {
 
     CREATE_LAYOUT(ID_LAYOUT_EARS)
     
@@ -22,66 +49,110 @@ void ui_character_animal::drawEars(int i) {
         Vec2 posEarLeftL = getPositionOnGrid2(1, 1, ALIGNMENT_LEFT_BOTTOM);
         Vec2 posEarLeftR = getPositionOnGrid2(2, 1, ALIGNMENT_RIGHT_BOTTOM);
         
-        gui::inst()->drawTriangle(mLayout[ID_LAYOUT_EARS], posEarLeftT, posEarLeftL, posEarLeftR, mColorSkin);
+        gui::inst()->drawTriangle(mLayout[ID_LAYOUT_EARS], posEarLeftT, posEarLeftL, posEarLeftR, mColorSkin.getColor4F());
         gui::inst()->drawTriangle(mLayout[ID_LAYOUT_EARS]
                                   , Vec2(posEarLeftT.x, posEarLeftT.y - (f / 2.f))
                                   , Vec2(posEarLeftL.x + (f / 2.f), posEarLeftL.y)
                                   , Vec2(posEarLeftR.x - (f / 2.f), posEarLeftR.y)
-                                  , mColorFeatures);
+                                  , mColorFeatures.getColor4F());
         
         Vec2 posEarRightT = getPositionOnGrid2(5, 0, ALIGNMENT_RIGHT);
         Vec2 posEarRightL = getPositionOnGrid2(5, 1, ALIGNMENT_LEFT_BOTTOM);
         Vec2 posEarRightR = getPositionOnGrid2(6, 1, ALIGNMENT_RIGHT_BOTTOM);
         
-        gui::inst()->drawTriangle(mLayout[ID_LAYOUT_EARS], posEarRightT, posEarRightL, posEarRightR, mColorSkin);
+        gui::inst()->drawTriangle(mLayout[ID_LAYOUT_EARS], posEarRightT, posEarRightL, posEarRightR, mColorSkin.getColor4F());
         gui::inst()->drawTriangle(mLayout[ID_LAYOUT_EARS]
                                   , Vec2(posEarRightT.x, posEarRightT.y - (f / 2.f))
                                   , Vec2(posEarRightL.x + (f / 2.f), posEarRightL.y)
                                   , Vec2(posEarRightR.x - (f / 2.f), posEarRightR.y)
-                                  , mColorFeatures);
+                                  , mColorFeatures.getColor4F());
     }
 }
 
-void ui_character_animal::drawFace(int i) {
+void ui_character_animal::drawFace(ID_FACE i) {
     
     CREATE_LAYOUT(ID_LAYOUT_FACE)
     
     if(mType == TYPE_RECTANGLE) {
-        Vec2 posFace1 = getPositionOnGrid2(0, 1, ALIGNMENT_RIGHT_BOTTOM);
-        Vec2 posFace2 = getPositionOnGrid2(6, 1, ALIGNMENT_RIGHT_BOTTOM);
-        Vec2 posFace3 = getPositionOnGrid2(6, 7, ALIGNMENT_RIGHT_BOTTOM);
-        Vec2 posFace4 = getPositionOnGrid2(0, 7, ALIGNMENT_RIGHT_BOTTOM);
         
-        gui::inst()->drawRect(mLayout[ID_LAYOUT_FACE], posFace1, posFace2, posFace3, posFace4, mColorSkin, true);
+        switch(i) {
+            case ID_FACE_1: {
+                gui::inst()->drawRect(mLayout[ID_LAYOUT_FACE]
+                                      , getPositionOnGrid2(0, 1, ALIGNMENT_RIGHT_BOTTOM)
+                                      , getPositionOnGrid2(6, 1, ALIGNMENT_RIGHT_BOTTOM)
+                                      , getPositionOnGrid2(6, 6, ALIGNMENT_RIGHT_BOTTOM)
+                                      , getPositionOnGrid2(0, 6, ALIGNMENT_RIGHT_BOTTOM)
+                                      , mColorSkin.getColor4F()
+                                      , true);
+                
+                gui::inst()->drawRect(mLayout[ID_LAYOUT_FACE]
+                                      , getPositionOnGrid2(1, 6, ALIGNMENT_RIGHT_BOTTOM)
+                                      , getPositionOnGrid2(5, 6, ALIGNMENT_RIGHT_BOTTOM)
+                                      , getPositionOnGrid2(5, 7, ALIGNMENT_RIGHT_BOTTOM)
+                                      , getPositionOnGrid2(1, 7, ALIGNMENT_RIGHT_BOTTOM)
+                                      , mColorSkin.getColor4F()
+                                      , true);
+                
+                gui::inst()->drawTriangle(mLayout[ID_LAYOUT_FACE]
+                                          , getPositionOnGrid2(0, 7, ALIGNMENT_LEFT_TOP)
+                                          , getPositionOnGrid2(0, 7, ALIGNMENT_RIGHT_TOP)
+                                          , getPositionOnGrid2(0, 7, ALIGNMENT_RIGHT_BOTTOM)
+                                          , mColorSkin.getColor4F());
+                
+                gui::inst()->drawTriangle(mLayout[ID_LAYOUT_FACE]
+                                          , getPositionOnGrid2(6, 7, ALIGNMENT_LEFT_TOP)
+                                          , getPositionOnGrid2(6, 7, ALIGNMENT_RIGHT_TOP)
+                                          , getPositionOnGrid2(6, 7, ALIGNMENT_LEFT_BOTTOM)
+                                          , mColorSkin.getColor4F());
+                
+                break;
+            }
+            case ID_FACE_2: {
+                gui::inst()->drawRect(mLayout[ID_LAYOUT_FACE]
+                                      , getPositionOnGrid2(0, 1, ALIGNMENT_RIGHT_BOTTOM)
+                                      , getPositionOnGrid2(6, 1, ALIGNMENT_RIGHT_BOTTOM)
+                                      , getPositionOnGrid2(6, 7, ALIGNMENT_RIGHT_BOTTOM)
+                                      , getPositionOnGrid2(0, 7, ALIGNMENT_RIGHT_BOTTOM)
+                                      , mColorSkin.getColor4F()
+                                      , true);
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
 
-void ui_character_animal::drawEyebrow(int i) {
-    
-    CREATE_LAYOUT(ID_LAYOUT_EYEBROW)
-    
-    if(mType == TYPE_RECTANGLE) {
-        float f = mLayout[ID_LAYOUT_EYEBROW]->getContentSize().height / GRID2.y;
-        gui::inst()->drawRect(mLayout[ID_LAYOUT_EYEBROW], getPositionOnGrid2(2, 3, ALIGNMENT_RIGHT_TOP), Size(f / 2, f / 8), mColorFeatures);
-        gui::inst()->drawRect(mLayout[ID_LAYOUT_EYEBROW], getPositionOnGrid2(5, 3, ALIGNMENT_LEFT_TOP), Size(f / 2, f / 8), mColorFeatures);
-    }
-}
-
-void ui_character_animal::drawEyes(int i) {
+void ui_character_animal::drawEyes(ID_EYES i) {
     CREATE_LAYOUT(ID_LAYOUT_EYES)
     if(mType == TYPE_RECTANGLE) {
         float f = mLayout[ID_LAYOUT_EYES]->getContentSize().height / GRID2.y;
-        gui::inst()->drawCircle(mLayout[ID_LAYOUT_EYES], getPositionOnGrid2(2, 3, ALIGNMENT_RIGHT), f / 4.f, mColorFeatures);
-        gui::inst()->drawCircle(mLayout[ID_LAYOUT_EYES], getPositionOnGrid2(5, 3, ALIGNMENT_LEFT), f / 4.f, mColorFeatures);
+        switch(i) {
+            case ID_EYES_1: {
+                gui::inst()->drawCircle(mLayout[ID_LAYOUT_EYES], getPositionOnGrid2(2, 3, ALIGNMENT_RIGHT), f / 2.f, mColorFeatures.getColor4F());
+                gui::inst()->drawCircle(mLayout[ID_LAYOUT_EYES], getPositionOnGrid2(5, 3, ALIGNMENT_LEFT), f / 2.f, mColorFeatures.getColor4F());
+                break;
+            }
+            case ID_EYES_2: {
+                gui::inst()->drawRect(mLayout[ID_LAYOUT_EYES], getPositionOnGrid2(2, 3, ALIGNMENT_RIGHT_TOP), Size(f / 2, f / 8), mColorFeatures.getColor4F());
+                gui::inst()->drawRect(mLayout[ID_LAYOUT_EYES], getPositionOnGrid2(5, 3, ALIGNMENT_LEFT_TOP), Size(f / 2, f / 8), mColorFeatures.getColor4F());
+                
+                gui::inst()->drawCircle(mLayout[ID_LAYOUT_EYES], getPositionOnGrid2(2, 3, ALIGNMENT_RIGHT), f / 4.f, mColorFeatures.getColor4F());
+                gui::inst()->drawCircle(mLayout[ID_LAYOUT_EYES], getPositionOnGrid2(5, 3, ALIGNMENT_LEFT), f / 4.f, mColorFeatures.getColor4F());
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
 
-void ui_character_animal::drawMouth(int i) {
+void ui_character_animal::drawMouth(ID_MOUTH i) {
     CREATE_LAYOUT(ID_LAYOUT_MOUTH)
     if(mType == TYPE_RECTANGLE) {
         float f = mLayout[ID_LAYOUT_MOUTH]->getContentSize().height / GRID2.y;
         switch(i) {
-            case 0: {
+            case ID_MOUTH_1: {
                 Vec2 t = getPositionOnGrid2(3, 4, ALIGNMENT_RIGHT);
                 Vec2 c = getPositionOnGrid2(3, 5, ALIGNMENT_RIGHT_TOP);
                 Vec2 l = getPositionOnGrid2(3, 5, ALIGNMENT_CENTER);
@@ -89,30 +160,32 @@ void ui_character_animal::drawMouth(int i) {
                 
                 //100 : 10 = f: x
                 //
-                gui::inst()->drawLine(mLayout[ID_LAYOUT_MOUTH], t, c, mColorFeatures, f / 4);
-                gui::inst()->drawLine(mLayout[ID_LAYOUT_MOUTH], c, l, mColorFeatures, f / 2);
-                gui::inst()->drawLine(mLayout[ID_LAYOUT_MOUTH], c, r, mColorFeatures, f / 2);
+                gui::inst()->drawLine(mLayout[ID_LAYOUT_MOUTH], t, c, mColorFeatures.getColor4F(), f / 4);
+                gui::inst()->drawLine(mLayout[ID_LAYOUT_MOUTH], c, l, mColorFeatures.getColor4F(), f / 2);
+                gui::inst()->drawLine(mLayout[ID_LAYOUT_MOUTH], c, r, mColorFeatures.getColor4F(), f / 2);
                 
                 break;
             }
-            case 1: {
-                gui::inst()->drawCircle(mLayout[ID_LAYOUT_MOUTH], getPositionOnGrid(1, 2, ALIGNMENT_RIGHT), f / 16.f, mColorFeatures);
+            case ID_MOUTH_2: {
+                gui::inst()->drawCircle(mLayout[ID_LAYOUT_MOUTH], getPositionOnGrid(1, 2, ALIGNMENT_RIGHT), f / 16.f, mColorFeatures.getColor4F());
                 
                 break;
             }
+            default:
+                break;
         }
     }
 }
 
-void ui_character_animal::drawNose(int i) {
+void ui_character_animal::drawNose(ID_NOSE i) {
     CREATE_LAYOUT(ID_LAYOUT_NOSE)
     if(mType == TYPE_RECTANGLE) {
         float f = mLayout[ID_LAYOUT_NOSE]->getContentSize().height / GRID2.y;
-        gui::inst()->drawCircle(mLayout[ID_LAYOUT_NOSE], getPositionOnGrid2(3, 4, ALIGNMENT_RIGHT), f / 6.f, mColorFeatures);
+        gui::inst()->drawCircle(mLayout[ID_LAYOUT_NOSE], getPositionOnGrid2(3, 4, ALIGNMENT_RIGHT), f / 6.f, mColorFeatures.getColor4F());
     }
 }
 
-void ui_character_animal::drawPoint(int i) {
+void ui_character_animal::drawPoint(ID_POINT i) {
     CREATE_LAYOUT(ID_LAYOUT_POINT)
     if(mType == TYPE_RECTANGLE) {
         float f = mLayout[ID_LAYOUT_POINT]->getContentSize().height / GRID2.y;
@@ -120,62 +193,55 @@ void ui_character_animal::drawPoint(int i) {
         gui::inst()->drawLine(mLayout[ID_LAYOUT_POINT]
                               , getPositionOnGrid2(1, 4, ALIGNMENT_RIGHT)
                               , getPositionOnGrid2(0, 4, ALIGNMENT_CENTER)
-                              , mColorPoint
+                              , mColorPoint.getColor4F()
                               , thick
                               );
         gui::inst()->drawLine(mLayout[ID_LAYOUT_POINT]
                               , getPositionOnGrid2(1, 5, ALIGNMENT_RIGHT)
                               , getPositionOnGrid2(0, 5, ALIGNMENT_CENTER)
-                              , mColorPoint
+                              , mColorPoint.getColor4F()
                               , thick
                               );
         
         gui::inst()->drawLine(mLayout[ID_LAYOUT_POINT]
                               , getPositionOnGrid2(7, 4, ALIGNMENT_CENTER)
                               , getPositionOnGrid2(6, 4, ALIGNMENT_LEFT)
-                              , mColorPoint
+                              , mColorPoint.getColor4F()
                               , thick
                               );
         gui::inst()->drawLine(mLayout[ID_LAYOUT_POINT]
                               , getPositionOnGrid2(7, 5, ALIGNMENT_CENTER)
                               , getPositionOnGrid2(6, 5, ALIGNMENT_LEFT)
-                              , mColorPoint
+                              , mColorPoint.getColor4F()
                               , thick
                               );
     }
 }
 
-void ui_character_animal::addRectangle(Size parentSize, Color3B colorBG, Color4F colorSkin, Color4F colorFeatures, Color4F colorPoint) {
-    this->setContentSize(parentSize);
-    
-    this->setBackGroundColor(colorBG);
-    this->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-
-    mColorSkin = colorSkin;
-    mColorFeatures = colorFeatures;
-    mColorPoint = colorPoint;
-    
+void ui_character_animal::addRectangle(ID_EARS nEars
+                                       , ID_FACE nFace
+                                       , ID_EYES nEyes
+                                       , ID_MOUTH nMouth
+                                       , ID_NOSE nNose
+                                       , ID_POINT nPoint) {
     mType = TYPE_RECTANGLE;
     //ear
-    drawEars(0);
+    drawEars(nEars);
     
     //face
-    drawFace(0);
+    drawFace(nFace);
 
-    //눈썹
-    drawEyebrow(0);
-    
     //eyes
-    drawEyes(0);
+    drawEyes(nEyes);
 
     //mouth
-    drawMouth(0);
+    drawMouth(nMouth);
     
     //nose
-    drawNose(0);
+    drawNose(nNose);
 
     // point
-    drawPoint(0);
+    drawPoint(nPoint);
     
     //drawLine
 //    gui::inst()->drawGrid(this, this->getContentSize(), GRID2, Vec2::ZERO, Vec2::ZERO);

@@ -13,10 +13,11 @@
 class ui_icon : public Layout
 {
 public:
-    static ui_icon * create() {
+    static ui_icon * create(bool isGlow = true, const Color4B& color = Color4B::BLACK) {
         ui_icon * ret = new (std::nothrow) ui_icon;
         if (ret)
         {
+            ret->setGlow(isGlow, color);
             ret->autorelease();
         } else {
             CC_SAFE_DELETE(ret);
@@ -24,7 +25,7 @@ public:
         
         return ret;
     };
-    ui_icon() : mEnable(true) {};
+    ui_icon() : mEnable(true), mEnableGlow(true), mColorGlow(Color4B::BLACK) {};
     
     void addHeart(Node * p
                   , Size sizePerGrid
@@ -52,6 +53,12 @@ public:
             mNodes.label->setColor(color);
         }
     };
+    
+    inline void setGlow(bool isGlow, const Color4B& color = Color4B::BLACK) {
+        mEnableGlow = isGlow;
+        mColorGlow = color;
+    };
+    
     inline void enableGlow(const Color4B& color) {
         if(mNodes.label) {
             mNodes.label->enableGlow(color);
@@ -77,5 +84,7 @@ private:
     } mNodes;
     
     bool mEnable;
+    bool mEnableGlow;
+    Color4B mColorGlow;
 };
 #endif /* ui_icon_h */
