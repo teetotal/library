@@ -266,7 +266,7 @@ void guiExt::addScaleEffect(Node * p
                             , float duration
                             , float sizeRatio
                             , Vec2 specificPosition
-                            , GLubyte opacity
+                            , bool isFadeout
                             ) {
     Size size = p->getContentSize();
     size.width *= sizeRatio;
@@ -289,11 +289,12 @@ void guiExt::addScaleEffect(Node * p
     Vec2 position = Vec2::ZERO;
     float fontSize = -1;
     
+    Sprite * pImg = NULL;
+    Label * label = NULL;
     if(img.size() > 0) {
-        auto pImg = gui::inst()->getSprite(img);
+        pImg = gui::inst()->getSprite(img);
         gui::inst()->setScale(pImg, min);
         pImg->setPosition(gui::inst()->getCenter(layer));
-        pImg->setOpacity(opacity);
         
         layer->addChild(pImg);
         grid.y++;
@@ -302,11 +303,19 @@ void guiExt::addScaleEffect(Node * p
     }
     
     if(text.size() > 0) {
-        auto label = gui::inst()->addLabelAutoDimension(position.x, position.y, text, layer, fontSize, ALIGNMENT_CENTER, fontColor.getColor3B(), grid, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO);
+        label = gui::inst()->addLabelAutoDimension(position.x, position.y, text, layer, fontSize, ALIGNMENT_CENTER, fontColor.getColor3B(), grid, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO);
         label->enableGlow(Color4B::BLACK);
         label->setOpacity(fontColor.getA());
     }
     
+    if(isFadeout) {
+        if(pImg) {
+            pImg->runAction(FadeOut::create(duration * 2));
+        }
+        if(label) {
+            label->runAction(FadeOut::create(duration * 2));
+        }
+    }
     runScaleEffect(layer, pCallFunc, duration, true);
     
     p->addChild(layer);
@@ -317,6 +326,7 @@ void guiExt::runScaleEffect(Node * p, CallFunc * pCallFunc, float duration, bool
     float origin = p->getScale();
     actions.pushBack(EaseBackIn::create(ScaleBy::create(duration, 1.2f)));
     actions.pushBack(EaseBackOut::create(ScaleTo::create(duration, origin)));
+    
     if(isRemoveSelf)
         actions.pushBack(RemoveSelf::create());
     if(pCallFunc)
