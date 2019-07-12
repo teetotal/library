@@ -65,8 +65,8 @@ void ui_roulette::init(Size size
     gui::inst()->drawCircle(this, centerInner, mRadius * 0.32, colorBG.getColor4F());
     gui::inst()->drawCircle(this, centerInner, mRadius * 0.3, Color4F::WHITE);
     
-    gui::inst()->drawTriangle(this, l, t, c, mColor.getColorDark().getColor4F());
-    gui::inst()->drawTriangle(this, r, t, c, mColor.getColorDark().getColorDark().getColor4F());
+    gui::inst()->drawTriangle(this, l, t, c, mColor.getColor4F());
+    gui::inst()->drawTriangle(this, r, t, c, mColor.getColorDark().getColor4F());
 }
 
 bool ui_roulette::run(const ccMenuCallback& callback) {
