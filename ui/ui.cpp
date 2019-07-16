@@ -820,8 +820,20 @@ Layout * gui::createLayout(Size size, const string bgImg, bool hasBGColor, Color
         //l->setBackGroundImageScale9Enabled(true);
         auto img = Sprite::create(bgImg);
 //        float min = (l->getContentSize().width > l->getContentSize().height) ? l->getContentSize().height : l->getContentSize().width;
-        img->setScaleX(size.width / img->getContentSize().width);
-        img->setScaleY(size.height / img->getContentSize().height);
+        
+        float ratioX = size.width / img->getContentSize().width;
+        float ratioY = size.height / img->getContentSize().height;
+        Size sizeImg = img->getContentSize();
+        
+        if(sizeImg.height * ratioX < size.height) { //가로만 맞춰도 문제 없으면 가로만
+            img->setScale(ratioX);
+        } else if (sizeImg.width * ratioY < size.width) { //세로만 맞춰도 문제 없으면 세로만
+            img->setScale(ratioY);
+        } else {
+            img->setScaleX(size.width / img->getContentSize().width);
+            img->setScaleY(size.height / img->getContentSize().height);
+        }
+        
         img->setPosition(Vec2(size.width / 2.f, size.height / 2.f));
         l->addChild(img);
     }
