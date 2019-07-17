@@ -5,6 +5,7 @@
 #include "ui_wizard.h"
 #include "ui_progressbar.h"
 #include "ui_roulette.h"
+#include "ui_effect.h"
 #include "ui_icon.h"
 #include "ui_ext.h"
 #include "ui_button.h"
@@ -197,6 +198,8 @@ int WIZARD::_Object::getObjectType(const string type)
         return OBJECT_TYPE_CHECKBOX;
     else if (type.compare("roulette") == 0)
         return OBJECT_TYPE_ROULETTE;
+    else if (type.compare("lighting") == 0)
+        return OBJECT_TYPE_LIGHTING;
 	else if (type.compare("circle") == 0)
 		return OBJECT_TYPE_CIRCLE;
     else if (type.compare("rectangle") == 0)
@@ -1097,6 +1100,10 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 pObj = guiExt::addRoulette(layoutBG, gridSizeWithSpanWithMargin, center, obj.color1, obj.color2, sz);
                 break;
             }
+            case WIZARD::OBJECT_TYPE_LIGHTING:
+                pObj = ui_effect::create();
+                ((ui_effect*)pObj)->addBG(layoutBG, obj.color1);
+                break;
             case WIZARD::OBJECT_TYPE_CIRCLE:
                 pObj = gui::inst()->drawCircle(layoutBG
                                                , circleCenter

@@ -26,22 +26,25 @@ void ui_effect::addBG(Node * parent, COLOR_RGB color, bool isRunRotate) {
     }
     
     Color4B color1 = Color4B(0, 0, 0, 0);
+    Color4B color2 = color.getColorDark().getColor4B();
     mBGGradientLayer = LayerRadialGradient::create( color1
-                                                    , Color4B::BLACK
+                                                    , color2
                                                     , radius
                                                     , gui::inst()->getCenter(parent)
                                                     , 0.3f);
     
-    mBGGradientLayer->setContentSize(parent->getContentSize());
+    mBGGradientLayer->setContentSize(this->getContentSize());
+    
+    
     gui::inst()->setAnchorPoint(mBGLayer, ALIGNMENT_CENTER);
     mBGLayer->setPosition(gui::inst()->getCenter(parent));
+    
     this->addChild(mBGLayer);
     this->addChild(mBGGradientLayer);
     parent->addChild(this);
 }
 
 void ui_effect::drawArc(Node * layer, float radius, float fromDegree, float toDegree, const Color4F color) {
-    CCLOG("%f ~ %f", fromDegree, toDegree);
     DrawNode * arc = DrawNode::create();
     vector<Vec2> vecs;
     Vec2 center = gui::inst()->getCenter(layer);

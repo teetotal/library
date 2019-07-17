@@ -377,3 +377,23 @@ DrawNode * guiExt::drawRectCircleButton(Node * p, Vec2 pos, Size size, COLOR_RGB
     
     return draw;
 }
+
+void guiExt::addBlinkStar(Node * p, CallFunc * pCallFunc, float duration, Color3B color) {
+    Vec2 grid = Vec2(3, 3);
+    auto s1 = gui::inst()->createLabel(0, 1, "+", 0, ALIGNMENT_CENTER, color, p->getContentSize(), grid, Vec2::ZERO, Vec2::ZERO);
+    auto s2 = gui::inst()->createLabel(2, 0, "+", -1, ALIGNMENT_CENTER, color, p->getContentSize(), grid, Vec2::ZERO, Vec2::ZERO);
+    auto s3 = gui::inst()->createLabel(1, 2, "+", -2, ALIGNMENT_CENTER, color, p->getContentSize(), grid, Vec2::ZERO, Vec2::ZERO);
+    const float scale = 1.8f;
+    s1->runAction(
+                  Sequence::create(Spawn::create(RotateBy::create(duration, 180), ScaleBy::create(duration, scale), FadeOut::create(duration), NULL)
+                                   , pCallFunc, NULL)
+                  );
+    duration -= 0.2f;
+    s2->runAction(Spawn::create(RotateBy::create(duration, 270), ScaleBy::create(duration, scale), FadeOut::create(duration), NULL));
+    duration -= 0.2f;
+    s3->runAction(Spawn::create(RotateBy::create(duration, 360), ScaleBy::create(duration, scale), FadeOut::create(duration), NULL));
+    
+    p->addChild(s1);
+    p->addChild(s2);
+    p->addChild(s3);
+}

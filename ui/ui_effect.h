@@ -26,7 +26,7 @@ public:
     };
     
     void addBG(Node * parent, COLOR_RGB color, bool isRunRotate = false);
-    void runBGRotate(float duration = 8.f);
+    void runBGRotate(float duration = 10.f);
     void stopRotate();
     
 private:

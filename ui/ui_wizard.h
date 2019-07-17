@@ -39,6 +39,7 @@ namespace WIZARD {
         OBJECT_TYPE_CHECKBOX,
         
         OBJECT_TYPE_ROULETTE,
+        OBJECT_TYPE_LIGHTING,
         
 		OBJECT_TYPE_CIRCLE,
         
