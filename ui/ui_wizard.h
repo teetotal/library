@@ -266,6 +266,7 @@ protected:
         mNodeMap.clear();
         Node::cleanup();
     };
+    Node * createNode(const Size& Dimension, const Vec2& Origin, const Vec2& Grid, WIZARD::_Node &node, int seq);
     
     Node * mScreen;
     
@@ -276,7 +277,6 @@ private:
 
 	void drawBackground(WIZARD::_Background &bg);
 	void drawNode(WIZARD::_Node &node);
-    Node * createNode(const Size& Dimension, const Vec2& Origin, const Vec2& Grid, WIZARD::_Node &node, int seq);
     
     bool mIsDrawGrid;
     Vec2 mGrid;

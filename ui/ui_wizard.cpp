@@ -638,7 +638,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
         layoutBG->setOpacity(node.color.getA());
     
     layoutBG->setPosition(Vec2(start.x + node.margin.x, end.y + node.margin.y));
-    ScrollView * sv;
+    ScrollView * sv = NULL;
     if (node.color_second.isValidColor) {
         
         auto gradient = LayerRadialGradient::create( node.color_second.getColor4B() //node.color.getColor4B()
@@ -664,7 +664,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
     }
     
     if(node.id >= 0)
-        mNodeMap[node.id] = layoutBG;
+        mNodeMap[node.id] = (sv != NULL) ? sv : layoutBG;
     
 	//draw grid line
     if(mIsDrawGrid) {
@@ -677,9 +677,10 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
 	for (size_t n = 0; n < node.mObjects.size(); n++) {
 		WIZARD::_Object obj = node.mObjects[n];
         
+        int objId = obj.id + seq;
         string sz = obj.text;
         if(obj.id > 0)
-            sz = getText(obj.text, obj.id + seq);
+            sz = getText(obj.text, objId);
         
 		Vec2 center = gui::inst()->getPointVec2(obj.position.x
                                                 , obj.position.y
@@ -825,7 +826,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                                , obj.position.y
                                                                , sz
                                                                , layoutBG
-                                                               , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                               , CC_CALLBACK_1(ui_wizard::callback, this, objId, obj.link)
                                                                , obj.fontSize
                                                                , obj.alignment
                                                                , obj.color
@@ -840,7 +841,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                 pObj = gui::inst()->addTextButtonAutoDimension(obj.position.x, obj.position.y
                    , sz
                    , layoutBG
-                   , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                   , CC_CALLBACK_1(ui_wizard::callback, this, objId, obj.link)
                    , obj.fontSize
                    , obj.alignment
                    , obj.color
@@ -867,7 +868,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , 0
                                                      , sz
                                                      , layoutBG
-                                                     , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                     , CC_CALLBACK_1(ui_wizard::callback, this, objId, obj.link)
                                                      , fontSize
                                                      , ALIGNMENT_CENTER
                                                      , obj.color
@@ -887,7 +888,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             }
             case WIZARD::OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_1: {
                 
-                pObj = ui_button::create(obj.id
+                pObj = ui_button::create(objId
                                          , obj.link
                                          , sz
                                          , layoutBG
@@ -906,7 +907,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             }
             case WIZARD::OBJECT_TYPE_BUTTON_RECT_CIRCLE_SHADOW_2:
             {
-                pObj = ui_button::create(obj.id
+                pObj = ui_button::create(objId
                                          , obj.link
                                          , sz
                                          , layoutBG
@@ -925,7 +926,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             }
             case WIZARD::OBJECT_TYPE_BUTTON_RECT_ROUND_SHADOW:
             {
-                pObj = ui_button::create(obj.id
+                pObj = ui_button::create(objId
                                          , obj.link
                                          , sz
                                          , layoutBG
@@ -1004,7 +1005,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                     , obj.img
                                                     , obj.img_selected
                                                     , layoutBG
-                                                    , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                    , CC_CALLBACK_1(ui_wizard::callback, this, objId, obj.link)
                                                     , obj.alignment
                                                     , layoutBG->getContentSize()
                                                     , node.gridSize
@@ -1031,7 +1032,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                        , obj.img
                                                        , obj.img_selected
                                                        , layoutBG
-                                                       , CC_CALLBACK_1(ui_wizard::callback, this, obj.id, obj.link)
+                                                       , CC_CALLBACK_1(ui_wizard::callback, this, objId, obj.link)
                                                        , ALIGNMENT_CENTER
                                                        , layoutBG->getContentSize()
                                                        , Vec2(1, 1)
@@ -1078,7 +1079,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
                                                      , Vec2::ZERO
                                                      , node.innerMargin
                                                      , obj.span);
-                pObj= ui_progressbar::create(t, getProgressValue(obj.id), pos, gridSizeWithSpanWithMargin, obj.color1, obj.color2, obj.alignment);
+                pObj= ui_progressbar::create(t, getProgressValue(objId), pos, gridSizeWithSpanWithMargin, obj.color1, obj.color2, obj.alignment);
                 if(sz.size() > 0)
                     ((ui_progressbar*)pObj)->setText(sz);
                 
@@ -1221,7 +1222,7 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
 		pObj->setOpacity(obj.opacity);
         pObj->setVisible(obj.visible);
 		if(obj.id >= 0 && obj.type != WIZARD::OBJECT_TYPE_COMPONENT)
-			mNodeMap[obj.id + seq] = pObj;
+			mNodeMap[objId] = pObj;
 	}
     
     //node link
