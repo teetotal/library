@@ -20,9 +20,8 @@ void ui_character_animal::init(Node * parent
           , COLOR_RGB colorPoint
           , COLOR_RGB colorBG)
 {
-    
-    this->setContentSize(size);
-    if(colorBG.isValidColor) {
+    mParentSize = size;
+    if(colorBG.isValidColor && colorBG.getA() > 0) {
         this->setBackGroundColor(colorBG.getColor3B());
         this->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
     }
@@ -223,8 +222,10 @@ void ui_character_animal::addRectangle(ID_EARS nEars
                                        , ID_EYES nEyes
                                        , ID_MOUTH nMouth
                                        , ID_NOSE nNose
-                                       , ID_POINT nPoint) {
+                                       , ID_POINT nPoint)
+{
     mType = TYPE_RECTANGLE;
+    setContentSize(mParentSize);
     //ear
     drawEars(nEars);
     
@@ -247,28 +248,26 @@ void ui_character_animal::addRectangle(ID_EARS nEars
 //    gui::inst()->drawGrid(this, this->getContentSize(), GRID2, Vec2::ZERO, Vec2::ZERO);
 }
 
-void ui_character_animal::addCircle(Size parentSize, Color3B colorBG, Color4F colorSkin, Color4F colorFeatures, Color4F colorPoint) {
-    float f = fmin(parentSize.width, parentSize.height);
-    this->setContentSize(Size(f, f));
+void ui_character_animal::addCircle() {
+    mType = TYPE_CIRCLE;
     
-    this->setBackGroundColor(colorBG);
-    this->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-
+    float f = fmin(mParentSize.width, mParentSize.height);
+    setContentSize(Size(f, f));
     //ear
-    gui::inst()->drawCircle(this, getPositionOnGrid(0, 0), f / 8.f, colorSkin);
-    gui::inst()->drawCircle(this, getPositionOnGrid(3, 0), f / 8.f, colorSkin);
+    gui::inst()->drawCircle(this, getPositionOnGrid(0, 0), f / 8.f, mColorSkin.getColor4F());
+    gui::inst()->drawCircle(this, getPositionOnGrid(3, 0), f / 8.f, mColorSkin.getColor4F());
     
-    gui::inst()->drawCircle(this, getPositionOnGrid(0, 0), f / 12.f, colorFeatures);
-    gui::inst()->drawCircle(this, getPositionOnGrid(3, 0), f / 12.f, colorFeatures);
+    gui::inst()->drawCircle(this, getPositionOnGrid(0, 0), f / 12.f, mColorFeatures.getColor4F());
+    gui::inst()->drawCircle(this, getPositionOnGrid(3, 0), f / 12.f, mColorFeatures.getColor4F());
     //face
-    gui::inst()->drawCircle(this, gui::inst()->getCenter(this), f / 2.f, colorSkin);
+    gui::inst()->drawCircle(this, gui::inst()->getCenter(this), f / 2.f, mColorSkin.getColor4F());
     
     //눈썹
-    gui::inst()->drawRect(this, getPositionOnGrid(1, 1, ALIGNMENT_CENTER_TOP), Size(f / 8, f / 32), colorFeatures);
-    gui::inst()->drawRect(this, getPositionOnGrid(2, 1, ALIGNMENT_CENTER_TOP), Size(f / 8, f / 32), colorFeatures);
+    gui::inst()->drawRect(this, getPositionOnGrid(1, 1, ALIGNMENT_CENTER_TOP), Size(f / 8, f / 32), mColorFeatures.getColor4F());
+    gui::inst()->drawRect(this, getPositionOnGrid(2, 1, ALIGNMENT_CENTER_TOP), Size(f / 8, f / 32), mColorFeatures.getColor4F());
     //eyes
-    gui::inst()->drawCircle(this, getPositionOnGrid(1, 1), f / 16.f, colorFeatures);
-    gui::inst()->drawCircle(this, getPositionOnGrid(2, 1), f / 16.f, colorFeatures);
+    gui::inst()->drawCircle(this, getPositionOnGrid(1, 1), f / 24.f, mColorFeatures.getColor4F());
+    gui::inst()->drawCircle(this, getPositionOnGrid(2, 1), f / 24.f, mColorFeatures.getColor4F());
     
     
     //mouth
@@ -278,17 +277,17 @@ void ui_character_animal::addCircle(Size parentSize, Color3B colorBG, Color4F co
     Vec2 l = getPositionOnGrid(3, 5, ALIGNMENT_CENTER_TOP, Vec2(8,8));
     Vec2 r = getPositionOnGrid(4, 5, ALIGNMENT_CENTER_TOP, Vec2(8,8));
     
-    gui::inst()->drawLine(this, t, c, colorFeatures, f*0.05f);
-    gui::inst()->drawLine(this, c, l, colorFeatures, f*0.1f);
-    gui::inst()->drawLine(this, c, r, colorFeatures, f*0.1f);
+    gui::inst()->drawLine(this, t, c, mColorFeatures.getColor4F(), f*0.05f);
+    gui::inst()->drawLine(this, c, l, mColorFeatures.getColor4F(), f*0.1f);
+    gui::inst()->drawLine(this, c, r, mColorFeatures.getColor4F(), f*0.1f);
     
     //nose
-    gui::inst()->drawCircle(this, getPositionOnGrid(1, 2, ALIGNMENT_RIGHT_TOP), f / 32.f, colorFeatures);
+    gui::inst()->drawCircle(this, getPositionOnGrid(1, 2, ALIGNMENT_RIGHT_TOP), f / 32.f, mColorFeatures.getColor4F());
     
     
     // point
-    gui::inst()->drawCircle(this, getPositionOnGrid(0, 2, ALIGNMENT_RIGHT_TOP), f / 16.f, colorPoint);
-    gui::inst()->drawCircle(this, getPositionOnGrid(3, 2, ALIGNMENT_LEFT_TOP), f / 16.f, colorPoint);
+    gui::inst()->drawCircle(this, getPositionOnGrid(0, 2, ALIGNMENT_RIGHT_TOP), f / 16.f, mColorPoint.getColor4F());
+    gui::inst()->drawCircle(this, getPositionOnGrid(3, 2, ALIGNMENT_LEFT_TOP), f / 16.f, mColorPoint.getColor4F());
     
 //    gui::inst()->drawGrid(this, this->getContentSize(), Vec2(8,8), Vec2::ZERO, Vec2::ZERO);
 }

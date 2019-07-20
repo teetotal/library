@@ -1202,7 +1202,8 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             }
             case WIZARD::OBJECT_TYPE_LAYER:
             {
-                pObj = gui::inst()->createLayout(gridSizeWithSpanWithMargin, obj.img, true, obj.color);
+                bool isBGColor = (obj.color1.isValidColor) ? true : false;
+                pObj = gui::inst()->createLayout(gridSizeWithSpanWithMargin, obj.img, isBGColor, obj.color);
                 gui::inst()->setAnchorPoint(pObj, ALIGNMENT_LEFT_TOP);
                 auto pos = gui::inst()->getPointVec2(obj.position.x, obj.position.y
                                                      , ALIGNMENT_LEFT_TOP

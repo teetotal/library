@@ -89,12 +89,7 @@ public:
                       , ID_NOSE nNose = ID_NOSE_1
                       , ID_POINT nPoint = ID_POINT_1);
     
-    void addCircle(Size size
-                   , Color3B colorBG
-                   , Color4F colorSkin
-                   , Color4F colorFeatures
-                   , Color4F colorPoint
-                   );
+    void addCircle();
 
 private:
     enum ID_LAYOUT {
@@ -109,11 +104,13 @@ private:
     
     enum TYPE {
         TYPE_RECTANGLE,
+        TYPE_CIRCLE,
     };
     Layout * mLayout[ID_LAYOUT_MAX];
     Node * mParent;
     COLOR_RGB mColorSkin, mColorFeatures, mColorPoint;
     TYPE mType;
+    Size mParentSize;
     
     #define GRID Vec2(4,4)
     #define GRID2 Vec2(8,8)
