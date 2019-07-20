@@ -825,21 +825,27 @@ Layout * gui::createLayout(Size size, const string bgImg, bool hasBGColor, Color
         float ratioY = size.height / img->getContentSize().height;
         Size sizeImg = img->getContentSize();
         
-        if(sizeImg.height * ratioX < size.height) { //가로만 맞춰도 문제 없으면 가로만
+        if(sizeImg.height * ratioX <= size.height) { //가로만 맞춰도 문제 없으면 가로만
             img->setScale(ratioX);
-        } else if (sizeImg.width * ratioY < size.width) { //세로만 맞춰도 문제 없으면 세로만
-            img->setScale(ratioY);
+        } else if (sizeImg.width * ratioY <= size.width) { //세로만 맞춰도 문제 없으면 세로만
+            float width = sizeImg.width * ratioY;
+            int count = size.width / width;
+            for(int n=0; n<count; n++) {
+                auto p = Sprite::create(bgImg);
+                p->setAnchorPoint(Vec2::ZERO);
+                p->setScale(ratioY);
+                p->setPosition(Vec2(n * width, 0));
+                l->addChild(p);
+            }
+            
         } else {
             img->setScaleX(size.width / img->getContentSize().width);
             img->setScaleY(size.height / img->getContentSize().height);
+            
+            img->setPosition(Vec2(size.width / 2.f, size.height / 2.f));
+            l->addChild(img);
         }
-        
-        img->setPosition(Vec2(size.width / 2.f, size.height / 2.f));
-        l->addChild(img);
     }
-    
-    
-    
     return l;
 }
 

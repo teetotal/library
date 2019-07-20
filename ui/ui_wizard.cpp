@@ -780,10 +780,6 @@ Node * ui_wizard::createNode(const Size& Dimension, const Vec2& Origin, const Ve
             break;
         }
         
-//        COLOR_RGB color1, color2;
-//        color1.set(obj.color, obj.opacity);
-//        color2.set(obj.color_second, obj.opacity_second);
-        
         Node * pObj;
         switch(obj.type) {
             case WIZARD::OBJECT_TYPE_LABEL:

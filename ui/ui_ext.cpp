@@ -381,23 +381,27 @@ DrawNode * guiExt::drawRectCircleButton(Node * p, Vec2 pos, Size size, COLOR_RGB
 void guiExt::addBlinkStar(Node * p, CallFunc * pCallFunc, float d, Color3B color) {
     float duration = d;
     Vec2 grid = Vec2(3, 3);
-    auto s1 = gui::inst()->createLabel(0, 1, "+", 0, ALIGNMENT_CENTER, color, p->getContentSize(), grid, Vec2::ZERO, Vec2::ZERO);
-    auto s2 = gui::inst()->createLabel(2, 0, "+", -1, ALIGNMENT_CENTER, color, p->getContentSize(), grid, Vec2::ZERO, Vec2::ZERO);
-    auto s3 = gui::inst()->createLabel(1, 2, "+", -2, ALIGNMENT_CENTER, color, p->getContentSize(), grid, Vec2::ZERO, Vec2::ZERO);
+    auto s1 = gui::inst()->createLabel(0, 1, "+", -1, ALIGNMENT_CENTER, color, p->getContentSize(), grid, Vec2::ZERO, Vec2::ZERO);
+    auto s2 = gui::inst()->createLabel(2, 0, "+", 0, ALIGNMENT_CENTER, color, p->getContentSize(), grid, Vec2::ZERO, Vec2::ZERO);
+    auto s3 = gui::inst()->createLabel(2, 2, "+", -2, ALIGNMENT_CENTER, color, p->getContentSize(), grid, Vec2::ZERO, Vec2::ZERO);
     const float scale = 1.8f;
     s1->runAction(
-                  Sequence::create(Spawn::create(RotateBy::create(duration, 180), ScaleBy::create(duration, scale), FadeOut::create(duration), NULL)
+                  Sequence::create(Spawn::create(RotateBy::create(duration, 270), ScaleBy::create(duration, scale), FadeOut::create(duration), NULL)
                                    , pCallFunc, NULL)
                   );
     duration = d * 0.75f;
     s2->runAction(Sequence::create(
-                                   DelayTime::create(d * 0.25f)
+                                   Hide::create()
+                                   , DelayTime::create(d * 0.25f)
+                                   , Show::create()
                                    , Spawn::create(RotateBy::create(duration, 270), ScaleBy::create(duration, scale), FadeOut::create(duration), NULL)
                                    , NULL)
                                    );
-    duration = d * 0.25f;
+    duration = d * 0.5f;
     s3->runAction(Sequence::create(
-                                   DelayTime::create(d * 0.75f)
+                                   Hide::create()
+                                   , DelayTime::create(d * 0.5f)
+                                   , Show::create()
                                    , Spawn::create(RotateBy::create(duration, 360), ScaleBy::create(duration, scale), FadeOut::create(duration), NULL)
                                    , NULL
                                    ));
