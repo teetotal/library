@@ -212,7 +212,7 @@ private:
     
     bool mEnable, mIsChecked;
     void drawUnchecked(COLOR_RGB color);
-    
+    COLOR_RGB mColorFont;
     Size mCheckboxSize;
 };
 #endif /* ui_button_h */

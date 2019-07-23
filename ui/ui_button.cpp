@@ -162,7 +162,7 @@ void ui_checkbox::init(Node * p
     float scale = gui::inst()->getScaleDefine(sizeDefine);
     Size size = Size(sizePerGrid.height * scale, sizePerGrid.height * scale);
     mCheckboxSize = size;
-    
+    mColorFont.set(colorFont);
     //checkbox
     drawUnchecked(color);
     
@@ -171,12 +171,11 @@ void ui_checkbox::init(Node * p
     float fontSize = gui::inst()->getFontSizeDefine(mCheckboxSize, -2);
     mNodes.labelChecked = Label::createWithSystemFont("V", SYSTEM_FONT_NAME, fontSize);
 //    mNodes.labelChecked = Label::createWithTTF("V", gui::inst()->mDefaultFont, fontSize);
-    mNodes.labelChecked->setColor(color.getColor3B());
+    mNodes.labelChecked->setColor(color.getColorDark().getColor3B());
     mNodes.labelChecked->setPosition(center);
 //    mNodes.labelChecked->enableBold();
 //    mNodes.labelChecked->enableGlow(Color4B::BLACK);
     this->addChild(mNodes.labelChecked);
-    setChecked(mIsChecked);
     
     mNodes.label = Label::createWithTTF(text, gui::inst()->mDefaultFont
                                         , gui::inst()->getFontSizeDefine(size, 0));
@@ -194,6 +193,7 @@ void ui_checkbox::init(Node * p
     gui::inst()->setAnchorPoint(this, align);
     
     p->addChild(this);
+    setChecked(mIsChecked);
 }
 
 void ui_checkbox::drawUnchecked(COLOR_RGB color) {
@@ -215,6 +215,9 @@ void ui_checkbox::drawUnchecked(COLOR_RGB color) {
 void ui_checkbox::setChecked(bool isChecked) {
     mIsChecked = isChecked;
     mNodes.labelChecked->setVisible(mIsChecked);
+    
+    if(mNodes.label)
+        mNodes.label->setColor((isChecked) ? mColorFont.getColor3B() : mColorFont.getColorLight().getColor3B());
 }
 
 void ui_checkbox::setEnabled(bool enable) {
