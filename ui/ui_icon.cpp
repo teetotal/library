@@ -100,7 +100,8 @@ void ui_icon::addCircle(Node * p
     //img
     if(img.size() > 0) {
         mNodes.sprite = gui::inst()->getSprite(img);
-        gui::inst()->setScale(mNodes.sprite, innerCircleRadius * 2 * 0.8f);
+        mSpriteSize = innerCircleRadius * 2 * 0.8f;
+        gui::inst()->setScale(mNodes.sprite, mSpriteSize);
         mNodes.sprite->setPosition(centerInner);
         this->addChild(mNodes.sprite);
     }
@@ -167,4 +168,12 @@ void ui_icon::setText(const string sz) {
         Size size = this->getContentSize();
         this->setContentSize(Size(size.width + f, size.height));
     }
-};
+}
+
+void ui_icon::replaceImg(const string sz) {
+    if(mNodes.sprite) {
+        auto spriteFrame = gui::inst()->getSpriteFrame(sz);
+        mNodes.sprite->setSpriteFrame(spriteFrame);
+        gui::inst()->setScale(mNodes.sprite, mSpriteSize);
+    }
+}

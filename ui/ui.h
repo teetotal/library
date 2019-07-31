@@ -140,6 +140,16 @@ public:
         init(font, GRID_DEFAULT_FONT_SIZE, Color4F::WHITE, true);
     };
     // get sprite  --------------------------------------------------------------------------------
+    SpriteFrame * getSpriteFrame(const string img) {
+        if(mUseSpriteCache) {
+            if (SpriteFrameCache::getInstance()->getSpriteFrameByName(img) == NULL)
+                SpriteFrameCache::getInstance()->addSpriteFrame(Sprite::create(img)->getSpriteFrame(), img);
+            
+            return SpriteFrameCache::getInstance()->getSpriteFrameByName(img);
+        }
+        return Sprite::create(img)->getSpriteFrame();
+    };
+    
     Sprite * getSprite(const string img) {
         if(mUseSpriteCache) {
             if (SpriteFrameCache::getInstance()->getSpriteFrameByName(img) == NULL)

@@ -47,6 +47,7 @@ public:
                    , const float fontSize = 0);
     
     void setText(const string sz);
+    void replaceImg(const string sz);
     
     inline void setTextColor(const Color3B& color) {
         if(mNodes.label) {
@@ -86,5 +87,6 @@ private:
     bool mEnable;
     bool mEnableGlow;
     Color4B mColorGlow;
+    float mSpriteSize;
 };
 #endif /* ui_icon_h */
