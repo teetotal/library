@@ -55,7 +55,10 @@ public:
         p->addChild(this);
     };
     const float getValue() {
-        return mValue;
+        mLock.lock();
+        const float val = mValue;
+        mLock.unlock();
+        return val;
     };
     const float setValue(float f);
     const float setValueIncrese(float f) {
@@ -91,5 +94,7 @@ private:
         ZORDER_TEXT,
         ZORDER_PERCENTAGE
     };
+    
+    mutex mLock;
 };
 #endif /* ui_progressbar_h */

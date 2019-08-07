@@ -49,6 +49,7 @@ void ui_progressbar::init(UI_PROGRESSBAR_TYPE type
 }
 
 const float ui_progressbar::setValue(float f) {
+    mLock.lock();
     if(mBar) {
         this->removeChild(mBar);
     }
@@ -56,7 +57,10 @@ const float ui_progressbar::setValue(float f) {
     mValue = std::fmin(1.f, f);
     if(mValue <= 0.f) {
         mValue = 0.f;
-        return mValue;
+        const float val = mValue;
+        mLock.unlock();
+        
+        return val;
     }
     Size size = this->getContentSize();
     float margin2 = mMargin;// + (mMargin * .5f);
@@ -101,7 +105,10 @@ const float ui_progressbar::setValue(float f) {
     }
    
     this->addChild(mBar, ZORDER_VALUE);
-    return mValue;
+    const float val = mValue;
+    mLock.unlock();
+    
+    return val;
 }
 
 void ui_progressbar::blink(float duration, int blinks) {
