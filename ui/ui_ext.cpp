@@ -344,7 +344,7 @@ void guiExt::runScaleEffect(Node * p, CallFunc * pCallFunc, float duration, bool
   
 }
 
-void guiExt::runFlyEffect(Node * p, CallFunc * pCallFunc, float duration, bool isDown) {
+void guiExt::runFlyEffect(Node * p, CallFunc * pCallFunc, float duration, bool isDown, bool isRemoveSelf) {
     Vec2 direction = Vec2(p->getContentSize().width / 2.f, p->getContentSize().height * 1.5f);
     if(isDown) {
         direction.x *= -1.f;
@@ -355,7 +355,13 @@ void guiExt::runFlyEffect(Node * p, CallFunc * pCallFunc, float duration, bool i
                                   , FadeOut::create(duration)
                                   , NULL
                                   );
-    Sequence * seq = Sequence::create(spawn, RemoveSelf::create(), pCallFunc, NULL);
+    Vector<FiniteTimeAction *> actions;
+    actions.pushBack(spawn);
+    if(isRemoveSelf)
+        actions.pushBack(RemoveSelf::create());
+    if(pCallFunc)
+        actions.pushBack(pCallFunc);
+    Sequence * seq = Sequence::create(actions);
     p->runAction(seq);
 }
 
